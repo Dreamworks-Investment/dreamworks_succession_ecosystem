@@ -22,6 +22,11 @@ const AppState = {
   autosaveTimer: null
 };
 
+// Capture the entry route while the document is still being parsed. This keeps
+// refreshable case/chapter deep links stable even when other modules initialise
+// on DOMContentLoaded and update History state.
+const INITIAL_ROUTE_HASH = window.location.hash.replace(/^#/, '');
+
 // Load saved state from localStorage
 function loadSavedState() {
   try {
@@ -89,6 +94,12 @@ function navigateTo(page, options = {}) {
   document.querySelectorAll('.page').forEach(el => {
     el.classList.toggle('active', el === targetPage);
   });
+
+  // The strategy landing page is now a case library. Generic navigation to
+  // “战略与实践” returns to the library; direct case/chapter routes opt out.
+  if (page === 'strategy' && !options.preserveStrategyView && typeof strategyShowHub === 'function') {
+    strategyShowHub({ pushHistory: false, scroll: false });
+  }
 
   if (typeof updateBackToCycleButton === 'function') {
     updateBackToCycleButton(page);
@@ -173,18 +184,32 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Restore direct links such as #strategy / #wealth and initialise History state.
-  const requested = window.location.hash.replace('#', '');
+  const requested = INITIAL_ROUTE_HASH || window.location.hash.replace(/^#/, '');
   const internalPages = ['home', 'strategy', 'wealth', 'trust', 'academy'];
   if (requested === 'strategy-chapter1' || requested === 'strategy-chapter2') {
     const strategyChapter = requested === 'strategy-chapter2' ? 2 : 1;
-    navigateTo('strategy', { skipHistory: true, scroll: false });
+    navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
     try {
       window.history.replaceState(
-        { page: 'strategy', strategyChapter },
+        { page: 'strategy', strategyChapter, strategyCase: 'skyworth' },
         '',
         '#' + requested
       );
     } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof strategyOpenSkyworthDepth === 'function') {
+        strategyOpenSkyworthDepth(strategyChapter, { replaceHistory: true, scroll: false });
+      }
+    }, 0);
+  } else if (requested.startsWith('strategy-case-')) {
+    const strategyCase = requested.replace('strategy-case-', '');
+    navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
+    try { window.history.replaceState({ page: 'strategy', strategyCase }, '', '#' + requested); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof strategyOpenCase === 'function') {
+        strategyOpenCase(strategyCase, { replaceHistory: true, scroll: false });
+      }
+    }, 0);
   } else if (internalPages.includes(requested)) {
     navigateTo(requested, { skipHistory: true });
     try { window.history.replaceState({ page: requested }, '', '#' + requested); } catch (error) {}
@@ -198,7 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('popstate', (event) => {
     const page = event.state && event.state.page ? event.state.page : 'home';
-    navigateTo(page, { skipHistory: true });
+    const preserveStrategyView = page === 'strategy' && event.state &&
+      (event.state.strategyCase || event.state.strategyChapter || event.state.strategyView);
+    navigateTo(page, { skipHistory: true, preserveStrategyView });
     if (event.state && event.state.anchor === 'home-value-cycle') {
       window.setTimeout(() => {
         if (typeof scrollHomeJourneyTo === 'function') scrollHomeJourneyTo('home-value-cycle');

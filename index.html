@@ -10,6 +10,7 @@
 <link href="css/strategy-roadmap.css" rel="stylesheet"/>
 <link href="css/strategy-chapter2-original.css" rel="stylesheet"/>
 <link href="css/strategy-chapter2-presentation.css" rel="stylesheet"/><link href="css/strategy-chapter-split.css" rel="stylesheet"/>
+<link href="css/strategy-case-gallery.css" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
@@ -337,13 +338,58 @@
 </article>
 </section>
 <!-- ===================== STRATEGY ===================== -->
-<section class="page strategy-roadmap-page" id="page-strategy">
+<section class="page strategy-roadmap-page strategy-hub-active" id="page-strategy">
+<article class="strategy-case-hub" id="strategy-case-hub">
+<section class="strategy-hub-hero" aria-labelledby="strategy-hub-title">
+<div class="strategy-case-shell strategy-hub-hero-grid">
+<div class="strategy-hub-copy">
+<p class="strategy-hub-kicker">战略定位 × 企业价值增进</p>
+<h1 id="strategy-hub-title">定位是中心，<span>价值才是核心</span></h1>
+<p class="strategy-hub-lead">把“让企业更值钱”拆成可诊断、可推演、可执行的系统：找对价值鱼塘，聚焦运营配称，占据用户心智，并用长期结果检验战略。</p>
+<div class="strategy-hub-actions">
+<button class="btn btn-primary" onclick="strategyScrollToCases()" type="button">翻阅合作案例</button>
+<button class="btn btn-secondary" onclick="strategyOpenCase('skyworth')" type="button">查看创维完整案例</button>
+</div>
+<div class="strategy-hub-proof" aria-label="价值增进信用状">
+<span>1998 起 · 商业模式实践</span>
+<span>战略定位方法</span>
+<span>企业家视角</span>
+</div>
+</div>
+<div class="strategy-value-model" aria-label="企业价值由回报率、增长率和可持续时间共同构成">
+<div class="strategy-value-cube" aria-hidden="true">
+<span class="cube-face cube-front"></span><span class="cube-face cube-top"></span><span class="cube-face cube-side"></span>
+</div>
+<div class="strategy-value-axis axis-r"><strong>R</strong><span>回报率</span><small>定位找对价值鱼塘</small></div>
+<div class="strategy-value-axis axis-g"><strong>G</strong><span>增长率</span><small>运营配称聚焦</small></div>
+<div class="strategy-value-axis axis-s"><strong>S</strong><span>可持续时间</span><small>心智护城河</small></div>
+<div class="strategy-value-caption"><b>企业价值</b><span>R × G × S</span></div>
+</div>
+</div>
+</section>
+<section class="strategy-case-showcase" id="strategy-cases" aria-labelledby="strategy-cases-title">
+<div class="strategy-case-shell">
+<header class="strategy-case-heading">
+<div><p class="strategy-hub-kicker" id="strategy-case-counter">案例库 · 01 / 10</p><h2 id="strategy-cases-title">十个合作项目，一套通用翻阅方式</h2></div>
+<p>先看案例主页，再下钻报告、演示稿与研究附件。创维汽车作为第一案，完整双章节内容保留在下一层。</p>
+</header>
+<div class="strategy-case-carousel" aria-label="上市公司及重要合作机构案例" tabindex="0">
+<button class="strategy-case-arrow prev" id="strategy-case-prev" type="button" aria-label="上一个案例">←</button>
+<div id="strategy-case-carousel-stage"></div>
+<button class="strategy-case-arrow next" id="strategy-case-next" type="button" aria-label="下一个案例">→</button>
+</div>
+<div class="strategy-case-dots" id="strategy-case-dots" aria-label="选择案例"></div>
+</div>
+</section>
+</article>
+<article class="strategy-case-detail" id="strategy-case-detail" aria-live="polite" hidden></article>
+<div class="strategy-case-depth" id="strategy-skyworth-case">
 <!-- Breadcrumb -->
 <div class="strategy-roadmap-shell">
 <nav aria-label="当前位置" class="strategy-breadcrumb">
 <a onclick="navigateTo('home')" style="cursor:pointer;">首页</a>
 <span class="sep">/</span>
-<a onclick="navigateTo('strategy')" style="cursor:pointer;">战略与实践</a>
+<a onclick="strategyOpenCase('skyworth')" style="cursor:pointer;">创维汽车案例主页</a>
 <span class="sep">/</span>
 <span class="current" id="strategy-breadcrumb-current">第一章 · 创维汽车战略定位的推演之路</span>
 </nav>
@@ -351,6 +397,7 @@
 <!-- Chapter-level navigation -->
 <div aria-label="战略与实践章节切换" class="strategy-chapterbar" role="tablist">
 <div class="strategy-chapterbar-inner">
+<button class="strategy-case-backlink" onclick="strategyOpenCase('skyworth')" type="button">← 创维案例主页</button>
 <button aria-controls="strategy-chapter-view-1" aria-selected="true" class="strategy-chapter-tab active" data-chapter="1" data-chapter-target="roadmap-overview" onclick="strategyOpenChapter(1, { pushHistory: true, scroll: true })" role="tab" type="button">
 <span class="strategy-chapter-index">第一章</span>
 <span>创维汽车战略定位的推演之路</span>
@@ -1813,6 +1860,7 @@
 </div>
 </section>
 </div>
+</div>
 </section>
 <!-- ===================== VALUE INVESTING ===================== -->
 <!-- “狠值投资”由独立后端应用提供登录与Bearer token管理；本站只打开其公开根入口 -->
@@ -2196,6 +2244,8 @@
 <script src="js/wealth.js?v=11.8.1"></script>
 <script src="js/report.js"></script>
 <script src="js/strategy-agent-config.js"></script><script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
+<script src="js/strategy-cases-data.js"></script>
+<script src="js/strategy-cases.js"></script>
 <script src="js/strategy.js"></script>
 <script src="js/academy-assessment.js"></script>
 </body>

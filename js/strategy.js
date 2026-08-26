@@ -305,7 +305,8 @@ function updateActiveStrategySection() {
     if (!page) return;
 
     function syncPageState() {
-      StrategyChapterState.pageActive = page.classList.contains('active');
+      StrategyChapterState.pageActive = page.classList.contains('active') &&
+        page.classList.contains('strategy-depth-active');
       if (StrategyChapterState.pageActive) {
         var chapter = chapterFromLocation();
         strategyOpenChapter(chapter, { scroll: false });
