@@ -1,0 +1,488 @@
+
+/* ===================== V10.8 Strategy chapter split views ===================== */
+.strategy-chapter-view {
+  display: none;
+}
+
+.strategy-chapter-view.active {
+  display: block;
+}
+
+.strategy-chapter-view[aria-hidden="true"] {
+  display: none !important;
+}
+
+.strategy-chapter-handoff {
+  padding: 88px 28px 104px;
+  border-top: 1px solid rgba(26, 26, 46, .08);
+}
+
+.strategy-chapter-handoff-next {
+  background:
+    linear-gradient(90deg, rgba(212, 175, 55, .08), transparent 38%),
+    #fafaf7;
+}
+
+.strategy-chapter-handoff-track {
+  display: grid;
+  grid-template-columns: 18px minmax(80px, 1fr) 38px 18px;
+  align-items: center;
+  max-width: 760px;
+  margin: 0 auto 28px;
+}
+
+.strategy-chapter-handoff-track .track-dot {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #d4af37;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.strategy-chapter-handoff-track .track-dot.active {
+  background: #d4af37;
+}
+
+.strategy-chapter-handoff-track .track-line {
+  height: 1px;
+  background: linear-gradient(90deg, #d4af37, rgba(212, 175, 55, .25));
+}
+
+.strategy-chapter-handoff-track .track-arrow {
+  color: #d4af37;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.strategy-chapter-handoff-copy {
+  max-width: 920px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.strategy-chapter-handoff-copy h2,
+.strategy-agent-copy h2 {
+  margin: 12px 0 18px;
+  color: #1a1a2e;
+  font-size: clamp(2rem, 3.4vw, 3.4rem);
+  line-height: 1.22;
+  letter-spacing: -.035em;
+}
+
+.strategy-chapter-handoff-copy > p:not(.strategy-roadmap-kicker) {
+  max-width: 760px;
+  margin: 0 auto 32px;
+  color: #5d6075;
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
+
+.strategy-chapter-flip {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 22px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid rgba(212, 175, 55, .42);
+  border-radius: 18px;
+  background: #1a1a2e;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 18px 45px rgba(26, 26, 46, .15);
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.strategy-chapter-flip:hover,
+.strategy-chapter-flip:focus-visible {
+  transform: translateY(-3px);
+  border-color: #d4af37;
+  box-shadow: 0 24px 52px rgba(26, 26, 46, .2);
+  outline: none;
+}
+
+.strategy-chapter-flip span {
+  display: grid;
+  gap: 6px;
+}
+
+.strategy-chapter-flip small {
+  color: #d4af37;
+  font-size: .78rem;
+  font-weight: 760;
+  letter-spacing: .12em;
+}
+
+.strategy-chapter-flip strong {
+  color: #fff;
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  line-height: 1.4;
+}
+
+.strategy-chapter-flip b {
+  color: #d4af37;
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.strategy-agent-handoff {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(212, 175, 55, .12), transparent 32%),
+    #f4f1e9;
+}
+
+.strategy-agent-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr);
+  gap: 42px;
+  align-items: center;
+}
+
+.strategy-agent-copy > p:not(.strategy-roadmap-kicker):not(.strategy-agent-status) {
+  color: #5d6075;
+  font-size: 1.02rem;
+  line-height: 1.85;
+}
+
+.strategy-agent-question-list {
+  display: grid;
+  gap: 10px;
+  margin: 26px 0;
+}
+
+.strategy-agent-question-list span {
+  padding: 13px 16px;
+  border-left: 3px solid #d4af37;
+  background: rgba(255, 255, 255, .72);
+  color: #313348;
+  border-radius: 0 12px 12px 0;
+  font-size: .92rem;
+  line-height: 1.55;
+}
+
+.strategy-agent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.strategy-interaction-btn {
+  display: none;
+}
+
+.strategy-interaction-btn.visible {
+  display: inline-flex;
+}
+
+.strategy-interaction-placeholder {
+  display: inline-flex;
+  opacity: .68;
+  cursor: not-allowed;
+}
+
+.strategy-agent-status {
+  margin-top: 14px;
+  color: #77798b;
+  font-size: .82rem;
+  line-height: 1.65;
+}
+
+.strategy-agent-status code {
+  color: #1a1a2e;
+  background: rgba(26, 26, 46, .07);
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+.strategy-agent-terminal {
+  overflow: hidden;
+  border: 1px solid rgba(26, 26, 46, .12);
+  border-radius: 18px;
+  background: #17182b;
+  box-shadow: 0 24px 55px rgba(26, 26, 46, .18);
+}
+
+.strategy-agent-terminal-head {
+  height: 48px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #24263c;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.strategy-agent-terminal-head > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.28);
+}
+
+.strategy-agent-terminal-head strong {
+  margin-left: 8px;
+  color: rgba(255,255,255,.78);
+  font-size: .82rem;
+  font-weight: 600;
+}
+
+.strategy-agent-terminal-body {
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+}
+
+.strategy-agent-terminal-body p {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: .9rem;
+  line-height: 1.7;
+}
+
+.strategy-agent-terminal-body .user {
+  justify-self: end;
+  max-width: 88%;
+  background: rgba(212, 175, 55, .14);
+  color: #f7f0d4;
+  border: 1px solid rgba(212, 175, 55, .22);
+}
+
+.strategy-agent-terminal-body .agent {
+  justify-self: start;
+  max-width: 94%;
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.84);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.strategy-agent-terminal-body .hint {
+  padding: 0;
+  color: #d4af37;
+  background: none;
+  border: 0;
+  font-size: .78rem;
+  letter-spacing: .06em;
+}
+
+/* ===================== V10.8 Positioning triangle gate ===================== */
+.ch2-positioning-gate {
+  margin-top: 34px;
+  padding: 34px;
+  display: grid;
+  grid-template-columns: minmax(250px, .72fr) minmax(520px, 1.28fr);
+  gap: 34px;
+  align-items: center;
+  background: linear-gradient(145deg, #fff, #faf8f2);
+  border: 1px solid rgba(26, 26, 46, .10);
+  border-radius: 22px;
+  box-shadow: 0 18px 48px rgba(26, 26, 46, .07);
+}
+
+.ch2-positioning-gate-copy h3 {
+  margin: 14px 0 16px;
+  color: #1a1a2e;
+  font-size: clamp(1.55rem, 2.2vw, 2.2rem);
+  line-height: 1.35;
+}
+
+.ch2-positioning-gate-copy > p {
+  margin: 0;
+  color: #626477;
+  line-height: 1.85;
+}
+
+.ch2-positioning-gate-result {
+  margin-top: 24px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border-left: 3px solid #d4af37;
+  background: rgba(212, 175, 55, .08);
+  border-radius: 0 12px 12px 0;
+}
+
+.ch2-positioning-gate-result strong {
+  color: #1a1a2e;
+}
+
+.ch2-positioning-gate-result span {
+  color: #77798b;
+  font-size: .88rem;
+}
+
+.ch2-positioning-triangle {
+  position: relative;
+  width: min(100%, 720px);
+  aspect-ratio: 720 / 610;
+  margin: 0 auto;
+}
+
+.ch2-positioning-triangle > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ch2-positioning-triangle polygon,
+.ch2-positioning-triangle line {
+  fill: none;
+  stroke: rgba(26, 26, 46, .22);
+  stroke-width: 2;
+}
+
+.ch2-positioning-triangle circle {
+  fill: #fff;
+  stroke: rgba(212, 175, 55, .72);
+  stroke-width: 3;
+  filter: drop-shadow(0 10px 24px rgba(26, 26, 46, .10));
+}
+
+.gate-card,
+.gate-center {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.gate-card {
+  width: 190px;
+  min-height: 118px;
+  padding: 16px 18px;
+  background: #fff;
+  border: 1px solid rgba(26, 26, 46, .12);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(26, 26, 46, .08);
+}
+
+.gate-card span {
+  color: #d4af37;
+  font-size: .7rem;
+  font-weight: 780;
+  letter-spacing: .12em;
+}
+
+.gate-card strong {
+  color: #1a1a2e;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.gate-card small {
+  color: #747689;
+  font-size: .76rem;
+  line-height: 1.55;
+}
+
+.gate-mind { left: 50%; top: 10%; }
+.gate-internal { left: 15%; top: 84%; }
+.gate-external { left: 85%; top: 84%; }
+
+.gate-center {
+  left: 50%;
+  top: 51%;
+  width: 175px;
+  height: 175px;
+  padding: 22px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.gate-center span {
+  color: #888a9a;
+  font-size: .72rem;
+  letter-spacing: .1em;
+}
+
+.gate-center strong {
+  color: #1a1a2e;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.gate-center small {
+  color: #d4af37;
+  font-size: .75rem;
+  font-weight: 760;
+}
+
+@media (max-width: 980px) {
+  .strategy-agent-grid,
+  .ch2-positioning-gate {
+    grid-template-columns: 1fr;
+  }
+
+  .strategy-agent-terminal {
+    max-width: 720px;
+  }
+
+  .ch2-positioning-triangle {
+    width: min(100%, 680px);
+  }
+}
+
+@media (max-width: 720px) {
+  .strategy-chapter-handoff {
+    padding: 68px 18px 78px;
+  }
+
+  .strategy-chapter-flip {
+    padding: 19px 18px;
+  }
+
+  .strategy-agent-terminal-body {
+    padding: 20px;
+  }
+
+  .ch2-positioning-gate {
+    padding: 24px 18px;
+  }
+
+  .ch2-positioning-triangle {
+    aspect-ratio: auto;
+    min-height: 540px;
+  }
+
+  .ch2-positioning-triangle > svg {
+    display: none;
+  }
+
+  .gate-card,
+  .gate-center {
+    position: static;
+    transform: none;
+    width: 100%;
+    min-height: auto;
+    margin-bottom: 12px;
+    border-radius: 14px;
+  }
+
+  .gate-center {
+    height: auto;
+    padding: 20px;
+    border: 1px solid rgba(212, 175, 55, .55);
+  }
+
+  .ch2-positioning-triangle {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .gate-mind { order: 1; }
+  .gate-internal { order: 2; }
+  .gate-external { order: 3; }
+  .gate-center { order: 4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strategy-chapter-flip {
+    transition: none;
+  }
+}

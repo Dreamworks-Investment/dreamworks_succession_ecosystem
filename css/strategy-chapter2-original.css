@@ -1,0 +1,215 @@
+
+/* ==========================================================================
+   第二章 · 创维汽车战略定位最终方案 · 原稿复刻版
+   目标：保持原话、原表格、原页面顺序与原排版，不进行观众化重构。
+   ========================================================================== */
+
+.strategy-toc-inner {
+  position: relative;
+}
+
+.strategy-toc-group {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  min-width: max-content;
+}
+
+.strategy-toc-group.active {
+  display: flex;
+}
+
+.strategy-original-chapter {
+  padding: 76px 0 96px;
+  background:
+    linear-gradient(180deg, rgba(26,26,46,.035), transparent 260px),
+    #f6f5f0;
+  scroll-margin-top: 172px;
+}
+
+.strategy-original-intro {
+  max-width: 920px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.strategy-original-intro h2 {
+  margin: 18px 0 16px;
+  color: #1a1a2e;
+  font-size: clamp(2rem, 3.5vw, 3.25rem);
+  line-height: 1.18;
+  letter-spacing: -.025em;
+}
+
+.strategy-original-intro > p {
+  max-width: 820px;
+  margin: 0 auto;
+  color: #666676;
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.strategy-original-fidelity {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.strategy-original-fidelity span {
+  padding: 8px 14px;
+  border: 1px solid rgba(212,175,55,.38);
+  border-radius: 999px;
+  background: rgba(255,255,255,.82);
+  color: #69591d;
+  font-size: .82rem;
+  font-weight: 600;
+}
+
+.strategy-original-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.strategy-original-pages {
+  display: grid;
+  gap: 36px;
+  width: min(100%, 1100px);
+  margin: 0 auto;
+}
+
+.strategy-original-page {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid #e8e4db;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(26,26,46,.075);
+  scroll-margin-top: 172px;
+}
+
+.strategy-original-page-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 4px 14px;
+  border-bottom: 1px solid #eeeae1;
+  color: #6f6d75;
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.strategy-original-page-meta span {
+  color: #a38319;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.strategy-original-page-meta strong {
+  color: #3b3a48;
+  font-weight: 600;
+  text-align: right;
+}
+
+.strategy-original-page img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 18px;
+  border: 0;
+  background: #fff;
+}
+
+.strategy-original-end {
+  max-width: 900px;
+  margin: 52px auto 0;
+  padding: 34px;
+  border: 1px solid rgba(212,175,55,.3);
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 12px 36px rgba(26,26,46,.05);
+}
+
+.strategy-original-end > span {
+  color: #b18d1c;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.strategy-original-end p {
+  margin: 12px auto 22px;
+  color: #666676;
+  line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+  .strategy-original-chapter {
+    padding-top: 56px;
+  }
+
+  .strategy-original-pages {
+    gap: 24px;
+  }
+
+  .strategy-original-page {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .strategy-original-page-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+    padding: 3px 4px 10px;
+  }
+
+  .strategy-original-page-meta strong {
+    text-align: left;
+  }
+
+  .strategy-original-page img {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .strategy-original-chapter {
+    padding: 44px 0 72px;
+  }
+
+  .strategy-original-intro {
+    text-align: left;
+  }
+
+  .strategy-original-fidelity,
+  .strategy-original-actions {
+    justify-content: flex-start;
+  }
+
+  .strategy-original-page {
+    padding: 6px;
+    box-shadow: 0 8px 24px rgba(26,26,46,.06);
+  }
+
+  .strategy-original-page-meta {
+    padding: 6px 8px 10px;
+  }
+
+  .strategy-original-end {
+    padding: 26px 20px;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strategy-original-page {
+    scroll-behavior: auto;
+  }
+}

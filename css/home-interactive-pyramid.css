@@ -1,0 +1,703 @@
+
+/* ============================================================
+   V11.1 · 大型价值金字塔总览 + 全宽里程碑 + 迷你悬浮导航
+   ============================================================ */
+
+.home-pyramid-overview-section {
+  --home-pyramid-navy: #0b2948;
+  --home-pyramid-navy-deep: #071c31;
+  --home-pyramid-gold: #d8ad2d;
+  --home-pyramid-blue-bright: #286db8;
+  --home-pyramid-blue-mid: #24577f;
+  --home-pyramid-blue-soft: #3979ad;
+  --home-pyramid-slate: #506572;
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - 130px);
+  display: flex;
+  align-items: center;
+  background:
+    radial-gradient(circle at 43% 22%, rgba(27, 83, 135, .42), transparent 38%),
+    radial-gradient(circle at 78% 66%, rgba(18, 69, 112, .28), transparent 34%),
+    linear-gradient(145deg, var(--home-pyramid-navy-deep) 0%, var(--home-pyramid-navy) 52%, #081e35 100%);
+  color: #f8fbff;
+  box-shadow: inset 0 1px rgba(255,255,255,.08);
+}
+
+.home-pyramid-overview-inner {
+  width: min(1200px, calc(100vw - 48px));
+  margin: 0 auto;
+  padding-top: 70px;
+  padding-bottom: 74px;
+}
+
+.home-pyramid-overview-heading {
+  max-width: 850px;
+  margin: 0 auto 42px;
+  text-align: center;
+}
+
+.home-pyramid-overview-heading > p:last-child {
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+  color: rgba(226, 237, 247, .78);
+}
+
+.home-pyramid-overview-heading .roadshow-curated-kicker {
+  color: var(--home-pyramid-gold);
+}
+
+.home-pyramid-overview-section .home-pyramid-overview-heading h2 {
+  color: #fff;
+}
+
+.home-pyramid-overview-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(480px, 1.1fr);
+  align-items: center;
+  gap: 70px;
+}
+
+.home-pyramid-overview-copy {
+  order: 2;
+  max-width: none;
+}
+
+.home-pyramid-overview-label {
+  display: inline-flex;
+  margin-bottom: 16px;
+  color: var(--home-pyramid-gold);
+  font-size: .76rem;
+  font-weight: 760;
+  letter-spacing: .14em;
+}
+
+.home-pyramid-overview-copy h3 {
+  margin: 0 0 18px;
+  color: #fff;
+  font-size: clamp(1.8rem, 3vw, 2.65rem);
+  line-height: 1.24;
+}
+
+.home-pyramid-overview-copy p {
+  margin: 0;
+  color: rgba(226, 237, 247, .76);
+  line-height: 1.9;
+}
+
+.home-pyramid-overview-path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 26px;
+  color: rgba(226, 237, 247, .70);
+  font-size: .78rem;
+}
+
+.home-pyramid-overview-path i {
+  color: var(--home-pyramid-gold);
+  font-style: normal;
+}
+
+.home-pyramid-preview {
+  --home-preview-accent: var(--home-pyramid-gold);
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+  width: 100%;
+}
+
+.home-pyramid-preview[data-preview-stage="charity"] {
+  --home-preview-accent: #2c8fff;
+}
+
+.home-pyramid-preview[data-preview-stage="investment"] {
+  --home-preview-accent: #a9c7df;
+}
+
+.home-pyramid-preview[data-preview-stage="business"] {
+  --home-preview-accent: #87bdeb;
+}
+
+.home-pyramid-preview[data-preview-stage="soil"] {
+  --home-preview-accent: #bdcbd4;
+}
+
+.home-pyramid-preview-year {
+  display: block;
+  padding-top: 4px;
+  color: var(--home-preview-accent);
+  font-size: clamp(2rem, 3.6vw, 2.75rem);
+  font-weight: 780;
+  line-height: 1;
+  letter-spacing: -.04em;
+  font-variant-numeric: tabular-nums;
+  transition: color .18s ease;
+}
+
+.home-pyramid-preview-card {
+  min-height: 210px;
+  padding: 24px 26px 25px;
+  border: 1px solid rgba(180, 207, 229, .22);
+  border-left: 6px solid var(--home-preview-accent);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .075);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, .055),
+    0 16px 34px rgba(0, 10, 24, .22);
+  transition: border-left-color .18s ease, background-color .18s ease;
+}
+
+.home-pyramid-preview-card .home-pyramid-overview-label {
+  margin-bottom: 9px;
+  color: rgba(218, 232, 244, .58);
+}
+
+.home-pyramid-preview-card h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .26em;
+  margin: 0 0 13px;
+  color: var(--home-preview-accent);
+  font-size: clamp(1.02rem, 1.65vw, 1.22rem);
+  line-height: 1.42;
+  letter-spacing: .025em;
+  transition: color .18s ease;
+}
+
+.home-pyramid-preview-card h3 i,
+.home-pyramid-preview-card h3 em {
+  font-style: normal;
+}
+
+.home-pyramid-preview-card p {
+  color: rgba(232, 240, 247, .84);
+  font-size: .92rem;
+  line-height: 1.82;
+}
+
+.home-pyramid-overview-wrap {
+  order: 1;
+  min-width: 0;
+}
+
+.home-pyramid-overview {
+  width: min(100%, 610px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+}
+
+.home-pyramid-step {
+  appearance: none;
+  position: relative;
+  min-height: 84px;
+  border: 0;
+  border-radius: 12px;
+  padding: 16px 30px;
+  color: #fff;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.20),
+    0 14px 30px rgba(0, 9, 22, .28);
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    filter .2s ease;
+}
+
+.home-pyramid-step::before,
+.home-pyramid-step::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  background: inherit;
+}
+
+.home-pyramid-step::before {
+  left: -10px;
+  transform: skewX(-10deg);
+  border-radius: 12px 0 0 12px;
+}
+
+.home-pyramid-step::after {
+  right: -10px;
+  transform: skewX(10deg);
+  border-radius: 0 12px 12px 0;
+}
+
+.home-pyramid-step span,
+.home-pyramid-step small {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.home-pyramid-step span {
+  font-size: clamp(1.18rem, 1.7vw, 1.5rem);
+  font-weight: 680;
+  letter-spacing: .04em;
+}
+
+.home-pyramid-step small {
+  margin-top: 6px;
+  color: rgba(255,255,255,.78);
+  font-size: .74rem;
+  letter-spacing: .08em;
+}
+
+.home-pyramid-step:hover,
+.home-pyramid-step:focus-visible,
+.home-pyramid-step.is-previewed,
+.home-pyramid-step.is-active {
+  transform: translateY(-3px) scale(1.015);
+  box-shadow:
+    inset 0 0 0 2px rgba(245, 204, 75, .82),
+    0 18px 38px rgba(0, 9, 22, .38);
+  outline: none;
+}
+
+.home-pyramid-step:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+.step-legacy {
+  width: 48%;
+  background: var(--home-pyramid-gold);
+  color: #0a2947;
+}
+
+.step-legacy small {
+  color: rgba(10, 41, 71, .70);
+}
+
+.step-charity {
+  width: 61%;
+  background: var(--home-pyramid-blue-bright);
+}
+
+.step-investment {
+  width: 75%;
+  background: var(--home-pyramid-blue-mid);
+}
+
+.step-business {
+  width: 88%;
+  background: var(--home-pyramid-blue-soft);
+}
+
+.step-soil {
+  width: 100%;
+  background: var(--home-pyramid-slate);
+}
+
+.home-pyramid-overview-hint {
+  margin: 20px 0 0;
+  text-align: center;
+  color: rgba(226, 237, 247, .58);
+  font-size: .8rem;
+  letter-spacing: .06em;
+}
+
+/* ---------- 五个完整里程碑 ---------- */
+
+.home-life-stage {
+  position: relative;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  padding-top: 88px;
+  padding-bottom: 88px;
+  color: #1a1a2e;
+  scroll-margin-top: 150px;
+}
+
+.home-life-stage:nth-of-type(even) {
+  background: #fafaf7;
+}
+
+.home-life-stage:nth-of-type(odd) {
+  background: #f4f1ea;
+}
+
+.home-life-stage-inner {
+  width: min(1200px, calc(100vw - 48px));
+  margin: 0 auto;
+}
+
+.home-life-stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 28px;
+  margin-bottom: 34px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(26,26,46,.12);
+}
+
+.home-life-stage-kicker {
+  margin: 0 0 9px;
+  color: #a78313;
+  font-size: .78rem;
+  font-weight: 760;
+  letter-spacing: .12em;
+}
+
+.home-life-stage-header h2 {
+  margin: 0;
+  color: #1a1a2e;
+  font-size: clamp(2.1rem, 4.3vw, 4.2rem);
+  line-height: 1.05;
+}
+
+.home-life-stage-year {
+  flex: 0 0 auto;
+  color: rgba(26,26,46,.50);
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  letter-spacing: .06em;
+}
+
+.home-life-stage-content {
+  min-width: 0;
+}
+
+/* 让旧阶段内容恢复正常全宽，不再被右侧卡片裁切 */
+.home-life-stage-content .roadshow-curated-profile-grid,
+.home-life-stage-content .roadshow-curated-profile-layout,
+.home-life-stage-content .roadshow-curated-module-layout,
+.home-life-stage-content .roadshow-curated-module-copy,
+.home-life-stage-content .roadshow-curated-gallery {
+  width: 100%;
+  max-width: none;
+}
+
+.home-life-stage-content .roadshow-curated-section-heading,
+.home-life-stage-content .roadshow-curated-module-heading {
+  margin-bottom: 28px;
+}
+
+.home-life-stage-content .roadshow-curated-gallery {
+  margin-top: 30px;
+}
+
+.home-life-stage-content .roadshow-curated-evidence {
+  min-width: 0;
+}
+
+/* 取消 V11 分屏容器所带来的内部滚动与黑色工具栏 */
+.home-life-stage-content .home-pyramid-detail-toolbar,
+.home-life-stage-content .home-pyramid-collapsed-note {
+  display: none !important;
+}
+
+/* ---------- 悬浮迷你金字塔 ---------- */
+
+.home-mini-pyramid {
+  position: fixed;
+  left: 22px;
+  bottom: 22px;
+  z-index: 96;
+  width: 178px;
+  border: 1px solid rgba(163, 195, 222, .26);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 68% 12%, rgba(37, 103, 162, .36), transparent 42%),
+    rgba(7, 28, 49, .96);
+  box-shadow: 0 18px 44px rgba(0, 10, 24, .38);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(.96);
+  pointer-events: none;
+  transition:
+    opacity .22s ease,
+    visibility .22s ease,
+    transform .22s ease;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.home-mini-pyramid.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.home-mini-pyramid.is-collapsed {
+  width: auto;
+}
+
+.home-mini-pyramid-toggle {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  border-radius: 18px 18px 0 0;
+  background: rgba(6, 24, 43, .82);
+  color: #fff;
+  padding: 11px 13px;
+  font-family: inherit;
+  font-size: .78rem;
+  cursor: pointer;
+}
+
+.home-mini-pyramid.is-collapsed .home-mini-pyramid-toggle {
+  border-radius: 999px;
+}
+
+.home-mini-pyramid-toggle:hover,
+.home-mini-pyramid-toggle:focus-visible {
+  color: #f0c84a;
+  outline: none;
+}
+
+.home-mini-pyramid-toggle:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.home-mini-pyramid-toggle-icon {
+  color: #f0c84a;
+  font-size: .9rem;
+}
+
+.home-mini-pyramid-body {
+  padding: 12px;
+}
+
+.home-mini-pyramid.is-collapsed .home-mini-pyramid-body {
+  display: none;
+}
+
+.home-mini-pyramid-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.home-mini-step {
+  appearance: none;
+  position: relative;
+  min-height: 28px;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  font-family: inherit;
+  font-size: .68rem;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.home-mini-step::before,
+.home-mini-step::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background: inherit;
+}
+
+.home-mini-step::before {
+  left: -3px;
+  transform: skewX(-10deg);
+}
+
+.home-mini-step::after {
+  right: -3px;
+  transform: skewX(10deg);
+}
+
+.home-mini-step span {
+  position: relative;
+  z-index: 1;
+}
+
+.home-mini-step:hover,
+.home-mini-step:focus-visible,
+.home-mini-step.is-active {
+  transform: scale(1.045);
+  box-shadow:
+    inset 0 0 0 2px #f0c84a,
+    0 6px 14px rgba(0, 8, 20, .30);
+  outline: none;
+}
+
+.home-mini-step:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.mini-legacy { width: 54%; background: #d8ad2d; color: #0a2947; }
+.mini-charity { width: 65%; background: #286db8; }
+.mini-investment { width: 76%; background: #24577f; }
+.mini-business { width: 88%; background: #3979ad; }
+.mini-soil { width: 100%; background: #506572; }
+
+.home-mini-pyramid-top {
+  appearance: none;
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid rgba(240, 200, 74, .52);
+  border-radius: 999px;
+  background: rgba(240, 200, 74, .10);
+  color: #f3d66f;
+  padding: 7px 8px;
+  font-family: inherit;
+  font-size: .68rem;
+  cursor: pointer;
+}
+
+.home-mini-pyramid-top:hover,
+.home-mini-pyramid-top:focus-visible {
+  border-color: #f0c84a;
+  background: rgba(240, 200, 74, .17);
+  outline: none;
+}
+
+.home-mini-pyramid-top:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1020px) {
+  .home-pyramid-overview-layout {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+
+  .home-pyramid-overview-copy {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .home-pyramid-overview-path {
+    justify-content: center;
+  }
+
+  .home-pyramid-overview {
+    width: min(100%, 680px);
+  }
+
+  .home-life-stage {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-pyramid-overview-section {
+    min-height: auto;
+  }
+
+  .home-pyramid-overview-inner,
+  .home-life-stage-inner {
+    width: min(100vw - 28px, 1200px);
+  }
+
+  .home-pyramid-overview-inner {
+    padding-top: 52px;
+    padding-bottom: 58px;
+  }
+
+  .home-pyramid-overview-heading {
+    margin-bottom: 30px;
+  }
+
+  .home-pyramid-step {
+    min-height: 68px;
+    padding: 12px 18px;
+    border-radius: 9px;
+  }
+
+  .home-pyramid-step::before,
+  .home-pyramid-step::after {
+    width: 14px;
+  }
+
+  .home-pyramid-step span {
+    font-size: .98rem;
+  }
+
+  .home-pyramid-step small {
+    font-size: .64rem;
+  }
+
+  .home-life-stage {
+    padding-top: 64px;
+    padding-bottom: 64px;
+    scroll-margin-top: 136px;
+  }
+
+  .home-life-stage-header {
+    align-items: start;
+    flex-direction: column;
+    margin-bottom: 26px;
+  }
+
+  .home-life-stage-header h2 {
+    font-size: 2.45rem;
+  }
+
+  .home-mini-pyramid {
+    left: 14px;
+    bottom: 14px;
+    width: 154px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-pyramid-preview {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .home-pyramid-preview-year {
+    padding-top: 0;
+    font-size: 2rem;
+  }
+
+  .home-pyramid-preview-card {
+    min-height: 0;
+    padding: 20px;
+  }
+
+  .home-pyramid-overview-path {
+    display: none;
+  }
+
+  .home-mini-pyramid {
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .home-mini-pyramid.is-collapsed .home-mini-pyramid-toggle-text {
+    display: none;
+  }
+}
+
+@media (hover: none) {
+  .home-pyramid-hint-hover {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-pyramid-step,
+  .home-mini-pyramid,
+  .home-mini-step {
+    transition: none !important;
+  }
+}

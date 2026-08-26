@@ -1,0 +1,13 @@
+{
+  "name": "dreamworks-succession-ecosystem",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node qa/check-js-syntax.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

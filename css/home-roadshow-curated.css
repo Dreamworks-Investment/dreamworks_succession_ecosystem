@@ -1,0 +1,900 @@
+
+/*
+ * 路演主页：主持人口述与前端展示分工版
+ * 原始图片保持不裁切、不改色；前端仅呈现适合投屏的核心信息。
+ */
+
+#page-home.roadshow-curated-page {
+  --roadshow-navy: #1a1a2e;
+  --roadshow-navy-soft: #24243b;
+  --roadshow-gold: #d4af37;
+  --roadshow-gold-dark: #9b7611;
+  --roadshow-cream: #fafaf7;
+  --roadshow-section: #f5f3ed;
+  --roadshow-paper: #ffffff;
+  --roadshow-text: #252536;
+  --roadshow-muted: #6c6b73;
+  --roadshow-line: #e7e1d4;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: var(--roadshow-cream);
+  color: var(--roadshow-text);
+}
+
+.roadshow-curated-document {
+  width: 100%;
+  overflow: clip;
+}
+
+.roadshow-curated-section {
+  position: relative;
+  padding: 96px 32px;
+}
+
+.roadshow-curated-inner {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+}
+
+.roadshow-curated-section-heading,
+.roadshow-curated-module-heading {
+  max-width: 980px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.roadshow-curated-kicker,
+.roadshow-curated-eyebrow,
+.roadshow-curated-module-index {
+  margin: 0 0 14px;
+  color: var(--roadshow-gold-dark);
+  font-size: .9rem;
+  font-weight: 760;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.roadshow-curated-section h2,
+.roadshow-curated-module h2 {
+  margin: 0;
+  color: var(--roadshow-navy);
+  font-size: clamp(2rem, 3.4vw, 3.65rem);
+  line-height: 1.28;
+  letter-spacing: -.035em;
+}
+
+.roadshow-curated-cover {
+  min-height: calc(100vh - 56px);
+  display: grid;
+  align-items: center;
+  background:
+    radial-gradient(circle at 83% 15%, rgba(212, 175, 55, .12), transparent 34%),
+    linear-gradient(180deg, #fff 0%, var(--roadshow-cream) 100%);
+}
+
+.roadshow-curated-cover-inner {
+  max-width: 1020px;
+  text-align: center;
+}
+
+.roadshow-curated-eyebrow {
+  display: inline-flex;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, .12);
+}
+
+.roadshow-curated-cover h1 {
+  margin: 20px auto 18px;
+  max-width: 1000px;
+  color: var(--roadshow-navy);
+  font-size: clamp(2.6rem, 5vw, 5.25rem);
+  line-height: 1.14;
+  letter-spacing: -.05em;
+}
+
+.roadshow-curated-subtitle {
+  margin: 0 auto 28px;
+  color: var(--roadshow-gold-dark);
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-weight: 720;
+  letter-spacing: .08em;
+}
+
+.roadshow-curated-cover blockquote {
+  max-width: 820px;
+  margin: 0 auto 34px;
+  color: var(--roadshow-muted);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.8;
+}
+
+.roadshow-curated-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.roadshow-curated-profile {
+  background: var(--roadshow-section);
+}
+
+.roadshow-curated-profile-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  gap: 56px;
+  align-items: stretch;
+}
+
+.roadshow-curated-profile-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 260px;
+  padding: 40px;
+  border-left: 4px solid var(--roadshow-gold);
+  background: var(--roadshow-paper);
+  border-radius: 0 18px 18px 0;
+  box-shadow: 0 18px 50px rgba(26, 26, 46, .06);
+}
+
+.roadshow-curated-profile-copy p {
+  margin: 0;
+  color: var(--roadshow-muted);
+  font-size: 1.08rem;
+  line-height: 1.85;
+}
+
+.roadshow-curated-profile-copy .roadshow-curated-lead {
+  margin-bottom: 18px;
+  color: var(--roadshow-navy);
+  font-size: clamp(1.25rem, 1.8vw, 1.7rem);
+  font-weight: 650;
+}
+
+.roadshow-curated-milestones {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.roadshow-curated-milestone {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 26px 22px;
+  background: var(--roadshow-navy);
+  color: white;
+  border-radius: 16px;
+}
+
+.roadshow-curated-milestone strong {
+  color: var(--roadshow-gold);
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  line-height: 1;
+}
+
+.roadshow-curated-milestone span {
+  color: rgba(255,255,255,.82);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.roadshow-curated-module {
+  border-top: 1px solid var(--roadshow-line);
+}
+
+.roadshow-curated-module:nth-of-type(even) {
+  background: var(--roadshow-section);
+}
+
+.roadshow-curated-module-index {
+  display: inline-flex;
+  padding: 8px 14px;
+  border-left: 4px solid var(--roadshow-gold);
+  background: rgba(212, 175, 55, .09);
+}
+
+.roadshow-curated-module-summary {
+  max-width: 880px;
+  margin: 24px auto 0;
+  color: var(--roadshow-muted);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.9;
+}
+
+.roadshow-curated-gallery {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.roadshow-curated-evidence {
+  grid-column: span 2;
+  min-width: 0;
+  min-height: 330px;
+  margin: 0;
+  padding: 18px;
+  display: grid;
+  place-items: center;
+  background: var(--roadshow-paper);
+  border: 1px solid var(--roadshow-line);
+  border-radius: 16px;
+  box-shadow: 0 12px 34px rgba(26, 26, 46, .06);
+}
+
+.roadshow-curated-evidence img {
+  display: block;
+  width: 100%;
+  height: 294px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.roadshow-curated-evidence-feature {
+  grid-column: 1 / -1;
+  min-height: 430px;
+}
+
+.roadshow-curated-evidence-feature img {
+  height: 390px;
+}
+
+.roadshow-curated-gallery-five .roadshow-curated-evidence:nth-child(4),
+.roadshow-curated-gallery-lead-five .roadshow-curated-evidence:nth-child(5) {
+  grid-column: 2 / span 2;
+}
+
+.roadshow-curated-gallery-five .roadshow-curated-evidence:nth-child(5),
+.roadshow-curated-gallery-lead-five .roadshow-curated-evidence:nth-child(6) {
+  grid-column: 4 / span 2;
+}
+
+.roadshow-curated-gallery-lead-four .roadshow-curated-evidence:not(.roadshow-curated-evidence-feature) {
+  grid-column: span 3;
+}
+
+.roadshow-curated-value-summary {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(212, 175, 55, .12), transparent 35%),
+    var(--roadshow-navy);
+  color: white;
+}
+
+.roadshow-curated-section-heading-light h2 {
+  color: white;
+}
+
+.roadshow-curated-section-heading-light .roadshow-curated-kicker {
+  color: var(--roadshow-gold);
+}
+
+.roadshow-curated-value-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.roadshow-curated-value-card {
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+}
+
+.roadshow-curated-value-card span {
+  color: var(--roadshow-gold);
+  font-size: .9rem;
+  font-weight: 780;
+  letter-spacing: .1em;
+}
+
+.roadshow-curated-value-card strong {
+  color: white;
+  font-size: clamp(1.08rem, 1.35vw, 1.3rem);
+  line-height: 1.65;
+}
+
+.roadshow-curated-value-conclusion {
+  max-width: 980px;
+  margin: 48px auto 0;
+  color: white;
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  line-height: 1.65;
+  text-align: center;
+  font-weight: 680;
+}
+
+.roadshow-curated-inheritance {
+  background: var(--roadshow-cream);
+}
+
+.roadshow-curated-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.roadshow-curated-stat {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 26px;
+  text-align: center;
+  background: var(--roadshow-paper);
+  border: 1px solid var(--roadshow-line);
+  border-radius: 16px;
+}
+
+.roadshow-curated-stat strong {
+  color: var(--roadshow-gold-dark);
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 1;
+}
+
+.roadshow-curated-stat span {
+  color: var(--roadshow-muted);
+  line-height: 1.65;
+}
+
+.roadshow-curated-major-quote {
+  max-width: 1000px;
+  margin: 58px auto;
+  padding: 38px 52px;
+  color: var(--roadshow-navy);
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+  line-height: 1.6;
+  font-weight: 700;
+  text-align: center;
+  border-top: 1px solid var(--roadshow-gold);
+  border-bottom: 1px solid var(--roadshow-gold);
+}
+
+.roadshow-curated-principle {
+  max-width: 900px;
+  margin: 0 auto 46px;
+  padding: 30px 36px;
+  text-align: center;
+  background: var(--roadshow-navy);
+  border-radius: 16px;
+}
+
+.roadshow-curated-principle p {
+  margin: 0 0 10px;
+  color: var(--roadshow-gold);
+  font-weight: 700;
+}
+
+.roadshow-curated-principle strong {
+  color: white;
+  font-size: clamp(1.3rem, 2vw, 1.9rem);
+  line-height: 1.5;
+}
+
+.roadshow-curated-solution-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.roadshow-curated-solution-grid article {
+  min-height: 270px;
+  padding: 30px;
+  background: var(--roadshow-paper);
+  border: 1px solid var(--roadshow-line);
+  border-radius: 16px;
+  box-shadow: 0 12px 34px rgba(26,26,46,.05);
+}
+
+.roadshow-curated-solution-grid h3 {
+  margin: 0 0 16px;
+  color: var(--roadshow-navy);
+  font-size: 1.35rem;
+}
+
+.roadshow-curated-solution-grid article > p:last-child {
+  margin: 0;
+  color: var(--roadshow-muted);
+  line-height: 1.8;
+}
+
+.roadshow-curated-mission {
+  margin-top: 42px;
+  padding: 40px;
+  text-align: center;
+  border-radius: 18px;
+  background: var(--roadshow-section);
+}
+
+.roadshow-curated-mission p {
+  max-width: 900px;
+  margin: 0 auto 20px;
+  color: var(--roadshow-navy);
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  line-height: 1.75;
+  font-weight: 650;
+}
+
+.roadshow-curated-mission strong {
+  color: var(--roadshow-gold-dark);
+  font-size: clamp(1.75rem, 3vw, 3rem);
+}
+
+.roadshow-curated-transition {
+  min-height: 78vh;
+  display: grid;
+  align-items: center;
+  text-align: center;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(212, 175, 55, .13), transparent 33%),
+    var(--roadshow-navy);
+}
+
+.roadshow-curated-transition .roadshow-curated-kicker {
+  color: var(--roadshow-gold);
+}
+
+.roadshow-curated-transition h2 {
+  max-width: 1000px;
+  margin: 0 auto;
+  color: white;
+}
+
+.roadshow-curated-transition-lead {
+  max-width: 880px;
+  margin: 28px auto 0;
+  color: rgba(255,255,255,.82);
+  font-size: clamp(1.08rem, 1.55vw, 1.35rem);
+  line-height: 1.85;
+}
+
+.roadshow-curated-methods {
+  max-width: 900px;
+  margin: 38px auto 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.roadshow-curated-methods > div {
+  min-height: 170px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  text-align: left;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+}
+
+.roadshow-curated-methods strong {
+  color: var(--roadshow-gold);
+  font-size: 1.25rem;
+}
+
+.roadshow-curated-methods span {
+  color: rgba(255,255,255,.8);
+  line-height: 1.7;
+}
+
+.roadshow-curated-disclaimer {
+  max-width: 820px;
+  margin: 30px auto 0;
+  color: rgba(255,255,255,.62);
+  font-size: .95rem;
+  line-height: 1.7;
+}
+
+.roadshow-curated-transition-button {
+  margin-top: 34px;
+}
+
+@media (max-width: 1000px) {
+  .roadshow-curated-profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .roadshow-curated-evidence {
+    grid-column: span 3;
+  }
+
+  .roadshow-curated-gallery-five .roadshow-curated-evidence:nth-child(4),
+  .roadshow-curated-gallery-five .roadshow-curated-evidence:nth-child(5),
+  .roadshow-curated-gallery-lead-five .roadshow-curated-evidence:nth-child(5),
+  .roadshow-curated-gallery-lead-five .roadshow-curated-evidence:nth-child(6) {
+    grid-column: span 3;
+  }
+
+  .roadshow-curated-gallery-five .roadshow-curated-evidence:nth-child(5),
+  .roadshow-curated-gallery-lead-five .roadshow-curated-evidence:nth-child(6) {
+    grid-column: 2 / span 4;
+  }
+
+  .roadshow-curated-value-grid,
+  .roadshow-curated-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .roadshow-curated-section {
+    padding: 72px 22px;
+  }
+
+  .roadshow-curated-cover {
+    min-height: auto;
+    padding-top: 96px;
+    padding-bottom: 86px;
+  }
+
+  .roadshow-curated-milestones,
+  .roadshow-curated-solution-grid,
+  .roadshow-curated-methods {
+    grid-template-columns: 1fr;
+  }
+
+  .roadshow-curated-milestone {
+    min-height: 130px;
+  }
+
+  .roadshow-curated-gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .roadshow-curated-evidence,
+  .roadshow-curated-evidence-feature,
+  .roadshow-curated-gallery-five .roadshow-curated-evidence:nth-child(4),
+  .roadshow-curated-gallery-five .roadshow-curated-evidence:nth-child(5),
+  .roadshow-curated-gallery-lead-five .roadshow-curated-evidence:nth-child(5),
+  .roadshow-curated-gallery-lead-five .roadshow-curated-evidence:nth-child(6),
+  .roadshow-curated-gallery-lead-four .roadshow-curated-evidence:not(.roadshow-curated-evidence-feature) {
+    grid-column: 1;
+    min-height: auto;
+  }
+
+  .roadshow-curated-evidence img,
+  .roadshow-curated-evidence-feature img {
+    height: auto;
+    max-height: 420px;
+  }
+
+  .roadshow-curated-value-grid,
+  .roadshow-curated-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .roadshow-curated-major-quote {
+    padding: 30px 12px;
+  }
+
+  .roadshow-curated-profile-copy {
+    padding: 30px 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roadshow-curated-page *,
+  .roadshow-curated-page *::before,
+  .roadshow-curated-page *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+
+/* ===================== V10.6 Homepage navigation & layout refinements ===================== */
+.home-anchor-shell {
+  width: min(1200px, calc(100vw - 48px));
+  margin: 0 auto 28px;
+}
+
+.home-anchor-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: rgba(27, 29, 54, .68);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.home-anchor-crumb {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.home-anchor-crumb-home:hover,
+.home-anchor-crumb-home:focus-visible {
+  color: var(--roadshow-gold-dark);
+}
+
+.home-anchor-sep {
+  color: rgba(27, 29, 54, .45);
+}
+
+.home-anchor-current {
+  color: var(--roadshow-ink);
+  font-weight: 600;
+}
+
+.home-anchor-toc {
+  position: sticky;
+  top: 76px;
+  z-index: 18;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px;
+  background: rgba(255, 255, 255, .94);
+  border: 1px solid rgba(27, 29, 54, .08);
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(26, 26, 46, .06);
+  backdrop-filter: blur(10px);
+}
+
+.home-anchor-toc::-webkit-scrollbar {
+  height: 6px;
+}
+
+.home-anchor-link {
+  flex: 0 0 auto;
+  appearance: none;
+  border: 1px solid transparent;
+  background: #fff;
+  color: rgba(27, 29, 54, .72);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .2s ease, border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+
+.home-anchor-link:hover,
+.home-anchor-link:focus-visible {
+  color: var(--roadshow-gold-dark);
+  border-color: rgba(212, 175, 55, .35);
+  outline: none;
+}
+
+.home-anchor-link.is-active {
+  background: rgba(212, 175, 55, .12);
+  color: var(--roadshow-gold-dark);
+  border-color: rgba(212, 175, 55, .28);
+  box-shadow: inset 0 -2px 0 var(--roadshow-gold);
+}
+
+.home-gallery-1998 .roadshow-curated-evidence-feature,
+.home-gallery-2011 .roadshow-curated-evidence-feature {
+  grid-column: 1 / -1;
+  min-height: 430px;
+}
+
+.home-gallery-1998 .roadshow-curated-evidence-feature img,
+.home-gallery-2011 .roadshow-curated-evidence-feature img {
+  height: 390px;
+}
+
+.home-gallery-1998 .roadshow-curated-evidence:nth-child(5),
+.home-gallery-1998 .roadshow-curated-evidence:nth-child(6),
+.home-gallery-2011 .roadshow-curated-evidence:nth-child(5),
+.home-gallery-2011 .roadshow-curated-evidence:nth-child(6) {
+  grid-column: span 3;
+}
+
+.home-gallery-2005 .roadshow-curated-evidence:nth-child(1),
+.home-gallery-2005 .roadshow-curated-evidence:nth-child(2) {
+  grid-column: span 3;
+}
+
+.home-gallery-2020 .roadshow-curated-evidence:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+.home-gallery-2020 .roadshow-curated-evidence:nth-child(5) {
+  grid-column: 4 / span 2;
+}
+
+.home-value-summary-visual {
+  margin: 24px 0 32px;
+  padding: 18px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 18px;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, .18);
+}
+
+.home-value-summary-visual img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 12px;
+}
+
+@media (max-width: 1024px) {
+  .home-anchor-shell {
+    width: min(100vw - 32px, 1200px);
+  }
+
+  .home-anchor-toc {
+    top: 68px;
+  }
+
+  .home-gallery-2005 .roadshow-curated-evidence:nth-child(1),
+  .home-gallery-2005 .roadshow-curated-evidence:nth-child(2),
+  .home-gallery-1998 .roadshow-curated-evidence:nth-child(5),
+  .home-gallery-1998 .roadshow-curated-evidence:nth-child(6),
+  .home-gallery-2011 .roadshow-curated-evidence:nth-child(5),
+  .home-gallery-2011 .roadshow-curated-evidence:nth-child(6) {
+    grid-column: span 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-anchor-breadcrumb {
+    font-size: 13px;
+  }
+
+  .home-anchor-toc {
+    top: 64px;
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .home-anchor-link {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
+  .home-gallery-1998 .roadshow-curated-evidence-feature,
+  .home-gallery-2011 .roadshow-curated-evidence-feature {
+    min-height: 320px;
+  }
+
+  .home-gallery-1998 .roadshow-curated-evidence-feature img,
+  .home-gallery-2011 .roadshow-curated-evidence-feature img {
+    height: 280px;
+  }
+
+  .home-gallery-2005 .roadshow-curated-evidence:nth-child(1),
+  .home-gallery-2005 .roadshow-curated-evidence:nth-child(2),
+  .home-gallery-1998 .roadshow-curated-evidence:nth-child(5),
+  .home-gallery-1998 .roadshow-curated-evidence:nth-child(6),
+  .home-gallery-2011 .roadshow-curated-evidence:nth-child(5),
+  .home-gallery-2011 .roadshow-curated-evidence:nth-child(6),
+  .home-gallery-2020 .roadshow-curated-evidence:nth-child(4),
+  .home-gallery-2020 .roadshow-curated-evidence:nth-child(5) {
+    grid-column: span 6;
+  }
+
+  .home-value-summary-visual {
+    margin-top: 18px;
+  }
+}
+
+
+/* ===================== V10.7 Persistent homepage chapter navigation ===================== */
+.home-anchor-shell {
+  position: sticky;
+  top: 56px;
+  z-index: 90;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 10px 24px 12px;
+  background: rgba(250, 250, 247, .96);
+  border-top: 1px solid rgba(27, 29, 54, .06);
+  border-bottom: 1px solid rgba(27, 29, 54, .10);
+  box-shadow: 0 10px 30px rgba(26, 26, 46, .06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.home-anchor-breadcrumb,
+.home-anchor-toc {
+  width: min(1200px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home-anchor-breadcrumb {
+  margin-bottom: 7px;
+}
+
+.home-anchor-toc {
+  position: static;
+  top: auto;
+  z-index: auto;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.home-restored-service-cycle {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(212, 175, 55, .07), transparent 38%),
+    var(--roadshow-section);
+  border-top: 1px solid var(--roadshow-line);
+}
+
+.home-cycle-intro {
+  max-width: 760px;
+  margin: 18px auto 0;
+  color: var(--roadshow-muted);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+#page-home section[id] {
+  scroll-margin-top: 150px;
+}
+
+@media (max-width: 768px) {
+  .home-anchor-shell {
+    top: 56px;
+    padding: 8px 16px 10px;
+  }
+
+  .home-anchor-breadcrumb {
+    margin-bottom: 6px;
+  }
+
+  #page-home section[id] {
+    scroll-margin-top: 138px;
+  }
+}
+
+/* ===================== V10.9 客户九项修改：首页 ===================== */
+#home-module-1998 .roadshow-curated-module-heading > .roadshow-curated-kicker {
+  font-size: clamp(1.2rem, 1.75vw, 1.6rem);
+  line-height: 1.35;
+  letter-spacing: .08em;
+}
+
+.home-gallery-1998 .roadshow-curated-evidence:nth-child(5),
+.home-gallery-1998 .roadshow-curated-evidence:nth-child(6),
+.home-gallery-1998 .roadshow-curated-evidence:nth-child(7) {
+  grid-column: span 2;
+}
+
+.home-gallery-1998 .client-inserted-case img {
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (max-width: 768px) {
+  .home-gallery-1998 .roadshow-curated-evidence:nth-child(5),
+  .home-gallery-1998 .roadshow-curated-evidence:nth-child(6),
+  .home-gallery-1998 .roadshow-curated-evidence:nth-child(7) {
+    grid-column: span 6;
+  }
+}
