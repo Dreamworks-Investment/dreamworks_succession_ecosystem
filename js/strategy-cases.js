@@ -68,8 +68,12 @@
   function updateViewClass(view) {
     var page = document.getElementById('page-strategy');
     if (!page) return;
-    page.classList.remove('strategy-hub-active', 'strategy-case-active', 'strategy-depth-active');
-    page.classList.add(view === 'detail' ? 'strategy-case-active' : view === 'depth' ? 'strategy-depth-active' : 'strategy-hub-active');
+    page.classList.remove('strategy-intro-active', 'strategy-hub-active', 'strategy-case-active', 'strategy-depth-active');
+    page.classList.add(
+      view === 'intro' ? 'strategy-intro-active' :
+      view === 'detail' ? 'strategy-case-active' :
+      view === 'depth' ? 'strategy-depth-active' : 'strategy-hub-active'
+    );
     page.setAttribute('data-strategy-view', view);
   }
 
@@ -95,13 +99,28 @@
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
+  function strategyShowIntro(options) {
+    options = options || {};
+    ensureStrategyPage();
+    updateViewClass('intro');
+    var detail = document.getElementById('strategy-case-detail');
+    if (detail) { detail.hidden = true; detail.innerHTML = ''; }
+    setHistory('#strategy', { page: 'strategy', strategyView: 'intro' }, options);
+    scrollTopForView(options);
+    document.title = '价值诊断与增进系统 · 梦工场战略与实践';
+  }
+
+  function strategyEnterSystem(options) {
+    strategyShowHub(options || {});
+  }
+
   function strategyShowHub(options) {
     options = options || {};
     ensureStrategyPage();
     updateViewClass('hub');
     var detail = document.getElementById('strategy-case-detail');
     if (detail) { detail.hidden = true; detail.innerHTML = ''; }
-    setHistory('#strategy', { page: 'strategy', strategyView: 'hub' }, options);
+    setHistory('#strategy-library', { page: 'strategy', strategyView: 'hub' }, options);
     scrollTopForView(options);
     document.title = '梦工场 · 家族传承系统 | 从价值创造到百年传承';
   }
@@ -235,7 +254,11 @@
       strategyOpenCase(hash.replace('strategy-case-', ''), options);
       return;
     }
-    if (hash === 'strategy') strategyShowHub(options);
+    if (hash === 'strategy-library') {
+      strategyShowHub(options);
+      return;
+    }
+    if (hash === 'strategy') strategyShowIntro(options);
   }
 
   function setupEvents() {
@@ -275,6 +298,8 @@
   }
 
   window.strategySelectCase = renderCarousel;
+  window.strategyShowIntro = strategyShowIntro;
+  window.strategyEnterSystem = strategyEnterSystem;
   window.strategyShowHub = strategyShowHub;
   window.strategyScrollToCases = strategyScrollToCases;
   window.strategyOpenCase = strategyOpenCase;

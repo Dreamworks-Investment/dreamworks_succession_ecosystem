@@ -1,7 +1,13 @@
 /* Strategy case hub: merges the value-increase proof and R/G/S model into a case-library landing page. */
-.strategy-case-shell { width:min(1180px, calc(100% - 48px)); margin:0 auto; }
+#page-strategy.strategy-roadmap-page { margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); overflow:clip; }
+.strategy-case-shell { width:min(1680px, calc(100% - 96px)); margin:0 auto; }
 .strategy-case-hub { color:#f6f1e7; background:#081b31; }
 .strategy-case-detail { min-height:70vh; background:#f5f0e6; }
+.strategy-system-intro,
+.strategy-case-hub,
+.strategy-case-detail,
+.strategy-case-depth { display:none; }
+.strategy-intro-active .strategy-system-intro { display:block; }
 .strategy-hub-active .strategy-case-hub { display:block; }
 .strategy-hub-active .strategy-case-detail,
 .strategy-hub-active .strategy-case-depth { display:none; }
@@ -11,6 +17,142 @@
 .strategy-depth-active .strategy-case-hub,
 .strategy-depth-active .strategy-case-detail { display:none; }
 .strategy-depth-active .strategy-case-depth { display:block; }
+
+/* Slide 12: the first layer of “战略与实践”. */
+.strategy-system-cover {
+  position:relative;
+  min-height:calc(100svh - 56px);
+  overflow:hidden;
+  color:#e7eef6;
+  background:
+    radial-gradient(900px 520px at 82% 18%,rgba(31,111,176,.16),transparent 66%),
+    linear-gradient(180deg,#0a2340 0%,#102e4d 52%,#071c31 100%);
+}
+.strategy-system-cover::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.14;
+  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:linear-gradient(90deg,transparent,#000 26%,#000 84%,transparent);
+}
+.strategy-system-cover-inner {
+  position:relative;
+  z-index:1;
+  display:flex;
+  width:min(1880px,calc(100% - 112px));
+  min-height:calc(100svh - 56px);
+  margin:0 auto;
+  padding:52px 0 28px;
+  flex-direction:column;
+}
+.strategy-system-topline {
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:3px;
+  background:linear-gradient(90deg,#d4af37 0 54%,rgba(212,175,55,.08) 54%);
+}
+.strategy-system-heading h1 {
+  margin:0;
+  color:#fff;
+  font-family:"Noto Serif SC","Songti SC",serif;
+  font-size:clamp(2.65rem,3.4vw,4.8rem);
+  font-weight:800;
+  line-height:1.18;
+  letter-spacing:-.025em;
+}
+.strategy-system-heading h1 span { color:#d4af37; }
+.strategy-system-rule { display:block; width:104px; height:3px; margin:14px 0 14px; background:#d4af37; }
+.strategy-system-module {
+  margin:0;
+  color:#1686ef;
+  font-size:clamp(.8rem,1.1vw,1.05rem);
+  font-weight:700;
+  letter-spacing:.28em;
+}
+.strategy-system-era { margin:7px 0 0; color:#9fb0c3; font-size:clamp(.75rem,1vw,.95rem); letter-spacing:.2em; }
+.strategy-system-panels { display:grid; gap:16px; margin-top:28px; }
+.strategy-system-panel {
+  padding:24px 30px;
+  border:1px solid rgba(212,175,55,.22);
+  border-radius:9px;
+  background:rgba(255,255,255,.035);
+  box-shadow:inset 0 1px rgba(255,255,255,.025);
+}
+.strategy-system-panel h2 { margin:0; color:#dce6f0; font-size:clamp(.92rem,1.15vw,1.2rem); font-weight:400; line-height:1.7; }
+.strategy-system-panel h2 strong { color:#d4af37; font-weight:700; }
+.strategy-system-rgs-list,.strategy-system-proof-list { display:grid; gap:10px; margin-top:17px; }
+.strategy-system-rgs-list article,
+.strategy-system-proof-list article {
+  display:grid;
+  min-height:54px;
+  padding:10px 18px;
+  align-items:center;
+  border-left:3px solid #d4af37;
+  background:rgba(87,125,164,.18);
+}
+.strategy-system-rgs-list article { grid-template-columns:42px 1fr; }
+.strategy-system-rgs-list article > span,
+.strategy-system-proof-list article > span {
+  display:grid;
+  width:32px;
+  height:32px;
+  place-items:center;
+  border-radius:50%;
+  color:#0c2945;
+  background:#d4af37;
+  font-family:Georgia,serif;
+  font-weight:800;
+}
+.strategy-system-rgs-list p,.strategy-system-proof-list p { margin:0; color:#cbd6e2; font-size:clamp(.82rem,1vw,1rem); }
+.strategy-system-rgs-list p { display:flex; gap:12px; align-items:baseline; }
+.strategy-system-rgs-list p strong,.strategy-system-proof-list p strong { color:#d4af37; font-weight:700; }
+.strategy-system-rgs-list p b { color:#cbd6e2; font-weight:400; }
+.strategy-system-rgs-list p b::before { content:"——"; margin-right:12px; color:#8295aa; }
+.strategy-system-belief h2 { display:flex; flex-wrap:wrap; gap:0 12px; }
+.strategy-system-belief h2 span { color:#dce6f0; }
+.strategy-system-proof-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.strategy-system-proof-list article { grid-template-columns:42px 1fr; }
+.strategy-system-bottom {
+  display:grid;
+  grid-template-columns:minmax(240px,1fr) auto minmax(240px,1fr);
+  gap:24px;
+  margin-top:auto;
+  padding-top:20px;
+  align-items:center;
+}
+.strategy-system-bottom-copy { display:grid; grid-template-columns:auto minmax(60px,1fr) auto; gap:14px; align-items:center; }
+.strategy-system-bottom-copy strong { color:#d4af37; font-family:"Noto Serif SC","Songti SC",serif; font-size:1.2rem; }
+.strategy-system-bottom-copy > span { height:1px; background:rgba(212,175,55,.35); }
+.strategy-system-bottom-copy p,.strategy-system-bottom > p { margin:0; color:#98aabd; font-size:.78rem; }
+.strategy-system-bottom > p { text-align:right; }
+.strategy-system-enter {
+  display:inline-flex;
+  min-width:420px;
+  min-height:58px;
+  padding:12px 30px;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  border:2px solid #d4af37;
+  border-radius:999px;
+  color:#d4af37;
+  background:rgba(212,175,55,.07);
+  font:inherit;
+  font-family:"Noto Serif SC","Songti SC",serif;
+  font-size:1.08rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  cursor:pointer;
+  transition:background .2s ease,color .2s ease,transform .2s ease;
+}
+.strategy-system-enter:hover,.strategy-system-enter:focus-visible { color:#071c31; background:#d4af37; transform:translateY(-2px); outline:none; }
+.strategy-system-enter span { font-family:Georgia,serif; font-size:1.3rem; }
+.strategy-system-folio { display:flex; margin-top:11px; justify-content:space-between; color:#526b83; font-size:.62rem; letter-spacing:.08em; }
+.strategy-system-folio span:first-child { font-weight:700; letter-spacing:.16em; }
 
 .strategy-hub-hero { position:relative; overflow:hidden; min-height:720px; padding:118px 0 82px; background:radial-gradient(circle at 78% 38%, rgba(206,160,83,.18), transparent 30%), linear-gradient(135deg,#07172a 0%,#0d2945 58%,#07172a 100%); }
 .strategy-hub-hero::before { content:""; position:absolute; inset:0; opacity:.16; background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px); background-size:64px 64px; mask-image:linear-gradient(90deg,transparent,#000 54%,#000); }
@@ -227,4 +369,80 @@
 }
 @media (prefers-reduced-motion:reduce) {
   #strategy-case-carousel-stage,.strategy-case-arrow,.strategy-case-photo img,.strategy-case-open span,.strategy-attachment-card { transition:none; }
+}
+
+@media (min-width:901px) {
+  #page-strategy .strategy-roadmap-shell,
+  #page-strategy .strategy-chapterbar-inner {
+    width:min(1680px,calc(100% - 96px));
+    max-width:none;
+  }
+  #page-strategy .strategy-toc-inner {
+    width:min(1680px,calc(100% - 96px));
+    max-width:none;
+    margin-inline:auto;
+  }
+  #page-strategy .ch2-page .strategy-roadmap-shell {
+    width:min(1680px,calc(100% - 96px));
+    max-width:none;
+    padding-inline:0;
+  }
+}
+
+/* Keep the complete slide, including its drill-down CTA, inside shorter laptop viewports. */
+@media (min-width:1101px) and (max-height:820px) {
+  .strategy-system-cover-inner { padding:26px 0 14px; }
+  .strategy-system-heading h1 { font-size:clamp(2.4rem,3vw,3.25rem); }
+  .strategy-system-rule { margin:9px 0; }
+  .strategy-system-panels { gap:10px; margin-top:16px; }
+  .strategy-system-panel { padding:14px 24px; }
+  .strategy-system-panel h2 { line-height:1.5; }
+  .strategy-system-rgs-list,.strategy-system-proof-list { gap:6px; margin-top:9px; }
+  .strategy-system-rgs-list article,
+  .strategy-system-proof-list article { min-height:42px; padding:5px 15px; }
+  .strategy-system-bottom { gap:18px; padding-top:10px; }
+  .strategy-system-enter { min-height:50px; }
+  .strategy-system-folio { margin-top:6px; }
+}
+
+@media (max-width:1100px) {
+  .strategy-system-cover-inner { width:min(100% - 56px,920px); padding-top:42px; }
+  .strategy-system-heading h1 { font-size:clamp(2.35rem,5.2vw,3.8rem); }
+  .strategy-system-proof-list { grid-template-columns:1fr; }
+  .strategy-system-bottom { grid-template-columns:1fr; justify-items:center; }
+  .strategy-system-bottom-copy { width:100%; }
+  .strategy-system-bottom > p { display:none; }
+}
+
+@media (max-width:900px) {
+  .strategy-system-cover { min-height:auto; }
+  .strategy-system-cover-inner { width:min(100% - 36px,680px); min-height:calc(100svh - 56px); padding:42px 0 22px; }
+  .strategy-system-heading h1 { font-size:clamp(2.15rem,6.2vw,3rem); }
+  .strategy-system-module,.strategy-system-era { letter-spacing:.15em; line-height:1.7; }
+  .strategy-system-panels { margin-top:18px; }
+  .strategy-system-panel { padding:20px 22px; }
+  .strategy-system-bottom { margin-top:20px; }
+  .strategy-system-enter { min-width:0; width:min(100%,520px); }
+}
+
+@media (max-width:540px) {
+  .strategy-system-cover-inner { width:calc(100% - 28px); padding-top:38px; }
+  .strategy-system-heading h1 { font-size:2.25rem; line-height:1.25; }
+  .strategy-system-heading h1 span { display:block; margin-top:6px; }
+  .strategy-system-module { font-size:.72rem; }
+  .strategy-system-era { font-size:.7rem; }
+  .strategy-system-panel { padding:22px 18px; }
+  .strategy-system-panel h2 { font-size:.9rem; }
+  .strategy-system-rgs-list article,.strategy-system-proof-list article { padding:12px 13px; }
+  .strategy-system-rgs-list p { display:grid; gap:2px; }
+  .strategy-system-rgs-list p b::before { content:""; margin:0; }
+  .strategy-system-proof-list p { font-size:.8rem; }
+  .strategy-system-bottom-copy { grid-template-columns:auto 1fr; }
+  .strategy-system-bottom-copy p { grid-column:1 / -1; }
+  .strategy-system-enter { min-height:54px; padding-inline:18px; font-size:.9rem; letter-spacing:.02em; }
+  .strategy-system-folio span:last-child { display:none; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .strategy-system-enter { transition:none; }
 }

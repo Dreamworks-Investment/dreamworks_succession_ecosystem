@@ -95,10 +95,10 @@ function navigateTo(page, options = {}) {
     el.classList.toggle('active', el === targetPage);
   });
 
-  // The strategy landing page is now a case library. Generic navigation to
-  // “战略与实践” returns to the library; direct case/chapter routes opt out.
-  if (page === 'strategy' && !options.preserveStrategyView && typeof strategyShowHub === 'function') {
-    strategyShowHub({ pushHistory: false, scroll: false });
+  // Generic navigation to “战略与实践” starts at the value-diagnosis cover.
+  // Direct library, case, and chapter routes preserve their requested depth.
+  if (page === 'strategy' && !options.preserveStrategyView && typeof window.strategyShowIntro === 'function') {
+    window.strategyShowIntro({ pushHistory: false, scroll: false });
   }
 
   if (typeof updateBackToCycleButton === 'function') {
@@ -199,6 +199,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(() => {
       if (typeof strategyOpenSkyworthDepth === 'function') {
         strategyOpenSkyworthDepth(strategyChapter, { replaceHistory: true, scroll: false });
+      }
+    }, 0);
+  } else if (requested === 'strategy-library') {
+    navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
+    try { window.history.replaceState({ page: 'strategy', strategyView: 'hub' }, '', '#strategy-library'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof strategyShowHub === 'function') {
+        strategyShowHub({ replaceHistory: true, scroll: false });
       }
     }, 0);
   } else if (requested.startsWith('strategy-case-')) {
