@@ -71,12 +71,6 @@ function openValueInvestment() {
 
 // Navigation
 function navigateTo(page, options = {}) {
-  // “狠值投资”由独立后端应用负责登录和Bearer token管理。
-  if (page === 'value') {
-    openValueInvestment();
-    return;
-  }
-
   const targetPage = document.getElementById('page-' + page);
   if (!targetPage) {
     console.warn('[navigation] Page not found:', page);
@@ -174,10 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Nav links
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', (event) => {
-      if (link.dataset.page === 'value') {
-        // 使用真实 href 作为无脚本/异常情况下的回退；正常情况下由浏览器直接跳转。
-        return;
-      }
       event.preventDefault();
       navigateTo(link.dataset.page);
     });
@@ -185,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Restore direct links such as #strategy / #wealth and initialise History state.
   const requested = INITIAL_ROUTE_HASH || window.location.hash.replace(/^#/, '');
-  const internalPages = ['home', 'strategy', 'wealth', 'trust', 'academy'];
+  const internalPages = ['home', 'strategy', 'value', 'wealth', 'trust', 'academy'];
   if (requested === 'strategy-chapter1' || requested === 'strategy-chapter2') {
     const strategyChapter = requested === 'strategy-chapter2' ? 2 : 1;
     navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });

@@ -42,10 +42,6 @@
 
   function enterBusinessPage(page) {
     if (!page) return;
-    if (page === 'value') {
-      if (typeof openValueInvestment === 'function') openValueInvestment();
-      return;
-    }
     if (typeof navigateTo === 'function') navigateTo(page);
   }
 
@@ -123,7 +119,7 @@
   window.updateBackToCycleButton = function updateBackToCycleButton(page) {
     const button = document.getElementById('back-to-value-cycle');
     if (!button) return;
-    button.classList.toggle('visible', page !== 'home' && page !== 'value');
+    button.classList.toggle('visible', page !== 'home');
   };
 
 

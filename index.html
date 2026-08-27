@@ -11,6 +11,7 @@
 <link href="css/strategy-chapter2-original.css" rel="stylesheet"/>
 <link href="css/strategy-chapter2-presentation.css" rel="stylesheet"/><link href="css/strategy-chapter-split.css" rel="stylesheet"/>
 <link href="css/strategy-case-gallery.css?v=2" rel="stylesheet"/>
+<link href="css/value-investment-intro.css?v=1" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
@@ -27,7 +28,7 @@
 <div class="nav-links">
 <a class="nav-link active" data-page="home">首页</a>
 <a class="nav-link" data-page="strategy">战略与实践</a>
-<a class="nav-link" data-page="value" href="https://sd85slpdkcofupk4bn66g.apigateway-cn-guangzhou.volceapi.com/" rel="noopener noreferrer" target="_blank">狠值投资</a>
+<a class="nav-link" data-page="value" href="#value">狠值投资</a>
 <a class="nav-link" data-page="wealth">身家诊断</a>
 <a class="nav-link" data-page="trust">家族信托</a>
 <a class="nav-link" data-page="academy">传承学院</a>
@@ -1881,7 +1882,108 @@
 </div>
 </section>
 <!-- ===================== VALUE INVESTING ===================== -->
-<!-- “狠值投资”由独立后端应用提供登录与Bearer token管理；本站只打开其公开根入口 -->
+<section class="page value-intro-page" id="page-value">
+<article aria-label="狠值投资系统介绍" class="value-intro-document">
+<section aria-labelledby="value-cube-title" class="value-intro-slide value-cube-overview" id="value-slide-13">
+<header class="value-slide-bar"><span>B1</span><strong>做菜与品菜，是同一件事的两面</strong></header>
+<div class="value-slide-inner value-cube-overview-grid">
+<figure class="value-cube-figure" aria-label="价值立方体：回报率、增长率和可持续时间共同决定企业价值">
+<svg class="value-cube-svg" viewBox="115 90 500 360" role="img" aria-labelledby="value-cube-svg-title-13">
+<title id="value-cube-svg-title-13">企业价值立方体</title>
+<defs>
+<linearGradient id="value-cube-front-13" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87ceeb" stop-opacity=".25"/><stop offset="100%" stop-color="#4682b4" stop-opacity=".25"/></linearGradient>
+<linearGradient id="value-cube-top-13" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87ceeb" stop-opacity=".38"/><stop offset="100%" stop-color="#87ceeb" stop-opacity=".16"/></linearGradient>
+<linearGradient id="value-cube-side-13" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4682b4" stop-opacity=".32"/><stop offset="100%" stop-color="#4682b4" stop-opacity=".14"/></linearGradient>
+</defs>
+<polygon points="260,160 460,160 460,360 260,360" fill="#87ceeb" fill-opacity=".08" stroke="#fff" stroke-opacity=".32" stroke-width="1.5"/>
+<polygon points="180,220 380,220 460,160 260,160" fill="url(#value-cube-top-13)" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>
+<polygon points="380,220 460,160 460,360 380,420" fill="url(#value-cube-side-13)" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>
+<polygon points="180,220 380,220 380,420 180,420" fill="url(#value-cube-front-13)" stroke="#fff" stroke-opacity=".75" stroke-width="2.5"/>
+<path d="M260 360V160M260 360H460M260 360L180 420" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="7 6"/>
+<path d="M180 420H465M180 420V135M180 420L400 240" fill="none" stroke-linecap="round" stroke-width="5.5"/>
+<path d="M180 420H465" stroke="#27ae60" stroke-width="5.5"/><path d="M465 420l-13-7v14z" fill="#27ae60"/>
+<text x="485" y="428" font-size="22" font-weight="700" fill="#27ae60">G · 增长率</text>
+<path d="M180 420V135" stroke="#e74c3c" stroke-width="5.5"/><path d="M180 135l-7 13h14z" fill="#e74c3c"/>
+<text x="180" y="118" text-anchor="middle" font-size="22" font-weight="700" fill="#e74c3c">R · 回报率</text>
+<path d="M180 420L400 240" stroke="#d4af37" stroke-width="5.5"/><path d="M400 240l-18 3 11.4 14z" fill="#d4af37"/>
+<text x="408" y="220" font-size="22" font-weight="700" fill="#d4af37">S · 可持续时间</text>
+</svg>
+</figure>
+<div class="value-cube-copy">
+<p class="value-intro-kicker">MENGONGCHANG · 同一套思维的一体两用</p>
+<h1 id="value-cube-title">一个价值立方体</h1>
+<p class="value-intro-lead">把一家企业的价值，想象成<strong>一个立方体</strong>：它的长、宽、高，分别由<strong>回报率、增长率、可持续时间</strong>决定。三条棱越长，体积越大，企业价值越大。</p>
+<p class="value-cube-formula">体积 = 长 × 宽 × 高 = <strong>R × G × S</strong> = 企业价值</p>
+<div class="value-two-use-summary">
+<article><strong>做菜 · 价值增进</strong><p>把三条棱都做长，立方体越来越大——企业家追求体积越来越大。</p></article>
+<article><strong>品菜 · 价值评估</strong><p>把三条棱量准确；价格远低于体积时，狠值出现——投资人追求评估相对准确。</p></article>
+</div>
+</div>
+</div>
+<button class="value-slide-next" onclick="document.getElementById('value-slide-14').scrollIntoView({behavior:'smooth'})" type="button">继续了解一体两用 <span>↓</span></button>
+<footer class="value-slide-footer"><span>MENGONGCHANG</span><span>13 / 20 · 战略价值增进 · 企业价值评估 · 标的研究</span></footer>
+</section>
+
+<section aria-labelledby="value-two-sides-title" class="value-intro-slide value-two-sides" id="value-slide-14">
+<div class="value-slide-inner">
+<header class="value-two-sides-heading"><p>ONE CUBE · TWO USES</p><h2 id="value-two-sides-title">一个立方体的两面</h2></header>
+<div class="value-two-sides-stage">
+<article class="value-side-card value-side-grow"><h3>价值增进<br/>把立方体做大</h3><p>ENTREPRENEUR · 做大体积</p><ul><li>定位找对鱼塘 → 拉长 R 回报率</li><li>配称聚焦场景 → 拉长 G 增长率</li><li>占据心智 → 拉长 S 可持续时间</li></ul></article>
+<figure class="value-cube-figure value-cube-figure-center" aria-label="一个立方体的两面">
+<svg class="value-cube-svg" viewBox="115 90 500 360" role="img" aria-labelledby="value-cube-svg-title-14">
+<title id="value-cube-svg-title-14">价值增进与价值评估共用的企业价值立方体</title>
+<defs>
+<linearGradient id="value-cube-front-14" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87ceeb" stop-opacity=".25"/><stop offset="100%" stop-color="#4682b4" stop-opacity=".25"/></linearGradient>
+<linearGradient id="value-cube-top-14" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#87ceeb" stop-opacity=".38"/><stop offset="100%" stop-color="#87ceeb" stop-opacity=".16"/></linearGradient>
+<linearGradient id="value-cube-side-14" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4682b4" stop-opacity=".32"/><stop offset="100%" stop-color="#4682b4" stop-opacity=".14"/></linearGradient>
+</defs>
+<polygon points="260,160 460,160 460,360 260,360" fill="#87ceeb" fill-opacity=".08" stroke="#fff" stroke-opacity=".32" stroke-width="1.5"/>
+<polygon points="180,220 380,220 460,160 260,160" fill="url(#value-cube-top-14)" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>
+<polygon points="380,220 460,160 460,360 380,420" fill="url(#value-cube-side-14)" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>
+<polygon points="180,220 380,220 380,420 180,420" fill="url(#value-cube-front-14)" stroke="#fff" stroke-opacity=".75" stroke-width="2.5"/>
+<path d="M260 360V160M260 360H460M260 360L180 420" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="7 6"/>
+<path d="M180 420H465" stroke="#27ae60" stroke-width="5.5"/><path d="M465 420l-13-7v14z" fill="#27ae60"/>
+<text x="485" y="428" font-size="22" font-weight="700" fill="#27ae60">G · 增长率</text>
+<path d="M180 420V135" stroke="#e74c3c" stroke-width="5.5"/><path d="M180 135l-7 13h14z" fill="#e74c3c"/>
+<text x="180" y="118" text-anchor="middle" font-size="22" font-weight="700" fill="#e74c3c">R · 回报率</text>
+<path d="M180 420L400 240" stroke="#d4af37" stroke-width="5.5"/><path d="M400 240l-18 3 11.4 14z" fill="#d4af37"/>
+<text x="408" y="220" font-size="22" font-weight="700" fill="#d4af37">S · 可持续时间</text>
+</svg>
+</figure>
+<article class="value-side-card value-side-judge"><h3>价值评估<br/>把体积估准</h3><p>INVESTOR · 估准体积</p><ul><li>量清三条棱 → 算出内在体积</li><li>价格 ≪ 体积 → 安全边际</li><li>狠值出现 → 不买会涨，只买狠值</li></ul></article>
+</div>
+<div class="value-two-sides-formula"><p>ENTERPRISE VALUE = VOLUME OF THE CUBE</p><strong>企业价值 = <em>回报率 R</em> × <em>增长率 G</em> × <em>可持续时间 S</em> = 立方体体积</strong></div>
+</div>
+<button class="value-slide-next" onclick="document.getElementById('value-slide-15').scrollIntoView({behavior:'smooth'})" type="button">继续了解狠值投资 <span>↓</span></button>
+<footer class="value-slide-footer"><span>MENGONGCHANG</span><span>14 / 20 · 企业家把体积做大，投资人把体积估准</span></footer>
+</section>
+
+<section aria-labelledby="value-investment-title" class="value-intro-slide value-investment-entry" id="value-slide-15">
+<div class="value-slide-inner value-investment-entry-inner">
+<header class="value-investment-heading">
+<h2 id="value-investment-title">狠值投资 · <span>评估价值、只买狠值</span></h2>
+<span aria-hidden="true"></span>
+<p>第二模块 · 狠值投资 · 品菜</p>
+<small>品菜 —— 评估企业内在价值 · 价格远低于价值时出手</small>
+</header>
+<div class="value-investment-story">
+<article><p>评估单个标的，用的是与价值增进完全相同的企业家思维——<strong>一体两用</strong>的品菜面：评估同样三要素（R · G · S），算清内在价值；当市场价格因恐慌或认知偏差远低于内在价值时，机会出现，即“<strong>狠值</strong>”。</p><h3>不买会涨，只买狠值。</h3><p>这一定位反人性，却历经短、中、长多个周期检验。管理规模中，公司、股东、员工自有资金占比约<strong>三分之一</strong>——我们是真的和客户绑在一起。</p></article>
+<div class="value-achievement-list">
+<p><span>·</span>有审计的<strong>17 年近 35 倍</strong>回报（年化约 23%）</p>
+<p><span>·</span><strong>2024 中国同规模组冠军</strong> #1</p>
+<p><span>·</span><strong>2025 三大奖大满贯</strong>：金牛奖 · 英华奖 · 金阳光奖</p>
+<p><span>·</span>自有资金占比约 <strong>1/3</strong> —— 与客户风险共担</p>
+</div>
+</div>
+<div class="value-investment-bottom">
+<div><strong>品菜</strong><span aria-hidden="true"></span><p>评估单个标的之后，家族整体身家怎么看？下一页，身家诊断</p></div>
+<button class="value-system-enter" onclick="openValueInvestment()" type="button">点击进入 狠值投资系统 <span aria-hidden="true">→</span></button>
+</div>
+</div>
+<footer class="value-slide-footer"><span>MENGONGCHANG</span><span>15 / 20 · 五模块分述 · 狠值投资</span></footer>
+</section>
+</article>
+</section>
 <!-- ===================== TRUST ===================== -->
 <section class="page" id="page-trust">
 <div class="section" style="padding-top:56px;">
@@ -2255,9 +2357,9 @@
 </footer>
 <!-- ===================== SCRIPTS ===================== -->
 <script src="js/charts.js"></script>
-<script src="js/app.js?v=3"></script>
+<script src="js/app.js?v=4"></script>
 <script src="js/home.js"></script>
-<script src="js/home-journey.js?v=2"></script>
+<script src="js/home-journey.js?v=3"></script>
 <script src="js/enterprise.js"></script>
 <script src="js/wealth.js?v=11.8.1"></script>
 <script src="js/report.js"></script>
