@@ -1,0 +1,232 @@
+/* 身家诊断 · 第16页介绍封面与五步诊断系统 */
+#page-wealth.wealth-diagnosis-page {
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
+  overflow:clip;
+}
+
+.wealth-system-intro,.wealth-diagnosis-wizard { display:none; }
+.wealth-intro-active .wealth-system-intro,.wealth-wizard-active .wealth-diagnosis-wizard { display:block; }
+
+.wealth-system-cover {
+  position:relative;
+  min-height:calc(100svh - 56px);
+  overflow:hidden;
+  color:#e6eef6;
+  background:
+    radial-gradient(720px 430px at 50% 38%,rgba(32,108,168,.17),transparent 72%),
+    linear-gradient(180deg,#0b2949 0%,#071b31 100%);
+}
+.wealth-system-cover::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.12;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);
+}
+.wealth-system-cover-inner {
+  position:relative;
+  width:min(1780px,calc(100% - 112px));
+  min-height:calc(100svh - 56px);
+  margin:0 auto;
+  padding:54px 0 72px;
+}
+.wealth-system-topline {
+  position:absolute;
+  top:0;
+  left:0;
+  width:68%;
+  height:3px;
+  background:linear-gradient(90deg,#1686ef,#d4af37 78%);
+}
+.wealth-system-heading h1 {
+  margin:0;
+  color:#fff;
+  font-family:"Noto Serif SC","Songti SC",serif;
+  font-size:clamp(3rem,4.4vw,5.35rem);
+  line-height:1.12;
+  letter-spacing:-.035em;
+}
+.wealth-system-heading h1 span { color:#d4af37; }
+.wealth-system-rule { display:block; width:102px; height:3px; margin:14px 0 14px; background:#d4af37; }
+.wealth-system-module { margin:0; color:#1686ef; font-weight:700; letter-spacing:.25em; }
+.wealth-system-era { margin:7px 0 0; color:#9eb1c4; font-size:.82rem; letter-spacing:.2em; }
+
+.wealth-system-stage {
+  display:grid;
+  margin-top:38px;
+  grid-template-columns:minmax(430px,.78fr) minmax(620px,1.22fr);
+  gap:clamp(48px,6vw,104px);
+  align-items:center;
+}
+.wealth-system-model {
+  margin:0;
+  padding:34px 32px 24px;
+  border:1px solid rgba(212,175,55,.25);
+  border-radius:12px;
+  background:rgba(255,255,255,.045);
+  box-shadow:0 28px 70px rgba(0,0,0,.17);
+}
+.wealth-system-types { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.wealth-type {
+  display:flex;
+  min-height:166px;
+  padding:25px 16px;
+  flex-direction:column;
+  justify-content:center;
+  text-align:center;
+  border:1px solid rgba(142,174,204,.52);
+  border-radius:8px;
+  background:rgba(75,112,149,.14);
+}
+.wealth-type strong { display:block; margin-bottom:12px; font-size:1.28rem; letter-spacing:.14em; }
+.wealth-type span { color:#aebfd0; font-size:.84rem; line-height:1.65; }
+.wealth-type-muscle { border-color:rgba(212,175,55,.78); }
+.wealth-type-muscle strong { color:#d4af37; }
+.wealth-type-tumor { border-color:rgba(230,78,73,.72); }
+.wealth-type-tumor strong { color:#ef635f; }
+.wealth-system-equation { margin:22px 0 0; color:#d4af37; text-align:center; font-size:.9rem; font-weight:700; letter-spacing:.08em; }
+.wealth-system-model figcaption { margin-top:12px; color:#8299ad; text-align:center; font-size:.72rem; letter-spacing:.08em; }
+.wealth-system-copy > p { margin:0; color:#cbd7e2; font-size:.96rem; line-height:1.9; }
+.wealth-system-copy > p strong { color:#d4af37; }
+.wealth-system-questions { display:grid; margin:22px 0 0; padding:0; gap:12px; list-style:none; }
+.wealth-system-questions li {
+  display:grid;
+  min-height:74px;
+  padding:13px 18px;
+  grid-template-columns:38px 1fr;
+  gap:13px;
+  align-items:center;
+  border-left:3px solid #d4af37;
+  background:rgba(87,125,164,.17);
+}
+.wealth-system-questions li > span { display:grid; width:30px; height:30px; place-items:center; border-radius:50%; color:#0b2949; background:#d4af37; font-weight:800; }
+.wealth-system-questions p { margin:0; color:#bdcbd9; font-size:.85rem; line-height:1.72; }
+.wealth-system-questions strong { margin-right:12px; color:#d4af37; }
+.wealth-system-bottom {
+  display:grid;
+  margin-top:36px;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:32px;
+  align-items:center;
+}
+.wealth-system-bottom > div { display:grid; grid-template-columns:auto minmax(90px,1fr) auto; gap:17px; align-items:center; }
+.wealth-system-bottom strong { color:#d4af37; font-family:"Noto Serif SC","Songti SC",serif; font-size:1.2rem; }
+.wealth-system-bottom > div span { height:1px; background:rgba(212,175,55,.34); }
+.wealth-system-bottom p { margin:0; color:#91a7ba; font-size:.77rem; }
+.wealth-system-enter {
+  display:inline-flex;
+  min-width:370px;
+  min-height:58px;
+  padding:12px 30px;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  border:2px solid #d4af37;
+  border-radius:999px;
+  color:#d4af37;
+  background:rgba(212,175,55,.065);
+  font:700 1rem/1.2 "Noto Serif SC","Songti SC",serif;
+  cursor:pointer;
+  transition:color .2s ease,background .2s ease,transform .2s ease;
+}
+.wealth-system-enter:hover,.wealth-system-enter:focus-visible { color:#071b31; background:#d4af37; outline:none; transform:translateY(-2px); }
+.wealth-system-folio { position:absolute; left:0; right:0; bottom:14px; display:flex; justify-content:space-between; color:#536d83; font-size:.62rem; letter-spacing:.11em; }
+.wealth-system-folio span:first-child { font-weight:800; letter-spacing:.16em; }
+
+.wealth-diagnosis-wizard { width:min(1440px,calc(100% - 64px)); margin:0 auto; }
+.wealth-diagnosis-wizard .section { max-width:none; }
+.wealth-wizard-back { margin:24px 0 -24px; }
+
+.wealth-required-hero {
+  display:grid;
+  margin-bottom:18px;
+  padding:22px 24px;
+  grid-template-columns:1fr auto;
+  gap:4px 24px;
+  align-items:center;
+  border:1px solid rgba(212,175,55,.55);
+  border-radius:12px;
+  background:linear-gradient(135deg,#0d2c49,#123a5d);
+  color:#fff;
+}
+.wealth-required-hero > span { color:#d9e4ed; font-weight:700; }
+.wealth-required-hero > strong { grid-row:1 / 3; grid-column:2; color:#d4af37; font-size:2.55rem; line-height:1; }
+.wealth-required-hero > p { margin:0; color:#9fb3c5; font-size:.8rem; }
+.wealth-return-cards { display:grid; margin-bottom:18px; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; }
+.wealth-return-card { position:relative; min-height:188px; padding:20px; border:1px solid var(--border); border-radius:12px; background:#fbfbf8; }
+.wealth-return-card.is-winner { border-color:#d4af37; box-shadow:inset 0 3px #d4af37,0 10px 30px rgba(75,55,12,.08); }
+.wealth-return-card.is-winner::after { content:"最终取值"; position:absolute; top:12px; right:12px; padding:2px 8px; border-radius:999px; color:#715510; background:#f8ebbd; font-size:.66rem; font-weight:700; }
+.wealth-return-card > span { display:block; padding-right:54px; color:var(--text-secondary); font-size:.8rem; font-weight:700; }
+.wealth-return-card > strong { display:block; margin:13px 0 9px; color:#173a58; font-size:2rem; }
+.wealth-return-card > p { margin:0; color:var(--text-muted); font-size:.76rem; line-height:1.6; }
+.wealth-return-card label { display:grid; margin-top:9px; grid-template-columns:auto 86px; gap:8px; align-items:center; color:var(--text-secondary); font-size:.74rem; }
+.wealth-return-card label input { padding:6px 8px; }
+.wealth-principal-panel { display:flex; margin:0 0 14px; padding:15px 18px; justify-content:space-between; gap:24px; align-items:center; border:1px solid var(--border); border-radius:10px; background:var(--bg-section); }
+.wealth-principal-panel strong { display:block; color:#173a58; }
+.wealth-principal-panel p { margin:3px 0 0; color:var(--text-muted); font-size:.76rem; }
+.wealth-principal-panel label { display:flex; min-width:250px; align-items:center; gap:7px; color:var(--text-secondary); font-size:.8rem; }
+.wealth-principal-panel input { text-align:right; }
+.wealth-formula-panel { display:grid; margin-bottom:18px; padding:14px 18px; grid-template-columns:auto 1fr; gap:18px; align-items:center; border-left:4px solid #185fa5; border-radius:7px; background:#edf5fb; }
+.wealth-formula-panel strong { color:#174c77; white-space:nowrap; }
+.wealth-formula-panel span { color:#52728d; font-size:.8rem; line-height:1.55; }
+.wealth-cashflow-breakdown { margin:0 0 18px; }
+.wealth-cashflow-breakdown:empty { display:none; }
+.wealth-cashflow-breakdown details { border:1px solid var(--border); border-radius:9px; background:#fff; }
+.wealth-cashflow-breakdown summary { padding:12px 16px; color:#173a58; font-size:.82rem; font-weight:700; cursor:pointer; }
+.wealth-cashflow-breakdown .table-wrap { margin:0 14px 14px; }
+.wealth-cashflow-breakdown table { font-size:.78rem; }
+.wealth-cashflow-equation { margin:0 16px 12px; color:var(--text-secondary); font-size:.78rem; }
+.wealth-expense-intro { margin:0 0 10px; color:var(--text-secondary); font-size:.84rem; }
+.wealth-expense-row { display:grid; margin-bottom:9px; grid-template-columns:minmax(170px,1.4fr) minmax(120px,.8fr) minmax(110px,.65fr) minmax(110px,.65fr) minmax(105px,.55fr) 36px; gap:8px; align-items:center; }
+.wealth-expense-row .form-input,.wealth-expense-row select { min-width:0; }
+.wealth-expense-remove { border:0; color:var(--red); background:transparent; font-size:1.3rem; cursor:pointer; }
+.wealth-recommendation-list { display:grid; gap:13px; }
+.wealth-recommendation { display:grid; padding:18px 20px; grid-template-columns:76px 1fr; gap:16px; border:1px solid var(--border); border-radius:10px; background:#fff; }
+.wealth-recommendation-priority { align-self:start; padding:5px 9px; border-radius:999px; text-align:center; font-size:.72rem; font-weight:800; }
+.wealth-priority-high { color:#8b2929; background:#fcebeb; }
+.wealth-priority-medium { color:#8a5a08; background:#fef3e0; }
+.wealth-priority-watch { color:#286b55; background:#e1f5ee; }
+.wealth-recommendation h5 { margin:0 0 7px; color:#173a58; font-size:.94rem; }
+.wealth-recommendation p { margin:4px 0 0; color:var(--text-secondary); font-size:.82rem; line-height:1.7; }
+.wealth-recommendation p strong { color:var(--text); }
+.wealth-advice-disclaimer { margin-top:18px; }
+.wealth-toast { position:fixed; z-index:10000; right:24px; bottom:24px; max-width:390px; padding:14px 18px; border-radius:10px; color:#fff; background:#173a58; box-shadow:0 16px 45px rgba(0,0,0,.25); font-size:.86rem; }
+.wealth-toast.is-error { background:#8f2d2d; }
+
+@media (max-width:1100px) {
+  .wealth-system-cover-inner { width:min(100% - 56px,1040px); }
+  .wealth-system-stage { grid-template-columns:1fr; gap:28px; }
+  .wealth-system-model { max-width:720px; }
+  .wealth-system-bottom { grid-template-columns:1fr; }
+  .wealth-system-bottom > div { grid-template-columns:auto 1fr; }
+  .wealth-system-bottom p { grid-column:1 / -1; }
+  .wealth-return-cards { grid-template-columns:1fr; }
+}
+@media (max-width:700px) {
+  .wealth-system-cover-inner { width:calc(100% - 30px); padding:38px 0 74px; }
+  .wealth-system-heading h1 { font-size:clamp(2.35rem,11vw,3.35rem); }
+  .wealth-system-module,.wealth-system-era { line-height:1.75; letter-spacing:.12em; }
+  .wealth-system-stage { margin-top:28px; }
+  .wealth-system-model { padding:20px 15px; }
+  .wealth-system-types { grid-template-columns:1fr; }
+  .wealth-type { min-height:104px; }
+  .wealth-system-copy > p { font-size:.88rem; }
+  .wealth-system-questions li { grid-template-columns:34px 1fr; padding:12px; }
+  .wealth-system-enter { min-width:0; width:100%; min-height:54px; padding-inline:18px; font-size:.9rem; }
+  .wealth-system-folio span:last-child { text-align:right; }
+  .wealth-diagnosis-wizard { width:calc(100% - 28px); }
+  .wealth-required-hero { grid-template-columns:1fr; }
+  .wealth-required-hero > strong { grid-row:auto; grid-column:auto; margin:8px 0; }
+  .wealth-principal-panel { align-items:flex-start; flex-direction:column; }
+  .wealth-principal-panel label { width:100%; min-width:0; }
+  .wealth-formula-panel { grid-template-columns:1fr; gap:6px; }
+  .wealth-expense-row { padding:12px; grid-template-columns:1fr 1fr; border:1px solid var(--border); border-radius:8px; }
+  .wealth-expense-row > :first-child { grid-column:1 / -1; }
+  .wealth-recommendation { grid-template-columns:1fr; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .wealth-system-enter { transition:none; }
+}

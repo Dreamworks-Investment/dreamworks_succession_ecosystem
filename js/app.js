@@ -16,7 +16,8 @@ const AppState = {
     debt: []
   },
   flags: { usage: false, convenience: false, emotional: false },
-  requiredReturn: { r1: null, r2: null, r3: 10 },
+  expenses: [],
+  requiredReturn: { r1: null, r2: null, r3: 10, winner: 'r3', computation: null, principalOverride: null },
   dcfResults: null,
   // Autosave
   autosaveTimer: null
@@ -35,7 +36,8 @@ function loadSavedState() {
       const data = JSON.parse(saved);
       AppState.assets = data.assets || AppState.assets;
       AppState.flags = data.flags || AppState.flags;
-      AppState.requiredReturn = data.requiredReturn || AppState.requiredReturn;
+      AppState.expenses = data.expenses || AppState.expenses;
+      AppState.requiredReturn = Object.assign({}, AppState.requiredReturn, data.requiredReturn || {});
       AppState.dcfResults = data.dcfResults || null;
       AppState.wealthStep = data.wealthStep || 1;
     }
@@ -47,6 +49,7 @@ function saveState() {
     localStorage.setItem('workbuddy_wealth_state', JSON.stringify({
       assets: AppState.assets,
       flags: AppState.flags,
+      expenses: AppState.expenses,
       requiredReturn: AppState.requiredReturn,
       dcfResults: AppState.dcfResults,
       wealthStep: AppState.wealthStep
@@ -78,6 +81,12 @@ function navigateTo(page, options = {}) {
   // Direct library, case, and chapter routes preserve their requested depth.
   if (page === 'strategy' && !options.preserveStrategyView && typeof window.strategyShowIntro === 'function') {
     window.strategyShowIntro({ pushHistory: false, scroll: false });
+  }
+
+  // Generic navigation to “身家诊断” always starts at its explanatory cover.
+  // Direct #wealth-system routes and browser history can preserve the wizard view.
+  if (page === 'wealth' && !options.preserveWealthView && typeof window.wealthShowIntro === 'function') {
+    window.wealthShowIntro({ pushHistory: false, scroll: false });
   }
 
   if (typeof updateBackToCycleButton === 'function') {
@@ -193,6 +202,14 @@ document.addEventListener('DOMContentLoaded', () => {
         strategyOpenCase(strategyCase, { replaceHistory: true, scroll: false });
       }
     }, 0);
+  } else if (requested === 'wealth-system') {
+    navigateTo('wealth', { skipHistory: true, scroll: false, preserveWealthView: true });
+    try { window.history.replaceState({ page: 'wealth', wealthView: 'wizard' }, '', '#wealth-system'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.wealthEnterSystem === 'function') {
+        window.wealthEnterSystem({ pushHistory: false, scroll: false });
+      }
+    }, 0);
   } else if (internalPages.includes(requested)) {
     navigateTo(requested, { skipHistory: true });
     try { window.history.replaceState({ page: requested }, '', '#' + requested); } catch (error) {}
@@ -208,7 +225,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = event.state && event.state.page ? event.state.page : 'home';
     const preserveStrategyView = page === 'strategy' && event.state &&
       (event.state.strategyCase || event.state.strategyChapter || event.state.strategyView);
-    navigateTo(page, { skipHistory: true, preserveStrategyView });
+    const preserveWealthView = page === 'wealth' && event.state && event.state.wealthView === 'wizard';
+    navigateTo(page, { skipHistory: true, preserveStrategyView, preserveWealthView });
+    if (preserveWealthView) {
+      window.setTimeout(() => {
+        if (typeof window.wealthEnterSystem === 'function') {
+          window.wealthEnterSystem({ pushHistory: false, scroll: false });
+        }
+      }, 0);
+    }
     if (event.state && event.state.anchor === 'home-value-cycle') {
       window.setTimeout(() => {
         if (typeof scrollHomeJourneyTo === 'function') scrollHomeJourneyTo('home-value-cycle');

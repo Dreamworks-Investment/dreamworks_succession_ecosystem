@@ -6,22 +6,17 @@
  */
 
 async function generatePDF(element, filename) {
-  if (!element) {
-    alert('没有可导出的报告内容');
-    return;
-  }
+  if (!element) throw new Error('没有可导出的报告内容');
+  if (typeof window.html2canvas !== 'function') throw new Error('PDF 渲染组件 html2canvas 未加载');
+  if (!window.jspdf || typeof window.jspdf.jsPDF !== 'function') throw new Error('PDF 组件 jsPDF 未加载');
 
+  const loadingDiv = document.createElement('div');
+  const origWidth = element.style.width;
   try {
     const { jsPDF } = window.jspdf;
-
-    // Show loading state
-    const loadingDiv = document.createElement('div');
     loadingDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(26,26,46,.9);color:#d4af37;padding:20px 40px;border-radius:12px;z-index:9999;font-family:sans-serif;font-size:1rem;';
     loadingDiv.textContent = '正在生成PDF...';
     document.body.appendChild(loadingDiv);
-
-    // Save original state
-    const origWidth = element.style.width;
     element.style.width = '750px'; // Fixed width for consistent PDF rendering
 
     // Render to canvas
@@ -49,18 +44,20 @@ async function generatePDF(element, filename) {
 
     // Additional pages
     while (heightLeft > 0) {
-      position = -(pageHeight * (pdf.internal.getNumberOfPages() - 1)) + 10;
+      position -= pageHeight;
       pdf.addPage();
       pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
     }
 
     pdf.save(filename + '.pdf');
-    document.body.removeChild(loadingDiv);
-
+    return true;
   } catch (err) {
     console.error('PDF generation error:', err);
-    alert('PDF生成失败，请重试。错误：' + err.message);
+    throw err;
+  } finally {
+    element.style.width = origWidth;
+    loadingDiv.remove();
   }
 }
 
@@ -69,6 +66,18 @@ async function generatePDF(element, filename) {
  * 严格按照 身家诊断报告_交付模板.md 的结构
  */
 async function exportWealthReport() {
+  const today = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+    .format(new Date()).replaceAll('/', '-');
+  const calculation = AppState.requiredReturn.computation || WealthModel.computeRequiredReturn(
+    AppState.assets,
+    AppState.expenses,
+    AppState.requiredReturn.r3 ?? 10,
+    AppState.requiredReturn.principalOverride
+  );
+  const recommendations = typeof window.buildWealthActionRecommendations === 'function'
+    ? window.buildWealthActionRecommendations()
+    : [];
+  const expenses = WealthModel.normalizeExpenses(AppState.expenses);
   // Build a comprehensive report element
   const reportDiv = document.createElement('div');
   reportDiv.id = 'wealth-report-full';
@@ -78,8 +87,9 @@ async function exportWealthReport() {
   const totalBook = dcf ? dcf.totalBook : 0;
   const totalPV = dcf ? dcf.totalPV : 0;
   const discountPct = dcf ? dcf.discountPct : 0;
-  const currentR = AppState.requiredReturn.r1 || 0;
-  const requiredR = Math.max(AppState.requiredReturn.r1 || 0, AppState.requiredReturn.r2 || 0, AppState.requiredReturn.r3 || 10);
+  const currentR = Number.isFinite(calculation.r1.rate) ? calculation.r1.rate : 0;
+  const requiredR = calculation.requiredRate;
+  const m2Rate = calculation.r3;
 
   const kpiPassed = currentR >= requiredR;
 
@@ -125,7 +135,7 @@ async function exportWealthReport() {
             <th style="padding:10px;text-align:left;">资产类别</th>
             <th style="padding:10px;text-align:right;">账面值（万元）</th>
             <th style="padding:10px;text-align:right;">占比</th>
-            <th style="padding:10px;text-align:right;">年化回报率</th>
+            <th style="padding:10px;text-align:right;">诊断</th>
           </tr>
         </thead>
         <tbody>
@@ -133,7 +143,7 @@ async function exportWealthReport() {
             <tr style="border-bottom:1px solid #f0ede5;">
               <td style="padding:10px;">${r.label}</td>
               <td style="padding:10px;text-align:right;">${Math.round(r.bookVal).toLocaleString()}</td>
-              <td style="padding:10px;text-align:right;">${(r.bookVal/totalBook*100).toFixed(1)}%</td>
+              <td style="padding:10px;text-align:right;">${totalBook > 0 ? (r.bookVal/totalBook*100).toFixed(1) : '0.0'}%</td>
               <td style="padding:10px;text-align:right;color:${r.destroyed > r.bookVal * 0.1 ? '#a32d2d' : '#1d9e75'};">${r.assessment}</td>
             </tr>
           `).join('')}
@@ -141,10 +151,11 @@ async function exportWealthReport() {
       </table>
     </div>
 
-    <!-- Part 2: Past 5 Years -->
+    <!-- Part 2: Annualized return -->
     <div style="margin-bottom:32px;">
-      <h2 style="font-size:1.3rem;color:#1a1a2e;border-bottom:1px solid #e5e2d8;padding-bottom:8px;margin-bottom:16px;">第二部分：过去五年回报率分析</h2>
-      <p style="font-size:.9rem;color:#555;">整体身家加权平均回报率：<strong style="font-size:1.2rem;">${fmtPct(currentR)}</strong></p>
+      <h2 style="font-size:1.3rem;color:#1a1a2e;border-bottom:1px solid #e5e2d8;padding-bottom:8px;margin-bottom:16px;">第二部分：整体身家年化净回报</h2>
+      <p style="font-size:.9rem;color:#555;">本报告所有收益与增值字段均采用年化口径。资产年收益减去负债年成本后，再除以净资产。</p>
+      <p style="font-size:.9rem;color:#555;">资产年收益 <strong>${fmtMoney(calculation.r1.annualAssetIncome)}</strong> − 负债年成本 <strong>${fmtMoney(calculation.r1.annualDebtCost)}</strong>，净资产 <strong>${fmtMoney(calculation.r1.netAssets)}</strong>，得到 R₁ = <strong style="font-size:1.2rem;">${fmtPct(currentR)}</strong>。</p>
       <p style="font-size:.9rem;color:#555;">与要求回报率 ${fmtPct(requiredR)} 对比：
         <strong style="color:${currentR < requiredR ? '#a32d2d' : '#1d9e75'}">
           ${currentR < requiredR ? '大幅低于要求回报率——你的身家在悄悄缩水' : '接近或高于要求回报率'}
@@ -165,30 +176,39 @@ async function exportWealthReport() {
         </thead>
         <tbody>
           <tr style="border-bottom:1px solid #f0ede5;">
-            <td style="padding:10px;">A. 过去5年实际回报率</td>
+            <td style="padding:10px;">A. 当前身家净回报率 R₁</td>
             <td style="padding:10px;text-align:right;font-weight:bold;">${fmtPct(currentR)}</td>
-            <td style="padding:10px;">加权平均计算</td>
+            <td style="padding:10px;">资产收益减负债成本 ÷ 净资产</td>
           </tr>
           <tr style="border-bottom:1px solid #f0ede5;">
             <td style="padding:10px;">B. 现金流倒算</td>
-            <td style="padding:10px;text-align:right;font-weight:bold;">${AppState.requiredReturn.r2 ? fmtPct(AppState.requiredReturn.r2) : '未计算'}</td>
-            <td style="padding:10px;">未来刚性支付义务</td>
+            <td style="padding:10px;text-align:right;font-weight:bold;">${Number.isFinite(calculation.r2.rate) ? fmtPct(calculation.r2.rate) : '未形成约束'}</td>
+            <td style="padding:10px;">逐年现金流现值 = 可投入本金</td>
           </tr>
           <tr style="border-bottom:1px solid #f0ede5;">
             <td style="padding:10px;">C. M2购买力底线</td>
-            <td style="padding:10px;text-align:right;font-weight:bold;">10.0%</td>
-            <td style="padding:10px;">中国M2近10年增速</td>
+            <td style="padding:10px;text-align:right;font-weight:bold;">${fmtPct(m2Rate)}</td>
+            <td style="padding:10px;">本次诊断采用的可编辑假设值</td>
           </tr>
         </tbody>
       </table>
       <p style="margin-top:16px;text-align:center;font-size:1.1rem;">
-        R<sub>要求</sub> = max(角度一, 角度二, 角度三) = <strong style="font-size:1.4rem;color:#d4af37;">${fmtPct(requiredR)}</strong>
+        R<sub>要求</sub> = max(角度一, 角度二, 角度三) = <strong style="font-size:1.4rem;color:#d4af37;">${fmtPct(requiredR)}</strong><br>
+        <span style="font-size:.82rem;color:#777;">最终取值来源：${calculation.winnerLabel}</span>
       </p>
+      <div style="margin-top:18px;padding:16px;background:#fafaf7;border-radius:6px;">
+        <p style="margin:0;font-size:.85rem;color:#555;"><strong>可投入本金：</strong>净资产 ${fmtMoney(calculation.investable.netAssets)} − 自住房 ${fmtMoney(calculation.investable.excludedSelfUseRealEstate)} = 默认 ${fmtMoney(calculation.investable.defaultPrincipal)}${calculation.investable.overridden ? `；本次手工调整为 ${fmtMoney(calculation.investable.principal)}` : ''}。</p>
+      </div>
+      ${expenses.length ? `
+        <table style="width:100%;margin-top:14px;border-collapse:collapse;font-size:.82rem;">
+          <thead><tr style="background:#f6f5f0;"><th style="padding:8px;text-align:left;">刚性支出</th><th style="padding:8px;text-align:right;">每次金额</th><th style="padding:8px;text-align:right;">首次发生</th><th style="padding:8px;text-align:right;">频率</th></tr></thead>
+          <tbody>${expenses.map(expense => `<tr style="border-bottom:1px solid #f0ede5;"><td style="padding:8px;">${escapeWealthHTML(expense.description)}</td><td style="padding:8px;text-align:right;">${fmtMoney(expense.amount)}</td><td style="padding:8px;text-align:right;">第 ${expense.firstYear} 年</td><td style="padding:8px;text-align:right;">${expense.frequency === 'annual' ? `每年，持续 ${expense.duration} 年` : '一次性'}</td></tr>`).join('')}</tbody>
+        </table>` : '<p style="font-size:.82rem;color:#888;">本次未录入有效刚性支出，R₂ 不参与最大值比较。</p>'}
     </div>
 
     <!-- Part 4: Real Wealth -->
     <div style="margin-bottom:32px;background:#fcf8f0;padding:24px;border-radius:8px;">
-      <h2 style="font-size:1.3rem;color:#1a1a2e;border-bottom:1px solid #e5e2d8;padding-bottom:8px;margin-bottom:16px;">第四部分：真实身家（全书最重要的一页）</h2>
+      <h2 style="font-size:1.3rem;color:#1a1a2e;border-bottom:1px solid #e5e2d8;padding-bottom:8px;margin-bottom:16px;">第四部分：真实身家（中性单情景）</h2>
       <table style="width:100%;border-collapse:collapse;font-size:.9rem;">
         <thead>
           <tr style="background:#f6f5f0;">
@@ -217,7 +237,7 @@ async function exportWealthReport() {
       </table>
 
       <p style="margin-top:16px;font-size:.95rem;color:#555;text-align:center;">
-        以 ${fmtPct(requiredR)} 要求回报率衡量，您的真实身家为 <strong>${fmtMoney(totalPV)}</strong>，
+        以 ${fmtPct(requiredR)} 要求回报率和 ${dcf?.horizonYears || 10} 年评估期衡量，您的真实身家为 <strong>${fmtMoney(totalPV)}</strong>，
         较账面值的 <strong>${fmtMoney(totalBook)}</strong> ${discountPct < -0.5 ? '折价 <span style="color:#a32d2d;">' + Math.abs(discountPct).toFixed(1) + '%</span>' : '基本持平'}。
       </p>
       <p style="font-size:.9rem;color:#888;text-align:center;margin-top:12px;">
@@ -242,7 +262,7 @@ async function exportWealthReport() {
           ${[0,5,10,15,20,40].map(y => {
             const currVal = totalBook * Math.pow(1 + currentR / 100, y);
             const reqVal = totalBook * Math.pow(1 + requiredR / 100, y);
-            const m2Val = totalBook * Math.pow(1 + 10 / 100, y);
+            const m2Val = totalBook * Math.pow(1 + m2Rate / 100, y);
             const diff = reqVal - currVal;
             return `
               <tr style="border-bottom:1px solid #f0ede5;">
@@ -268,22 +288,16 @@ async function exportWealthReport() {
         <strong>核心目标：</strong>让整体身家加权年化回报率 > 要求回报率 ${fmtPct(requiredR)}
       </p>
 
-      ${(dcf?.detailRows || []).filter(r => r.destroyed > 0).sort((a, b) => b.destroyed - a.destroyed).slice(0, 5).map((r, i) => `
+      ${recommendations.map((item, i) => `
         <div style="margin-bottom:16px;padding:16px;background:#fafaf7;border-radius:6px;">
-          <h4 style="color:#a32d2d;margin-bottom:4px;">建议${i + 1}：优化${r.label}配置</h4>
-          <p style="font-size:.85rem;color:#555;">该资产类账面值 ${Math.round(r.bookVal).toLocaleString()} 万元，价值损毁约 ${Math.round(r.destroyed).toLocaleString()} 万元。建议逐项审视此类资产，减少低回报配置，将释放的资本投入更高回报的长期资产。</p>
+          <h4 style="color:${item.priority === '高' ? '#a32d2d' : '#8a6418'};margin-bottom:4px;">${i + 1}. [${escapeWealthHTML(item.priority)}优先级] ${escapeWealthHTML(item.title)}</h4>
+          <p style="font-size:.82rem;color:#555;"><strong>证据：</strong>${escapeWealthHTML(item.evidence)}</p>
+          <p style="font-size:.82rem;color:#555;"><strong>行动：</strong>${escapeWealthHTML(item.action)}</p>
+          <p style="font-size:.82rem;color:#777;"><strong>边界：</strong>${escapeWealthHTML(item.caveat)}</p>
         </div>
       `).join('')}
 
-      <div style="padding:16px;background:#f6f5f0;border-radius:6px;margin-top:16px;">
-        <h4 style="margin-bottom:4px;">风险管理建议</h4>
-        <ul style="font-size:.85rem;color:#555;padding-left:20px;line-height:1.8;">
-          <li>家族信托架构：隔离企业经营风险对家族财富的冲击</li>
-          <li>资本久期匹配：长短期资本与需求端匹配</li>
-          <li>资产分散化：从单一行业/企业 → 多元化配置</li>
-          <li>定期体检：建议年度完整复检，季度快速检视</li>
-        </ul>
-      </div>
+      <p style="padding:12px 16px;background:#f6f5f0;border-radius:6px;font-size:.78rem;color:#777;">以上建议由可审计规则生成，用于家族内部讨论与顾问复核，不构成具体产品、买卖时点或配置比例建议。</p>
     </div>
 
     <!-- Part 7: Next Steps -->
@@ -297,15 +311,15 @@ async function exportWealthReport() {
 
     <!-- Appendix -->
     <div style="margin-bottom:24px;font-size:.8rem;color:#999;border-top:1px solid #e5e2d8;padding-top:16px;">
-      <p><strong>附录：要求回报率的参照锚</strong></p>
+      <p><strong>附录：本次计算口径与审计轨迹</strong></p>
       <table style="width:100%;border-collapse:collapse;">
-        <tr><td>十年期国债收益率</td><td>~1.7%</td><td>无风险利率</td></tr>
-        <tr><td>沪深300全收益19年</td><td>~9%</td><td>A股被动宽指</td></tr>
-        <tr><td>中国M2近10年增速</td><td>~10.5%</td><td>货币贬值速度</td></tr>
-        <tr><td>梦工场选股门槛</td><td>~15%</td><td>狠值投资最低要求</td></tr>
-        <tr><td>巴菲特60年回报</td><td>~20%</td><td>全球顶尖长期投资者</td></tr>
+        <tr><td>收益字段</td><td>年化口径</td><td>由用户录入或演示样本提供</td></tr>
+        <tr><td>R₁</td><td>${fmtPct(currentR)}</td><td>资产年收益 − 负债年成本，再除以净资产</td></tr>
+        <tr><td>R₂</td><td>${Number.isFinite(calculation.r2.rate) ? fmtPct(calculation.r2.rate) : '未形成约束'}</td><td>逐年刚性支出现金流现值倒算</td></tr>
+        <tr><td>R₃</td><td>${fmtPct(m2Rate)}</td><td>本次诊断采用的可编辑 M2 假设</td></tr>
+        <tr><td>评估期</td><td>${dcf?.horizonYears || 10} 年</td><td>中性单情景 DCF</td></tr>
       </table>
-      <p style="margin-top:12px;">数据来源：中国人民银行、Bloomberg、Siegel "Stocks for the Long Run"</p>
+      <p style="margin-top:12px;">报告由浏览器本地生成，输入数据保存在当前设备浏览器中。本报告用于诊断演示与顾问复核。</p>
     </div>
 
     <div style="text-align:center;margin-top:40px;padding-top:24px;border-top:1px solid #e5e2d8;">
@@ -319,8 +333,9 @@ async function exportWealthReport() {
   reportDiv.style.left = '-9999px';
   reportDiv.style.top = '0';
   document.body.appendChild(reportDiv);
-
-  await generatePDF(reportDiv, '身家诊断报告');
-
-  document.body.removeChild(reportDiv);
+  try {
+    return await generatePDF(reportDiv, `梦工场身家诊断报告_${today}`);
+  } finally {
+    reportDiv.remove();
+  }
 }

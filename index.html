@@ -12,6 +12,7 @@
 <link href="css/strategy-chapter2-presentation.css" rel="stylesheet"/><link href="css/strategy-chapter-split.css" rel="stylesheet"/>
 <link href="css/strategy-case-gallery.css?v=2" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
+<link href="css/wealth-diagnosis.css?v=1" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
@@ -2149,11 +2150,50 @@
 </div>
 </section>
 <!-- ===================== WEALTH ===================== -->
-<section class="page" id="page-wealth">
+<section class="page wealth-diagnosis-page wealth-intro-active" id="page-wealth">
+<article aria-label="身家诊断系统介绍" class="wealth-system-intro" id="wealth-system-intro">
+<section aria-labelledby="wealth-system-cover-title" class="wealth-system-cover">
+<div class="wealth-system-cover-inner">
+<span aria-hidden="true" class="wealth-system-topline"></span>
+<header class="wealth-system-heading">
+<h1 id="wealth-system-cover-title">身家诊断 · <span>让身家更安全</span></h1>
+<span aria-hidden="true" class="wealth-system-rule"></span>
+<p class="wealth-system-module">第四模块 · 身家诊断 · 价值立方体模型</p>
+<p class="wealth-system-era">体检 —— 把家族当上市公司体检 · 厘清真实身家 · 锚定传承要求回报率</p>
+</header>
+<div class="wealth-system-stage">
+<figure class="wealth-system-model" aria-labelledby="wealth-system-model-caption">
+<div class="wealth-system-types" aria-label="资产价值立方体三种分类">
+<article class="wealth-type wealth-type-muscle"><strong>肌肉型</strong><span>持续创造<br/>超额回报</span></article>
+<article class="wealth-type wealth-type-fat"><strong>肥肉型</strong><span>基本保值<br/>但增长有限</span></article>
+<article class="wealth-type wealth-type-tumor"><strong>肿瘤型</strong><span>跑不赢通胀<br/>持续损耗</span></article>
+</div>
+<p class="wealth-system-equation">R × G × S ＝ 身家未来自由现金流折现总和</p>
+<figcaption id="wealth-system-model-caption">资产价值立方体分类模型 · 身家诊断核心方法论</figcaption>
+</figure>
+<div class="wealth-system-copy">
+<p>把家族当成一家<strong>“上市公司”来体检</strong>，用同一把企业家思维评估每一项资产——企业股权、房子、现金、信托——再把它们放回整体身家中审视。身家诊断回答三个核心问题：</p>
+<ol class="wealth-system-questions">
+<li><span>1</span><p><strong>是什么</strong>全面梳理资产类型，按肌肉、肥肉、肿瘤三型分类，厘清哪些在增进身家、哪些在持续损耗。</p></li>
+<li><span>2</span><p><strong>要什么</strong>锚定家族专属的传承要求回报率——维持财富不缩水、实现代际传承的最低综合回报底线。</p></li>
+<li><span>3</span><p><strong>做什么</strong>给出资产结构优化方向，让整体身家回报率朝传承目标靠拢；出发点是成就客户，不是成交产品。</p></li>
+</ol>
+</div>
+</div>
+<footer class="wealth-system-bottom">
+<div><strong>M1</strong><span aria-hidden="true"></span><p>身家 ≠ 账面资产 · 身家 ＝ 未来自由现金流折现总和</p></div>
+<button class="wealth-system-enter" onclick="wealthEnterSystem({ pushHistory: true })" type="button">点击进入 身家诊断系统 <span aria-hidden="true">→</span></button>
+</footer>
+<div class="wealth-system-folio" aria-hidden="true"><span>MENGONGCHANG</span><span>16 / 20 · 五模块分述 · 身家诊断</span></div>
+</div>
+</section>
+</article>
+<article class="wealth-diagnosis-wizard" id="wealth-diagnosis-wizard">
+<button class="btn btn-secondary wealth-wizard-back" onclick="wealthShowIntro({ pushHistory: true })" type="button">← 返回身家诊断介绍</button>
 <div class="section" style="padding-top:56px;">
 <div class="section-header">
 <span class="section-label">身家诊断 · 五步看清真实财富</span>
-<h2>AI 身家诊断向导</h2>
+<h2 tabindex="-1">身家诊断向导</h2>
 <div class="gold-line"></div>
 <p class="text-subtitle">资产盘点 → 身家要求回报率 → 真实身家 DCF → 财富增长曲线 → 行动建议。数据保存在本地浏览器。</p>
 </div>
@@ -2169,7 +2209,7 @@
 <div class="step-panel active" data-wstep="1">
 <div class="card">
 <h4 style="margin-bottom:8px;">第一步 · 资产盘点</h4>
-<p style="font-size:.88rem;color:var(--text-secondary);margin-bottom:12px;">逐项录入您的资产与负债。系统将自动计算加权回报率与真实身家。</p>
+<p style="font-size:.88rem;color:var(--text-secondary);margin-bottom:12px;">逐项录入您的资产与负债。所有收益字段均采用年化口径；系统将自动计算净回报率与真实身家。</p>
 <div id="wealth-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:var(--bg-section);border:1px dashed var(--border);border-radius:var(--radius-sm);">
 <button class="btn btn-primary btn-sm" id="btn-load-sample" type="button">🎯 一键演示案例样本</button>
 <button class="btn btn-secondary btn-sm" id="btn-clear-assets" type="button">🗑 清空所有录入</button>
@@ -2186,7 +2226,7 @@
 <div class="tab-panel active" id="asset-cash">
 <div class="table-wrap">
 <table>
-<thead><tr><th>名称</th><th>账面值(万元)</th><th>五年回报(%)</th><th>流动性</th><th></th></tr></thead>
+<thead><tr><th>名称</th><th>账面值(万元)</th><th>年化回报率(%)</th><th>流动性</th><th></th></tr></thead>
 <tbody id="tbl-cash"></tbody>
 </table>
 </div>
@@ -2195,7 +2235,7 @@
 <div class="tab-panel" id="asset-realestate">
 <div class="table-wrap">
 <table>
-<thead><tr><th>名称</th><th>位置</th><th>账面值(万元)</th><th>五年增值(%)</th><th>用途</th><th></th></tr></thead>
+<thead><tr><th>名称</th><th>位置</th><th>账面值(万元)</th><th>年化增值率(%)</th><th>用途</th><th></th></tr></thead>
 <tbody id="tbl-realestate"></tbody>
 </table>
 </div>
@@ -2204,7 +2244,7 @@
 <div class="tab-panel" id="asset-business">
 <div class="table-wrap">
 <table>
-<thead><tr><th>名称</th><th>持股(%)</th><th>权益值(万元)</th><th>ROE(%)</th><th></th></tr></thead>
+<thead><tr><th>名称</th><th>持股(%)</th><th>权益值(万元)</th><th>年化ROE(%)</th><th></th></tr></thead>
 <tbody id="tbl-business"></tbody>
 </table>
 </div>
@@ -2213,7 +2253,7 @@
 <div class="tab-panel" id="asset-financial">
 <div class="table-wrap">
 <table>
-<thead><tr><th>名称</th><th>市值(万元)</th><th>五年回报(%)</th><th>类型</th><th></th></tr></thead>
+<thead><tr><th>名称</th><th>市值(万元)</th><th>年化回报率(%)</th><th>类型</th><th></th></tr></thead>
 <tbody id="tbl-financial"></tbody>
 </table>
 </div>
@@ -2255,21 +2295,30 @@
 <div class="step-panel" data-wstep="2">
 <div class="card">
 <h4 style="margin-bottom:16px;">第二步 · 身家要求回报率</h4>
-<div class="grid-2" style="margin-bottom:20px;">
-<div class="compare-col dim">
-<div class="label">整体身家加权年化回报率（R₁）</div>
-<div class="number" id="r1-display" style="font-size:2.2rem;">--%</div>
+<div class="wealth-required-hero">
+<span>身家要求回报率</span>
+<strong id="r-required-display">--%</strong>
+<p id="r-required-summary">由当前身家净回报、刚性支出倒算和 M2 购买力基准三者取最大值得出。</p>
 </div>
-<div class="compare-col highlight">
-<div class="label">身家要求回报率（R≥）</div>
-<div class="number" id="r-required-display" style="font-size:2.2rem;">--%</div>
+<div class="wealth-return-cards" aria-label="要求回报率三路计算">
+<article class="wealth-return-card" id="r1-card"><span>R₁ · 当前身家净回报率</span><strong id="r1-display">--%</strong><p id="r1-detail">资产年收益减去负债成本，再除以净资产。</p></article>
+<article class="wealth-return-card" id="r2-card"><span>R₂ · 刚性支出倒算率</span><strong id="r2-display">--%</strong><p id="r2-detail">录入未来支出后，按逐年现金流现值倒算。</p></article>
+<article class="wealth-return-card" id="r3-card"><span>R₃ · M2 购买力基准</span><strong id="r3-display">10.0%</strong><label>M2 假设值（%）<input class="form-input" id="m2-rate-input" max="50" min="0" step="0.1" type="number" value="10"/></label><p>默认 10%，可按本次诊断采用的基准修改。</p></article>
 </div>
+<div class="wealth-principal-panel">
+<div><strong>可投入本金</strong><p id="investable-principal-detail">净资产扣除自住房后自动计算，可根据实际限制资产调整。</p></div>
+<label><input class="form-input" id="investable-principal-input" min="0" placeholder="自动计算" step="1" type="number"/> 万元</label>
 </div>
-<p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:12px;">录入未来刚性支出，系统倒算现金流要求回报率：</p>
+<div class="wealth-formula-panel" id="required-return-formula">
+<strong>R要求 = max（R₁，R₂，R₃）</strong>
+<span>计算后将在这里说明每一步的输入、结果与最终取值。</span>
+</div>
+<div class="wealth-cashflow-breakdown" id="r2-cashflow-breakdown"></div>
+<p class="wealth-expense-intro">录入未来刚性支出。一次性支出填写发生年份；连续支出还需填写持续年数。</p>
 <div id="expense-list"></div>
 <button class="btn btn-secondary btn-sm" onclick="addExpenseRow()">+ 添加未来支出</button>
 <div style="margin-top:16px;">
-<button class="btn btn-primary" onclick="computeRequiredReturn()">计算要求回报率</button>
+<button class="btn btn-primary" id="btn-compute-required-return" onclick="computeRequiredReturn()">计算并展开要求回报率</button>
 </div>
 <div class="step-actions">
 <button class="btn btn-secondary" onclick="goToStep(1)">← 上一步</button>
@@ -2316,25 +2365,9 @@
 <!-- Step 5: 行动建议 -->
 <div class="step-panel" data-wstep="5">
 <div class="card">
-<h4 style="margin-bottom:16px;">第五步 · 行动建议与方案对比</h4>
+<h4 style="margin-bottom:16px;">第五步 · 行动建议与执行顺序</h4>
 <div id="action-suggestions"></div>
-<h5 style="font-size:.95rem;margin:20px 0 10px;">三种方案的长期身家对比</h5>
-<div class="grid-3" style="text-align:center;margin-bottom:8px;">
-<div><span class="tag tag-red" id="plan-current-r">--%</span><div class="text-caption">当前结构</div></div>
-<div><span class="tag tag-amber" id="plan-a-r">--%</span><div class="text-caption">方案 A（+3pct）</div></div>
-<div><span class="tag tag-green" id="plan-b-r">--%</span><div class="text-caption">方案 B（+6pct）</div></div>
-</div>
-<div class="table-wrap">
-<table>
-<thead><tr><th>年限</th><th>当前结构</th><th>方案 A</th><th>方案 B</th></tr></thead>
-<tbody>
-<tr><td>10 年后</td><td id="plan-current-10y">--</td><td id="plan-a-10y">--</td><td id="plan-b-10y">--</td></tr>
-<tr><td>20 年后</td><td id="plan-current-20y">--</td><td id="plan-a-20y">--</td><td id="plan-b-20y">--</td></tr>
-<tr><td>40 年后</td><td id="plan-current-40y">--</td><td id="plan-a-40y">--</td><td id="plan-b-40y">--</td></tr>
-<tr><td>较当前增量</td><td>--</td><td id="plan-a-delta">--</td><td id="plan-b-delta">--</td></tr>
-</tbody>
-</table>
-</div>
+<div class="alert alert-info wealth-advice-disclaimer"><strong>使用边界：</strong>建议由可审计的诊断规则生成，用于家族内部讨论与顾问复核，不构成具体产品、买卖时点或配置比例建议。</div>
 <div class="step-actions">
 <button class="btn btn-secondary" onclick="goToStep(4)">← 上一步</button>
 <button class="btn btn-primary" onclick="exportWealthReportHandler()">下载身家诊断报告 PDF</button>
@@ -2344,6 +2377,7 @@
 </div>
 </div>
 </div>
+</article>
 </section>
 </main>
 <button aria-label="返回梦工场主页" class="home-back-to-cycle" id="back-to-value-cycle" onclick="goToHomeCycle()" type="button">
@@ -2362,8 +2396,9 @@
 <script src="js/home.js"></script>
 <script src="js/home-journey.js?v=3"></script>
 <script src="js/enterprise.js"></script>
-<script src="js/wealth.js?v=11.8.1"></script>
-<script src="js/report.js"></script>
+<script src="js/wealth-model.js?v=1"></script>
+<script src="js/wealth.js?v=12"></script>
+<script src="js/report.js?v=2"></script>
 <script src="js/strategy-agent-config.js"></script><script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
 <script src="js/strategy-cases-data.js"></script>
 <script src="js/strategy-cases.js?v=2"></script>
