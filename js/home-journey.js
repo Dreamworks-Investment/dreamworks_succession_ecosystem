@@ -1,35 +1,43 @@
 /**
- * home-journey.js — 新版首页客户旅程与五大业务价值循环
+ * home-journey.js — 新版首页“富过三代”叙事与六道人生历程
  * 原生 HTML/CSS/JS；不依赖外部服务。
  */
 
 (function () {
   'use strict';
 
-  const DEFAULT_CENTER = {
-    title: '人，是最大的资产',
-    copy: '企业、股权、财富与制度都是载体，最终要服务于人的持续成长与家族长期价值。'
+  const DEFAULT_JOURNEY = {
+    label: '人生历程 · 六道关',
+    title: '从一代拥有，到世代相传',
+    copy: '企业价值、财富管理、身家诊断、风险隔离、后代认知与社会声誉，构成一个彼此咬合的完整系统。'
   };
 
-  function setCycleCenter(title, copy) {
-    const titleEl = document.getElementById('home-cycle-center-title');
-    const copyEl = document.getElementById('home-cycle-center-copy');
-    if (titleEl) titleEl.textContent = title || DEFAULT_CENTER.title;
-    if (copyEl) copyEl.textContent = copy || DEFAULT_CENTER.copy;
+  function setJourneySummary(label, title, copy) {
+    const labelEl = document.getElementById('home-life-journey-summary-label');
+    const titleEl = document.getElementById('home-life-journey-summary-title');
+    const copyEl = document.getElementById('home-life-journey-summary-copy');
+    if (labelEl) labelEl.textContent = label || DEFAULT_JOURNEY.label;
+    if (titleEl) titleEl.textContent = title || DEFAULT_JOURNEY.title;
+    if (copyEl) copyEl.textContent = copy || DEFAULT_JOURNEY.copy;
   }
 
-  function activateCycleNode(node) {
-    document.querySelectorAll('.home-cycle-node').forEach(item => {
+  function activateJourneyNode(node) {
+    document.querySelectorAll('.home-life-journey-node').forEach(item => {
       item.classList.toggle('is-active', item === node);
     });
-    setCycleCenter(node.dataset.title, node.dataset.copy);
+    const step = node.querySelector('span');
+    setJourneySummary(
+      `人生历程 · 第 ${step ? step.textContent.trim() : ''} 关`,
+      node.dataset.title,
+      node.dataset.copy
+    );
   }
 
-  function resetCycleCenter() {
-    document.querySelectorAll('.home-cycle-node').forEach(item => {
+  function resetJourneySummary() {
+    document.querySelectorAll('.home-life-journey-node').forEach(item => {
       item.classList.remove('is-active');
     });
-    setCycleCenter(DEFAULT_CENTER.title, DEFAULT_CENTER.copy);
+    setJourneySummary(DEFAULT_JOURNEY.label, DEFAULT_JOURNEY.title, DEFAULT_JOURNEY.copy);
   }
 
   function enterBusinessPage(page) {
@@ -41,25 +49,35 @@
     if (typeof navigateTo === 'function') navigateTo(page);
   }
 
-  function setupCycleInteractions() {
-    document.querySelectorAll('.home-cycle-node').forEach(node => {
-      node.addEventListener('mouseenter', () => activateCycleNode(node));
-      node.addEventListener('focus', () => activateCycleNode(node));
+  function enterJourneyDestination(node) {
+    if (node.dataset.target) {
+      window.scrollHomeJourneyTo(node.dataset.target);
+      return;
+    }
+    enterBusinessPage(node.dataset.page);
+  }
+
+  function setupJourneyInteractions() {
+    document.querySelectorAll('.home-life-journey-node').forEach(node => {
+      node.addEventListener('mouseenter', () => activateJourneyNode(node));
+      node.addEventListener('focus', () => activateJourneyNode(node));
       node.addEventListener('mouseleave', () => {
-        if (!node.matches(':focus-visible')) resetCycleCenter();
+        if (!node.matches(':focus-visible')) resetJourneySummary();
       });
-      node.addEventListener('blur', resetCycleCenter);
-      node.addEventListener('click', () => enterBusinessPage(node.dataset.page));
+      node.addEventListener('blur', resetJourneySummary);
+      node.addEventListener('click', () => enterJourneyDestination(node));
     });
 
-    document.querySelectorAll('.home-cycle-mobile button[data-page]').forEach(node => {
-      node.addEventListener('click', () => enterBusinessPage(node.dataset.page));
+    document.querySelectorAll('.home-system-module-link, .home-system-charity-foundation').forEach(node => {
+      node.addEventListener('click', () => enterJourneyDestination(node));
     });
   }
 
   function setupReveal() {
     const targets = document.querySelectorAll(
-      '.home-founder-grid, .home-timeline-item, .home-credibility-card, .home-cycle-section, .home-legacy-closing'
+      '.home-founder-grid, .home-timeline-item, .home-credibility-card, .home-legacy-closing, ' +
+      '.home-system-slide, .home-system-module-link, .home-life-journey-heading, ' +
+      '.home-life-journey-node, .home-life-journey-summary'
     );
     targets.forEach(el => el.classList.add('home-journey-reveal'));
 
@@ -180,7 +198,7 @@
 
 
   document.addEventListener('DOMContentLoaded', () => {
-    setupCycleInteractions();
+    setupJourneyInteractions();
     setupReveal();
     initHomeAnchorNav();
 
