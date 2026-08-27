@@ -54,21 +54,6 @@ function saveState() {
   } catch(e) { /* ignore */ }
 }
 
-// External business-system entry
-// The investment backend owns its own login flow:
-//   GET /          -> public login shell
-//   POST /auth/login -> returns an in-memory Bearer token used by that app
-// Never embed or forward the Bearer token from this public website.
-const VALUE_INVESTMENT_URL = 'https://sd85slpdkcofupk4bn66g.apigateway-cn-guangzhou.volceapi.com/';
-
-function openValueInvestment() {
-  const opened = window.open(VALUE_INVESTMENT_URL, '_blank', 'noopener,noreferrer');
-  if (!opened) {
-    // Popup blockers may prevent a new tab. Fall back to same-window navigation.
-    window.location.assign(VALUE_INVESTMENT_URL);
-  }
-}
-
 // Navigation
 function navigateTo(page, options = {}) {
   const targetPage = document.getElementById('page-' + page);
