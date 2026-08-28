@@ -89,6 +89,12 @@ function navigateTo(page, options = {}) {
     window.wealthShowIntro({ pushHistory: false, scroll: false });
   }
 
+  // Generic navigation to “家族信托” starts at the explanatory cover.
+  // Direct #trust-system routes and browser history can preserve the wizard view.
+  if (page === 'trust' && !options.preserveTrustView && typeof window.trustShowIntro === 'function') {
+    window.trustShowIntro({ pushHistory: false, scroll: false });
+  }
+
   if (typeof updateBackToCycleButton === 'function') {
     updateBackToCycleButton(page);
   }
@@ -210,6 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.wealthEnterSystem({ pushHistory: false, scroll: false });
       }
     }, 0);
+  } else if (requested === 'trust-system') {
+    navigateTo('trust', { skipHistory: true, scroll: false, preserveTrustView: true });
+    try { window.history.replaceState({ page: 'trust', trustView: 'wizard' }, '', '#trust-system'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.trustEnterSystem === 'function') {
+        window.trustEnterSystem({ pushHistory: false, scroll: false });
+      }
+    }, 0);
   } else if (internalPages.includes(requested)) {
     navigateTo(requested, { skipHistory: true });
     try { window.history.replaceState({ page: requested }, '', '#' + requested); } catch (error) {}
@@ -226,11 +240,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const preserveStrategyView = page === 'strategy' && event.state &&
       (event.state.strategyCase || event.state.strategyChapter || event.state.strategyView);
     const preserveWealthView = page === 'wealth' && event.state && event.state.wealthView === 'wizard';
-    navigateTo(page, { skipHistory: true, preserveStrategyView, preserveWealthView });
+    const preserveTrustView = page === 'trust' && event.state && event.state.trustView === 'wizard';
+    navigateTo(page, { skipHistory: true, preserveStrategyView, preserveWealthView, preserveTrustView });
     if (preserveWealthView) {
       window.setTimeout(() => {
         if (typeof window.wealthEnterSystem === 'function') {
           window.wealthEnterSystem({ pushHistory: false, scroll: false });
+        }
+      }, 0);
+    }
+    if (preserveTrustView) {
+      window.setTimeout(() => {
+        if (typeof window.trustEnterSystem === 'function') {
+          window.trustEnterSystem({ pushHistory: false, scroll: false });
         }
       }, 0);
     }
