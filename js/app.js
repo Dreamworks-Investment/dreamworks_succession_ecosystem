@@ -95,6 +95,12 @@ function navigateTo(page, options = {}) {
     window.trustShowIntro({ pushHistory: false, scroll: false });
   }
 
+  // Generic navigation to “传承学院” starts at its explanatory cover.
+  // Direct #academy-system routes and browser history preserve the assessment view.
+  if (page === 'academy' && !options.preserveAcademyView && typeof window.academyShowCover === 'function') {
+    window.academyShowCover({ pushHistory: false, scroll: false });
+  }
+
   if (typeof updateBackToCycleButton === 'function') {
     updateBackToCycleButton(page);
   }
@@ -175,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Restore direct links such as #strategy / #wealth and initialise History state.
   const requested = INITIAL_ROUTE_HASH || window.location.hash.replace(/^#/, '');
-  const internalPages = ['home', 'strategy', 'value', 'wealth', 'trust', 'academy'];
+  const internalPages = ['home', 'strategy', 'value', 'wealth', 'trust', 'academy', 'charity', 'vision'];
   if (requested === 'strategy-chapter1' || requested === 'strategy-chapter2') {
     const strategyChapter = requested === 'strategy-chapter2' ? 2 : 1;
     navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
@@ -224,6 +230,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.trustEnterSystem({ pushHistory: false, scroll: false });
       }
     }, 0);
+  } else if (requested === 'academy-system') {
+    navigateTo('academy', { skipHistory: true, scroll: false, preserveAcademyView: true });
+    try { window.history.replaceState({ page: 'academy', academyView: 'system' }, '', '#academy-system'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.academyEnterSystem === 'function') {
+        window.academyEnterSystem({ pushHistory: false, scroll: false });
+      }
+    }, 0);
   } else if (internalPages.includes(requested)) {
     navigateTo(requested, { skipHistory: true });
     try { window.history.replaceState({ page: requested }, '', '#' + requested); } catch (error) {}
@@ -241,7 +255,14 @@ document.addEventListener('DOMContentLoaded', () => {
       (event.state.strategyCase || event.state.strategyChapter || event.state.strategyView);
     const preserveWealthView = page === 'wealth' && event.state && event.state.wealthView === 'wizard';
     const preserveTrustView = page === 'trust' && event.state && event.state.trustView === 'wizard';
-    navigateTo(page, { skipHistory: true, preserveStrategyView, preserveWealthView, preserveTrustView });
+    const preserveAcademyView = page === 'academy' && event.state && event.state.academyView === 'system';
+    navigateTo(page, {
+      skipHistory: true,
+      preserveStrategyView,
+      preserveWealthView,
+      preserveTrustView,
+      preserveAcademyView
+    });
     if (preserveWealthView) {
       window.setTimeout(() => {
         if (typeof window.wealthEnterSystem === 'function') {
@@ -253,6 +274,13 @@ document.addEventListener('DOMContentLoaded', () => {
       window.setTimeout(() => {
         if (typeof window.trustEnterSystem === 'function') {
           window.trustEnterSystem({ pushHistory: false, scroll: false });
+        }
+      }, 0);
+    }
+    if (preserveAcademyView) {
+      window.setTimeout(() => {
+        if (typeof window.academyEnterSystem === 'function') {
+          window.academyEnterSystem({ pushHistory: false, scroll: false });
         }
       }, 0);
     }

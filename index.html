@@ -15,6 +15,7 @@
 <link href="css/wealth-diagnosis.css?v=1" rel="stylesheet"/>
 <link href="css/family-trust-system.css?v=1" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
+<link href="css/final-business-pages.css?v=1" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
@@ -34,6 +35,8 @@
 <a class="nav-link" data-page="wealth">身家诊断</a>
 <a class="nav-link" data-page="trust">家族信托</a>
 <a class="nav-link" data-page="academy">传承学院</a>
+<a class="nav-link" data-page="charity">公益慈善</a>
+<a class="nav-link" data-page="vision">六共愿景</a>
 </div>
 </div>
 </nav>
@@ -282,16 +285,16 @@
 </div>
 <div class="home-system-os-intro">
 <p>梦工场不是一家普通的私募基金，而是以“确定性狠值”投资为引擎，帮助中国企业家家族实现财富百年传承的<strong>系统解决方案提供商</strong>。</p>
-<blockquote>不是卖产品，是让五个模块相互咬合，成就客户的百年传承。</blockquote>
+<blockquote>不是卖产品，是让六个模块相互咬合，成就客户的百年传承。</blockquote>
 </div>
-<div aria-label="梦工场五位一体传承系统" class="home-system-module-grid">
+<div aria-label="梦工场六位一体传承系统" class="home-system-module-grid">
 <button class="home-system-module-link" data-page="strategy" type="button"><span>01</span><strong>企业价值诊断与增进</strong><small>把价值做出来 · 做菜</small></button>
 <button class="home-system-module-link" data-page="value" type="button"><span>02</span><strong>狠值投资</strong><small>评估价值、寻找狠值 · 品菜</small></button>
 <button class="home-system-module-link" data-page="wealth" type="button"><span>03</span><strong>身家诊断</strong><small>把家族当上市公司体检</small></button>
 <button class="home-system-module-link" data-page="trust" type="button"><span>04</span><strong>家族信托</strong><small>把资产装进法律保险箱</small></button>
 <button class="home-system-module-link" data-page="academy" type="button"><span>05</span><strong>传承学院</strong><small>培养家族财富管理人</small></button>
 </div>
-<button class="home-system-charity-foundation" data-target="home-life-charity" type="button"><span>精神底座</span><strong>公益慈善贯穿始终</strong><small>让家族财富在传承中承载社会价值与家族声誉 →</small></button>
+<button class="home-system-charity-foundation" data-page="charity" type="button"><span>06 · 精神底座</span><strong>公益慈善贯穿始终</strong><small>让家族财富在传承中承载社会价值与家族声誉 →</small></button>
 </article>
 </div>
 </section>
@@ -310,7 +313,7 @@
 <button class="home-life-journey-node journey-node-03" data-copy="先看清整个家族到底拥有什么、承担什么，以及风险敞口在哪里。" data-page="wealth" data-title="身家诊断，理清资产" type="button"><span>03</span><strong>身家诊断，理清资产</strong><small>盘清整体身家</small></button>
 <button class="home-life-journey-node journey-node-04" data-copy="以法律结构与家族信托隔离风险，让财富守得住、传得下。" data-page="trust" data-title="风险隔离" type="button"><span>04</span><strong>风险隔离</strong><small>守得住 · 传得下</small></button>
 <button class="home-life-journey-node journey-node-05" data-copy="富二代不等于守二代；认知、能力和家族共同语言需要系统培养。" data-page="academy" data-title="后代提高认知" type="button"><span>05</span><strong>后代提高认知</strong><small>培养传承之人</small></button>
-<button class="home-life-journey-node journey-node-06" data-copy="慈善不是简单花钱，而是家族精神、社会价值与声誉的代际延续。" data-target="home-life-charity" data-title="社会价值与家族声誉" type="button"><span>06</span><strong>社会价值与家族声誉</strong><small>让善意代际延续</small></button>
+<button class="home-life-journey-node journey-node-06" data-copy="慈善不是简单花钱，而是家族精神、社会价值与声誉的代际延续。" data-page="charity" data-title="社会价值与家族声誉" type="button"><span>06</span><strong>社会价值与家族声誉</strong><small>让善意代际延续</small></button>
 <div class="home-life-journey-endpoint journey-end"><small>终点 · 价值传承</small><strong>富过三代</strong></div>
 </div>
 <div aria-live="polite" class="home-life-journey-summary">
@@ -2161,7 +2164,46 @@
 </section>
 <!-- ===================== ACADEMY ===================== -->
 <!-- ===================== ACADEMY ===================== -->
-<section class="page" id="page-academy">
+<section class="page academy-page academy-cover-active" id="page-academy">
+<article aria-labelledby="academy-cover-title" class="academy-cover-view" id="academy-cover-view">
+<section class="academy-cover">
+<div class="academy-cover-inner">
+<span aria-hidden="true" class="final-cover-topline"></span>
+<header class="final-cover-heading">
+<h1 id="academy-cover-title">传承学院 · <span>传承最终靠“人”</span></h1>
+<span aria-hidden="true" class="final-cover-rule"></span>
+<p class="final-cover-module">第五业务板块 · 传承学院</p>
+<p class="final-cover-era">人的传承 —— 培养基金经理型家族财富管理人</p>
+</header>
+<div class="academy-cover-stage">
+<div class="academy-cover-story">
+<p>资产可隔离、信托可设防——但<strong>没人能管、愿意管，传承仍是空的</strong>。传承表面传财富，本质传关系、信任与责任。</p>
+<p>梦工场投资与传承学院，面向企业家家族两代人，让一代与二代在同一套价值语言里共同看企业、看投资、看家族未来。</p>
+<blockquote>从血缘父子，到共同守护家族未来的战略合伙人。</blockquote>
+</div>
+<div class="academy-cover-path" aria-label="传承学院培养路径">
+<div class="academy-path-card"><span>01</span><div><strong>传承认知</strong><small>看见财富、关系与责任的长期命题</small></div></div>
+<div class="academy-path-arrow" aria-hidden="true">→</div>
+<div class="academy-path-card"><span>02</span><div><strong>价值理解</strong><small>用企业家思维理解投资与身家</small></div></div>
+<div class="academy-path-arrow" aria-hidden="true">→</div>
+<div class="academy-path-card is-accent"><span>03</span><div><strong>信托工具</strong><small>把共识转化为治理与传承安排</small></div></div>
+<div class="academy-stage-rungs">
+<p><b>投资熟手</b><span>建立基础判断</span></p>
+<p><b>研究员</b><span>形成独立研究能力</span></p>
+<p><b>家族财富管理人</b><span>为家族长期负责</span></p>
+</div>
+</div>
+</div>
+<footer class="final-cover-bottom">
+<div><strong>传承</strong><span aria-hidden="true"></span><p>上一代愿意传 · 下一代有能力承 · 两代人共同完成长期交接</p></div>
+<button class="final-cover-enter" onclick="academyEnterSystem({ pushHistory: true })" type="button">点击进入传承学院系统 <span aria-hidden="true">→</span></button>
+</footer>
+<div aria-hidden="true" class="final-cover-folio"><span>MENGONGCHANG</span><span>18 / 20 · 五模块分述 · 传承学院</span></div>
+</div>
+</section>
+</article>
+<article aria-hidden="true" class="academy-system-view" id="academy-system-view">
+<button class="btn btn-secondary btn-sm academy-cover-back" onclick="academyShowCover({ pushHistory: true })" type="button">← 返回传承学院介绍</button>
 <div class="section" style="padding-top:56px;">
 
 <!-- 视图一：测评引导 -->
@@ -2271,6 +2313,74 @@
 </div>
 
 </div>
+</article>
+</section>
+
+<!-- ===================== CHARITY ===================== -->
+<section class="page charity-page" id="page-charity">
+<article aria-labelledby="charity-cover-title" class="charity-cover">
+<div class="charity-cover-inner">
+<span aria-hidden="true" class="final-cover-topline"></span>
+<header class="final-cover-heading">
+<h1 id="charity-cover-title">公益模式 · <span>让善更有力量</span></h1>
+<span aria-hidden="true" class="final-cover-rule"></span>
+<p class="final-cover-module">第六业务板块 · 公益慈善 · 2011 起</p>
+<p class="final-cover-era">助善 —— 以“助善”区隔“助困” · 开创公益新品类 · 让善意精准抵达</p>
+</header>
+<div class="charity-cover-stage">
+<div class="charity-credentials" aria-label="公益信用状">
+<article class="charity-credential charity-credential-longyue"><span>公益实践</span><strong>龙越基金会</strong><p>从真实行动出发，让长期公益成为价值体系的一部分。</p><small>LONGYUE FOUNDATION</small></article>
+<article class="charity-credential charity-credential-jianhui"><span>独特定位</span><strong>致敬行善者</strong><p>让身处困境仍坚持帮助他人的行善者被看见、被支持。</p><small>JIANHUI CHARITY FOUNDATION</small></article>
+<article class="charity-credential charity-credential-score"><span>透明底线</span><strong>FT2025 · 100</strong><p>以持续透明和规范治理，让每一份善意都能被信任。</p><small>CHINA FOUNDATION TRANSPARENCY INDEX</small></article>
+</div>
+<div class="charity-cover-copy">
+<p>很多公益瞄准“助困”，梦工场以<strong>“助善”独特定位</strong>区隔：把有限的善意，精准投向那些即使身处困境，仍在帮助别人的人。这是价值体系里<strong>精神确定性</strong>的底座。</p>
+<ol>
+<li><span>1</span><p><strong>开创新品类</strong> · 从帮助困难中的行善者出发，让善形成可持续的正向循环</p></li>
+<li><span>2</span><p><strong>坚持透明治理</strong> · 以长期公开、规范和可监督的方式赢得捐助人与社会信任</p></li>
+<li><span>3</span><p><strong>贯穿家族传承</strong> · 让公益慈善承载家族精神、社会价值与“共益未来”</p></li>
+</ol>
+</div>
+</div>
+<footer class="final-cover-bottom">
+<div><strong>公益</strong><span aria-hidden="true"></span><p>公益不是点缀 · 是梦工场价值体系的精神确定性底座</p></div>
+<a aria-label="在新标签页打开建辉慈善基金会官网" class="final-cover-enter" href="https://www.jianhuicishan.org/" rel="noopener noreferrer" target="_blank">点击进入公益慈善系统 <span aria-hidden="true">↗</span></a>
+</footer>
+<div aria-hidden="true" class="final-cover-folio"><span>MENGONGCHANG</span><span>07 · 公益慈善 · 共益未来</span></div>
+</div>
+</article>
+</section>
+
+<!-- ===================== SIX-COMMON VISION ===================== -->
+<section class="page vision-page" id="page-vision">
+<article aria-labelledby="vision-page-title" class="vision-experience">
+<header class="vision-heading">
+<p>CHUAN · CHENG · WEI · LAI</p>
+<h1 id="vision-page-title">六共愿景 · <span>与客户和合作伙伴共创</span></h1>
+<blockquote>企业是价值的临时载体，企业家也是临时身份；只有家族和传承，才是永恒的事业。</blockquote>
+</header>
+<div class="vision-orbit" id="vision-orbit">
+<div aria-hidden="true" class="vision-orbit-rings"><i></i><i></i><i></i></div>
+<button aria-controls="vision-core" aria-pressed="true" class="vision-node is-active vision-node-1" data-vision="value" type="button"><span>01</span><strong>共识狠值</strong><small>VALUE</small></button>
+<button aria-controls="vision-core" aria-pressed="false" class="vision-node vision-node-2" data-vision="governance" type="button"><span>02</span><strong>共有治理</strong><small>GOVERN</small></button>
+<button aria-controls="vision-core" aria-pressed="false" class="vision-node vision-node-3" data-vision="enterprise" type="button"><span>03</span><strong>共创基业</strong><small>BUILD</small></button>
+<button aria-controls="vision-core" aria-pressed="false" class="vision-node vision-node-4" data-vision="succession" type="button"><span>04</span><strong>共同传承</strong><small>LEGACY</small></button>
+<button aria-controls="vision-core" aria-pressed="false" class="vision-node vision-node-5" data-vision="ecosystem" type="button"><span>05</span><strong>共享生态</strong><small>ECOSYSTEM</small></button>
+<button aria-controls="vision-core" aria-pressed="false" class="vision-node vision-node-6" data-vision="future" type="button"><span>06</span><strong>共益未来</strong><small>FUTURE</small></button>
+<section aria-live="polite" class="vision-core" id="vision-core">
+<p id="vision-preview-index">01 · SIX-COMMON VISION</p>
+<h2 id="vision-preview-title">共识狠值</h2>
+<ul id="vision-preview-points">
+<li><strong>可持续</strong><span>以实业的眼光做投资，不赌涨跌，只买狠值。</span></li>
+<li><strong>赚钱</strong><span>长期复利，让资产在足够长的时间里赚足够多的钱。</span></li>
+<li><strong>省心</strong><span>无需年年寻找“股神”，把精力还给事业、家庭与长期目标。</span></li>
+</ul>
+<footer><span>一群同路人</span><b>共建家族传承新生态</b></footer>
+</section>
+</div>
+<p class="vision-interaction-hint"><span aria-hidden="true">↖</span> 悬浮、聚焦或点击任一愿景，查看它对应的三项共同承诺</p>
+<footer class="vision-footer"><span>MENGONGCHANG</span><p>富过三代 · 找梦工场</p><span>08 · 六共愿景</span></footer>
+</article>
 </section>
 <!-- ===================== WEALTH ===================== -->
 <section class="page wealth-diagnosis-page wealth-intro-active" id="page-wealth">
@@ -2515,7 +2625,7 @@
 </footer>
 <!-- ===================== SCRIPTS ===================== -->
 <script src="js/charts.js"></script>
-<script src="js/app.js?v=6"></script>
+<script src="js/app.js?v=7"></script>
 <script src="js/home.js"></script>
 <script src="js/home-journey.js?v=3"></script>
 <script src="js/enterprise.js"></script>
@@ -2529,5 +2639,6 @@
 <script src="js/strategy-cases.js?v=2"></script>
 <script src="js/strategy.js"></script>
 <script src="js/academy-assessment.js"></script>
+<script src="js/final-business-pages.js?v=1"></script>
 </body>
 </html>
