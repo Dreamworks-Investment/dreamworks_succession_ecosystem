@@ -137,6 +137,8 @@ const liveService = createWealthAgentService({
   env: {
     WORKBUDDY_CLIENT_ID: 'test-client-id',
     WORKBUDDY_CLIENT_SECRET: 'test-client-secret',
+    WORKBUDDY_API_KEY: 'test-runtime-api-key',
+    WORKBUDDY_INJECT_API_KEY: 'true',
     WORKBUDDY_TOKEN_URL: tokenUrl,
     WORKBUDDY_API_BASE: apiBase,
     WORKBUDDY_SOURCE_APP: 'dreamworks-test',
@@ -161,7 +163,11 @@ assert.deepEqual(
 const runtimeCreateBody = JSON.parse(liveCalls.find(call => call.url === `${apiBase}/runtimes`).body);
 assert.equal(runtimeCreateBody.agentManifest.id, 'agent_01M1AB3GRFAR44G0ED9RQ51WY9');
 assert.equal(Object.hasOwn(runtimeCreateBody.agentManifest, 'plugins'), false, 'Runtime must resolve the published expert without committing a signed plugin URL');
-assert.equal(Object.hasOwn(runtimeCreateBody.agentManifest, 'secrets'), false, 'Control-plane API key must not be injected into the Runtime by default');
+assert.deepEqual(
+  runtimeCreateBody.agentManifest.secrets,
+  [{ key: 'CODEBUDDY_API_KEY', value: 'test-runtime-api-key' }],
+  'OAuth control-plane auth must support the API key required inside the expert Runtime'
+);
 assert.equal(liveCalls.filter(call => call.url === tokenUrl).length, 1, 'OAuth access token must be cached across Runtime API calls');
 
 const service = createWealthAgentService({

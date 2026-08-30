@@ -351,7 +351,7 @@ function buildMockReply(prompt, turn) {
 
 export function createWealthAgentService({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
   const config = {
-    apiKey: env.WORKBUDDY_API_KEY || "",
+    apiKey: env.WORKBUDDY_API_KEY || env.CODEBUDDY_API_KEY || "",
     clientId: env.WORKBUDDY_CLIENT_ID || "",
     clientSecret: env.WORKBUDDY_CLIENT_SECRET || "",
     tokenUrl: env.WORKBUDDY_TOKEN_URL || DEFAULT_TOKEN_URL,
@@ -382,6 +382,7 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       configured: authMode() !== "none",
       mode: config.mock ? "mock" : "live",
       authMode: authMode(),
+      runtimeSecretConfigured: Boolean(config.injectApiKey && config.apiKey),
       agentId: config.agentId,
       agentName: config.agentName,
       sourceApp: config.sourceApp
@@ -499,7 +500,9 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       manifestVersion: "1.0",
       useWorkspaceRoot: true
     };
-    if (config.injectApiKey && authMode() === "api-key") {
+    // OAuth authenticates the web service to the Runtime control plane, while
+    // the published expert can still require CODEBUDDY_API_KEY in its sandbox.
+    if (config.injectApiKey && config.apiKey) {
       manifest.secrets = [{ key: "CODEBUDDY_API_KEY", value: config.apiKey }];
     }
     const created = await apiRequest("/runtimes", {

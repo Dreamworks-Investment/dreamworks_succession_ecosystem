@@ -182,7 +182,11 @@
       if (state.configured) {
         setAvailability('online', state.mode === 'mock'
           ? '模拟联调可用'
-          : state.authMode === 'oauth' ? '企业 OAuth 已配置' : 'API Key 已配置');
+          : state.authMode === 'oauth'
+            ? payload.runtimeSecretConfigured
+              ? '企业 OAuth + Runtime Key 已配置'
+              : '企业 OAuth 已配置'
+            : 'API Key 已配置');
         get('wealth-agent-setup-note').textContent = state.mode === 'mock'
           ? '当前为本地模拟联调，不会向云端提交数据。'
           : '首次进入时将验证凭据并创建本次专用的私有 Runtime。';
