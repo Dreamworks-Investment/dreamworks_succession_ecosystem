@@ -361,7 +361,6 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
     agentId: env.WORKBUDDY_AGENT_ID || DEFAULT_AGENT_ID,
     agentName: env.WORKBUDDY_AGENT_NAME || DEFAULT_AGENT_NAME,
     mock: parseBoolean(env.WORKBUDDY_MOCK),
-    injectApiKey: parseBoolean(env.WORKBUDDY_INJECT_API_KEY, false),
     acpMode: env.WORKBUDDY_ACP_MODE || "default",
     runtimeTimeoutMs: safeNumber(env.WORKBUDDY_RUNTIME_TIMEOUT_MS, 50_000),
     rpcTimeoutMs: safeNumber(env.WORKBUDDY_RPC_TIMEOUT_MS, 60_000),
@@ -378,11 +377,14 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
   }
 
   function status() {
+    const currentAuthMode = authMode();
+    const runtimeSecretConfigured = Boolean(config.apiKey);
     return {
-      configured: authMode() !== "none",
+      configured: currentAuthMode !== "none" && (config.mock || runtimeSecretConfigured),
       mode: config.mock ? "mock" : "live",
-      authMode: authMode(),
-      runtimeSecretConfigured: Boolean(config.injectApiKey && config.apiKey),
+      authMode: currentAuthMode,
+      runtimeSecretConfigured,
+      integrationRevision: "oauth-runtime-secret-v2",
       agentId: config.agentId,
       agentName: config.agentName,
       sourceApp: config.sourceApp
@@ -395,6 +397,13 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
         "AI 专家尚未配置，请设置企业 OAuth 凭据或 WORKBUDDY_API_KEY。",
         503,
         "NOT_CONFIGURED"
+      );
+    }
+    if (!config.mock && !config.apiKey) {
+      throw new WorkBuddyError(
+        "身家诊断专家 Runtime 缺少必需的 WORKBUDDY_API_KEY。",
+        503,
+        "RUNTIME_SECRET_NOT_CONFIGURED"
       );
     }
   }
@@ -501,10 +510,8 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       useWorkspaceRoot: true
     };
     // OAuth authenticates the web service to the Runtime control plane, while
-    // the published expert can still require CODEBUDDY_API_KEY in its sandbox.
-    if (config.injectApiKey && config.apiKey) {
-      manifest.secrets = [{ key: "CODEBUDDY_API_KEY", value: config.apiKey }];
-    }
+    // the published expert requires CODEBUDDY_API_KEY inside its private sandbox.
+    manifest.secrets = [{ key: "CODEBUDDY_API_KEY", value: config.apiKey }];
     const created = await apiRequest("/runtimes", {
       method: "POST",
       body: JSON.stringify({

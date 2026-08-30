@@ -19,7 +19,7 @@
 - `WORKBUDDY_CLIENT_SECRET`：与该应用配套的 Client Secret。
 - `WORKBUDDY_TOKEN_URL=https://copilot.tencent.com/oauth2/token`。
 - `WORKBUDDY_API_KEY`：当前发布的专家要求的 Runtime secret；即使使用 OAuth 控制面认证也必须设置。
-- `WORKBUDDY_INJECT_API_KEY=true`：将上面的 Key 仅注入本次私有 Runtime，浏览器不可见。
+- 后端会把上面的 Key 自动映射成 `CODEBUDDY_API_KEY`，仅注入本次私有 Runtime，浏览器不可见；不再需要额外的注入开关。
 - `WORKBUDDY_SOURCE_APP=dreamworks-succession-main`：用于 Runtime 可见性隔离，后续保持不变。
 - `WORKBUDDY_AGENT_ID=agent_01M1AB3GRFAR44G0ED9RQ51WY9`：已发布的“身家诊断专家”Manifest ID。
 - `WORKBUDDY_AGENT_NAME=身家诊断专家`。

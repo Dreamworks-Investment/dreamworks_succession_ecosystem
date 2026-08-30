@@ -16,7 +16,7 @@ const envExample = readFileSync(join(root, '.env.example'), 'utf8');
 
 assert(html.includes('id="wealth-agent-consent"'), 'AI handoff must require explicit consent');
 assert(html.includes('id="wealth-agent-console"'), 'AI handoff must provide an embedded expert console');
-assert(html.includes('js/wealth-agent.js?v=1'), 'AI handoff browser client must be loaded');
+assert(html.includes('js/wealth-agent.js?v=2'), 'AI handoff browser client must be loaded with the current cache version');
 assert(browserClient.includes('namesRemoved: true'), 'Submitted context must be explicitly de-identified');
 assert(browserClient.includes('assistantContent.textContent += event.text'), 'Agent output must be rendered as text, not HTML');
 assert(!browserClient.includes('assistantContent.innerHTML'), 'Agent output must never be assigned through innerHTML');
@@ -138,7 +138,6 @@ const liveService = createWealthAgentService({
     WORKBUDDY_CLIENT_ID: 'test-client-id',
     WORKBUDDY_CLIENT_SECRET: 'test-client-secret',
     WORKBUDDY_API_KEY: 'test-runtime-api-key',
-    WORKBUDDY_INJECT_API_KEY: 'true',
     WORKBUDDY_TOKEN_URL: tokenUrl,
     WORKBUDDY_API_BASE: apiBase,
     WORKBUDDY_SOURCE_APP: 'dreamworks-test',
@@ -169,6 +168,8 @@ assert.deepEqual(
   'OAuth control-plane auth must support the API key required inside the expert Runtime'
 );
 assert.equal(liveCalls.filter(call => call.url === tokenUrl).length, 1, 'OAuth access token must be cached across Runtime API calls');
+assert.equal(liveService.status().runtimeSecretConfigured, true, 'Runtime secret readiness must be visible without exposing its value');
+assert.equal(liveService.status().integrationRevision, 'oauth-runtime-secret-v2');
 
 const service = createWealthAgentService({
   env: {
