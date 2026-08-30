@@ -13,6 +13,7 @@
 <link href="css/strategy-case-gallery.css?v=2" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
 <link href="css/wealth-diagnosis.css?v=1" rel="stylesheet"/>
+<link href="css/wealth-agent.css?v=1" rel="stylesheet"/>
 <link href="css/family-trust-system.css?v=1" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <link href="css/final-business-pages.css?v=1" rel="stylesheet"/>
@@ -2606,6 +2607,49 @@
 <button class="btn btn-primary" onclick="exportWealthReportHandler()">下载身家诊断报告 PDF</button>
 </div>
 <button class="btn btn-secondary btn-sm" onclick="saveWealthDraft()" style="margin-top:12px;">保存草稿到本地</button>
+<section aria-labelledby="wealth-agent-launch-title" class="wealth-agent-launch" id="wealth-agent-launch">
+<div class="wealth-agent-launch-head">
+<div aria-hidden="true" class="wealth-agent-mark">身</div>
+<div>
+<p class="wealth-agent-kicker">WORKBUDDY · AI 深度诊断</p>
+<h4 id="wealth-agent-launch-title">把五步结果交给身家诊断专家继续追问</h4>
+</div>
+<span aria-live="polite" class="wealth-agent-availability is-checking" id="wealth-agent-availability">正在检查服务…</span>
+</div>
+<p class="wealth-agent-launch-copy">系统会把本次资产结构、要求回报率、真实身家与行动建议整理成脱敏摘要，交给已发布的“身家诊断专家”。专家从当前结果继续，不要求您重新填写一遍。</p>
+<div class="wealth-agent-handoff" aria-label="数据交接范围">
+<span>五步诊断摘要</span><b aria-hidden="true">→</b><span>名称脱敏</span><b aria-hidden="true">→</b><span>专家追问与复核</span>
+</div>
+<label class="wealth-agent-consent" for="wealth-agent-consent">
+<input id="wealth-agent-consent" type="checkbox"/>
+<span>我同意将本次脱敏诊断数据提交至 WorkBuddy 云端智能体分析；我不会在对话中填写身份证号、银行卡号、账户密码等敏感信息。</span>
+</label>
+<div class="wealth-agent-launch-actions">
+<button class="btn btn-primary wealth-agent-start" disabled id="wealth-agent-start" type="button">进入 AI 身家诊断专家 →</button>
+<small id="wealth-agent-setup-note">服务状态确认后即可进入。</small>
+</div>
+</section>
+<section aria-labelledby="wealth-agent-console-title" class="wealth-agent-console" hidden id="wealth-agent-console">
+<header class="wealth-agent-console-head">
+<div>
+<p class="wealth-agent-kicker">WORKBUDDY · 身家诊断专家</p>
+<h4 id="wealth-agent-console-title">顾问式深度诊断</h4>
+<p>承接前五步结果，逐项补齐缺口，再形成供专业顾问复核的清单。</p>
+</div>
+<span class="wealth-agent-live-status" id="wealth-agent-live-status">准备连接</span>
+</header>
+<div aria-live="polite" aria-relevant="additions text" class="wealth-agent-messages" id="wealth-agent-messages"></div>
+<form class="wealth-agent-composer" id="wealth-agent-form">
+<label class="sr-only" for="wealth-agent-input">补充信息或向身家诊断专家提问</label>
+<textarea id="wealth-agent-input" maxlength="6000" placeholder="补充刚性支出、家族安排或希望专家重点复核的问题…" rows="3"></textarea>
+<button class="btn btn-primary" id="wealth-agent-send" type="submit">发送</button>
+</form>
+<p class="wealth-agent-boundary">AI 输出用于需求澄清和顾问复核，不构成投资、法律、税务或产品建议。</p>
+<div class="wealth-agent-console-actions">
+<button class="btn btn-secondary btn-sm" id="wealth-agent-back" type="button">← 返回五步结果</button>
+<button class="wealth-agent-end" id="wealth-agent-end" type="button">结束并清除本次专家会话</button>
+</div>
+</section>
 </div>
 </div>
 </div>
@@ -2631,6 +2675,7 @@
 <script src="js/enterprise.js"></script>
 <script src="js/wealth-model.js?v=1"></script>
 <script src="js/wealth.js?v=12"></script>
+<script src="js/wealth-agent.js?v=1"></script>
 <script src="js/report.js?v=2"></script>
 <script src="js/family-trust-model.js?v=1"></script>
 <script src="js/family-trust-system.js?v=1"></script>
@@ -2642,7 +2687,6 @@
 <script src="js/final-business-pages.js?v=1"></script>
 </body>
 </html>
-
 
 
 
