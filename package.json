@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "test": "node qa/check-js-syntax.mjs && node qa/check-wealth-model.mjs && node qa/check-family-trust-model.mjs && node qa/check-family-trust-structure.mjs && node qa/check-final-business-pages.mjs && node qa/check-workbuddy-integration.mjs"
+    "test": "node qa/check-js-syntax.mjs && node qa/check-wealth-model.mjs && node qa/check-family-trust-model.mjs && node qa/check-family-trust-structure.mjs && node qa/check-final-business-pages.mjs && node qa/check-workbuddy-integration.mjs && node qa/check-strategy-aily-websdk.mjs"
   },
   "engines": {
     "node": ">=20"

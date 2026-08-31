@@ -11,6 +11,7 @@
 <link href="css/strategy-chapter2-original.css" rel="stylesheet"/>
 <link href="css/strategy-chapter2-presentation.css" rel="stylesheet"/><link href="css/strategy-chapter-split.css" rel="stylesheet"/>
 <link href="css/strategy-case-gallery.css?v=2" rel="stylesheet"/>
+<link href="css/strategy-agent-websdk.css?v=1" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
 <link href="css/wealth-diagnosis.css?v=1" rel="stylesheet"/>
 <link href="css/wealth-agent.css?v=2" rel="stylesheet"/>
@@ -374,6 +375,7 @@
 <div class="strategy-hub-actions">
 <button class="btn btn-primary" onclick="strategyScrollToCases()" type="button">翻阅合作案例</button>
 <button class="btn btn-secondary" onclick="strategyOpenCase('skyworth')" type="button">查看创维完整案例</button>
+<button class="btn btn-secondary strategy-agent-launch-button" onclick="strategyOpenAgent({ pushHistory: true })" type="button">点击进入 梦工场定位智体 <span aria-hidden="true">→</span></button>
 </div>
 <div class="strategy-hub-proof" aria-label="价值增进信用状">
 <span>1998 起 · 商业模式实践</span>
@@ -404,6 +406,73 @@
 <button class="strategy-case-arrow next" id="strategy-case-next" type="button" aria-label="下一个案例">→</button>
 </div>
 <div class="strategy-case-dots" id="strategy-case-dots" aria-label="选择案例"></div>
+</div>
+</section>
+</article>
+<article aria-hidden="true" class="strategy-agent-websdk-view" id="strategy-agent-websdk-view">
+<section aria-labelledby="strategy-agent-websdk-title" class="strategy-agent-websdk-stage">
+<div class="strategy-agent-websdk-shell">
+<nav aria-label="定位智体路径" class="strategy-agent-websdk-breadcrumb">
+<button onclick="strategyShowHub({ pushHistory: true })" type="button">战略与实践</button>
+<span aria-hidden="true">/</span>
+<strong>梦工场定位智体</strong>
+</nav>
+<header class="strategy-agent-websdk-heading">
+<div>
+<p>FEISHU AILY · 战略定位与运营配称方案助手</p>
+<h1 id="strategy-agent-websdk-title">让方案从“可阅读”，进入<span>可追问、可推演</span></h1>
+<p>围绕价值鱼塘、战略定位、运营配称与执行节奏继续对话。会话、附件、语音和历史记录由飞书官方 Web SDK 提供。</p>
+</div>
+<div class="strategy-agent-websdk-meta" aria-label="接入状态">
+<span><b aria-hidden="true"></b>飞书官方会话面板</span>
+<span>域名白名单已配置</span>
+<span>SDK v0.0.12</span>
+</div>
+</header>
+<div class="strategy-agent-websdk-layout">
+<aside class="strategy-agent-websdk-guide" aria-label="定位智体使用说明">
+<div class="strategy-agent-websdk-mark" aria-hidden="true">智</div>
+<h2>先把问题讲清楚，再让系统推演</h2>
+<p>您可以直接描述企业所处阶段、目标客群、竞争处境和当前最难取舍的问题。</p>
+<div class="strategy-agent-websdk-prompts" aria-label="建议提问">
+<span>如何制定适合我们企业的价值增进系统解决方案？</span>
+<span>我们目前处于发展阶段，该如何重新校准战略定位？</span>
+<span>现有运营配称存在冲突，优先应该优化哪一环？</span>
+</div>
+<div class="strategy-agent-websdk-access-note">
+<strong>当前访问规则</strong>
+<p>需登录飞书账号，并处于后台设置的可用范围内；访问权限由飞书后台实时控制。</p>
+</div>
+<button class="btn btn-secondary" onclick="strategyShowHub({ pushHistory: true })" type="button">← 返回战略与实践</button>
+</aside>
+<section class="strategy-agent-websdk-panel" aria-label="梦工场定位智体会话面板">
+<header>
+<div><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></div>
+<strong>梦工场定位智体</strong>
+<em aria-live="polite" id="strategy-agent-websdk-status">准备连接</em>
+</header>
+<div class="strategy-agent-websdk-container" id="strategy-agent-websdk-container">
+<div class="strategy-agent-websdk-loading" id="strategy-agent-websdk-loading" role="status">
+<span aria-hidden="true"></span>
+<strong>正在载入飞书智能体会话面板</strong>
+<small>首次打开可能需要完成飞书登录</small>
+</div>
+</div>
+<div class="strategy-agent-websdk-error" hidden id="strategy-agent-websdk-error" role="alert">
+<strong>定位智体暂时没有成功载入</strong>
+<p id="strategy-agent-websdk-error-message">请检查飞书登录状态和域名白名单后重试。</p>
+<button class="btn btn-primary" id="strategy-agent-websdk-retry" type="button">重新连接</button>
+</div>
+<details class="strategy-agent-websdk-diagnostics" id="strategy-agent-websdk-diagnostics">
+<summary>连接诊断 · <code id="strategy-agent-websdk-trace">尚未开始</code></summary>
+<div>
+<ol id="strategy-agent-websdk-timeline"></ol>
+<p>诊断仅记录加载阶段、页面来源和错误类型，不记录飞书登录凭据或对话内容。</p>
+<button class="strategy-agent-websdk-download" id="strategy-agent-websdk-download" type="button">下载诊断 JSON</button>
+</div>
+</details>
+</section>
+</div>
 </div>
 </section>
 </article>
@@ -1864,11 +1933,10 @@
 <span>如何把4P配称拆成90天行动清单？</span>
 </div>
 <div class="strategy-agent-actions">
-<a class="btn btn-primary strategy-interaction-btn" rel="noopener noreferrer" target="_blank">进入战略定位智能体</a>
-<button class="btn btn-primary strategy-interaction-placeholder" disabled="" type="button">互动入口待接入</button>
+<button class="btn btn-primary strategy-agent-launch-button" onclick="strategyOpenAgent({ pushHistory: true })" type="button">点击进入 梦工场定位智体 →</button>
 <button class="btn btn-secondary" onclick="strategyOpenChapter(1, { pushHistory: true, scroll: true })" type="button">回看第一章推演过程</button>
 </div>
-<p class="strategy-agent-status">当前部署包未配置智能体公开地址；设置 <code>STRATEGY_INTERACTION_URL</code> 后，正式入口会自动替代占位按钮。</p>
+<p class="strategy-agent-status">定位智体已通过飞书官方 Web SDK 嵌入本站；首次进入需按飞书后台规则完成身份验证。</p>
 </div>
 <aside aria-label="战略定位智能体交互预告" class="strategy-agent-terminal">
 <div class="strategy-agent-terminal-head">
@@ -2695,12 +2763,11 @@
 <script src="js/strategy-cases-data.js"></script>
 <script src="js/strategy-cases.js?v=2"></script>
 <script src="js/strategy.js"></script>
+<script type="module" src="js/strategy-agent-websdk.js?v=1"></script>
 <script src="js/academy-assessment.js"></script>
 <script src="js/final-business-pages.js?v=1"></script>
 </body>
 </html>
-
-
 
 
 

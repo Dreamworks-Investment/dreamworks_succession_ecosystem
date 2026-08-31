@@ -10,9 +10,6 @@
  * 5. 第二章结尾衔接战略定位智能体
  */
 
-/* 可在部署前配置为战略定位智能体公开地址。 */
-var STRATEGY_INTERACTION_URL = window.STRATEGY_INTERACTION_URL || '';
-
 var StrategyChapterState = {
   current: 1,
   pageActive: false
@@ -93,23 +90,6 @@ function revealVisibleStrategyElements() {
   });
 }
 
-function updateStrategyInteractionEntry() {
-  var link = document.querySelector('.strategy-interaction-btn');
-  var placeholder = document.querySelector('.strategy-interaction-placeholder');
-  var status = document.querySelector('.strategy-agent-status');
-
-  if (link && STRATEGY_INTERACTION_URL) {
-    link.classList.add('visible');
-    link.setAttribute('href', STRATEGY_INTERACTION_URL);
-    if (placeholder) placeholder.style.display = 'none';
-    if (status) status.style.display = 'none';
-  } else {
-    if (link) link.classList.remove('visible');
-    if (placeholder) placeholder.style.display = 'inline-flex';
-    if (status) status.style.display = '';
-  }
-}
-
 /**
  * 切换第一章 / 第二章。
  * options:
@@ -122,7 +102,6 @@ function strategyOpenChapter(chapter, options) {
   chapter = Number(chapter) === 2 ? 2 : 1;
 
   syncStrategyChapterUI(chapter);
-  updateStrategyInteractionEntry();
 
   if (options.pushHistory) {
     updateStrategyHistory(chapter, false);
@@ -176,12 +155,6 @@ function strategyScrollTo(targetId) {
     });
     window.setTimeout(updateActiveStrategySection, 100);
   });
-}
-
-function enterStrategyInteraction() {
-  if (STRATEGY_INTERACTION_URL) {
-    window.open(STRATEGY_INTERACTION_URL, '_blank', 'noopener,noreferrer');
-  }
 }
 
 function toggleRisk(riskId) {
@@ -341,6 +314,9 @@ function updateActiveStrategySection() {
     });
 
     window.addEventListener('popstate', function(event) {
+      var route = window.location.hash.replace(/^#/, '');
+      var isChapterRoute = route === 'strategy-chapter1' || route === 'strategy-chapter2';
+      if (!(event.state && event.state.strategyChapter) && !isChapterRoute) return;
       var chapter = event.state && event.state.strategyChapter
         ? Number(event.state.strategyChapter)
         : chapterFromLocation();
@@ -358,8 +334,6 @@ function updateActiveStrategySection() {
     createBackTopButton();
     setupPageWatcher();
     setupScrollEvents();
-    updateStrategyInteractionEntry();
-
     var initialChapter = chapterFromLocation();
     syncStrategyChapterUI(initialChapter);
   }

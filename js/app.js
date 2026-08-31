@@ -205,6 +205,14 @@ document.addEventListener('DOMContentLoaded', () => {
         strategyShowHub({ replaceHistory: true, scroll: false });
       }
     }, 0);
+  } else if (requested === 'strategy-agent') {
+    navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
+    try { window.history.replaceState({ page: 'strategy', strategyView: 'agent' }, '', '#strategy-agent'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof strategyOpenAgent === 'function') {
+        strategyOpenAgent({ replaceHistory: true, scroll: false });
+      }
+    }, 0);
   } else if (requested.startsWith('strategy-case-')) {
     const strategyCase = requested.replace('strategy-case-', '');
     navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });

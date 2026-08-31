@@ -68,13 +68,20 @@
   function updateViewClass(view) {
     var page = document.getElementById('page-strategy');
     if (!page) return;
-    page.classList.remove('strategy-intro-active', 'strategy-hub-active', 'strategy-case-active', 'strategy-depth-active');
+    var leavingAgent = page.classList.contains('strategy-agent-active') && view !== 'agent';
+    page.classList.remove('strategy-intro-active', 'strategy-hub-active', 'strategy-case-active', 'strategy-depth-active', 'strategy-agent-active');
     page.classList.add(
       view === 'intro' ? 'strategy-intro-active' :
       view === 'detail' ? 'strategy-case-active' :
-      view === 'depth' ? 'strategy-depth-active' : 'strategy-hub-active'
+      view === 'depth' ? 'strategy-depth-active' :
+      view === 'agent' ? 'strategy-agent-active' : 'strategy-hub-active'
     );
     page.setAttribute('data-strategy-view', view);
+    var agentView = document.getElementById('strategy-agent-websdk-view');
+    if (agentView) agentView.setAttribute('aria-hidden', view === 'agent' ? 'false' : 'true');
+    if (leavingAgent && typeof window.strategyAgentDestroy === 'function') {
+      void window.strategyAgentDestroy();
+    }
   }
 
   function setHistory(hash, state, options) {
@@ -123,6 +130,22 @@
     setHistory('#strategy-library', { page: 'strategy', strategyView: 'hub' }, options);
     scrollTopForView(options);
     document.title = '梦工场 · 家族传承系统 | 从价值创造到百年传承';
+  }
+
+  function strategyOpenAgent(options) {
+    options = options || {};
+    ensureStrategyPage();
+    updateViewClass('agent');
+    var detail = document.getElementById('strategy-case-detail');
+    if (detail) { detail.hidden = true; detail.innerHTML = ''; }
+    setHistory('#strategy-agent', { page: 'strategy', strategyView: 'agent' }, options);
+    scrollTopForView(options);
+    document.title = '梦工场定位智体 · 战略与实践';
+    window.requestAnimationFrame(function() {
+      if (typeof window.strategyAgentMount === 'function') {
+        void window.strategyAgentMount();
+      }
+    });
   }
 
   function strategyScrollToCases() {
@@ -258,6 +281,10 @@
       strategyShowHub(options);
       return;
     }
+    if (hash === 'strategy-agent') {
+      strategyOpenAgent(options);
+      return;
+    }
     if (hash === 'strategy') strategyShowIntro(options);
   }
 
@@ -301,6 +328,7 @@
   window.strategyShowIntro = strategyShowIntro;
   window.strategyEnterSystem = strategyEnterSystem;
   window.strategyShowHub = strategyShowHub;
+  window.strategyOpenAgent = strategyOpenAgent;
   window.strategyScrollToCases = strategyScrollToCases;
   window.strategyOpenCase = strategyOpenCase;
   window.strategyOpenSkyworthDepth = strategyOpenSkyworthDepth;
