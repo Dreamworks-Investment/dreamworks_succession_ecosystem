@@ -37,6 +37,12 @@ function sanitizeProviderMessage(payload, fallback) {
   return candidate.replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]").slice(0, 300);
 }
 
+function isRuntimeAuthenticationPrompt(text) {
+  return typeof text === "string" &&
+    /authentication required/i.test(text) &&
+    /\/login/i.test(text);
+}
+
 function extractRuntimeId(rawText, parsed) {
   const parsedId = parsed?.data?.id;
   const match = rawText.match(/"data"\s*:\s*\{\s*"id"\s*:\s*(?:"(\d+)"|(\d+))/);
@@ -168,6 +174,10 @@ class AcpConnection {
     const parts = extractTextParts(value);
     for (const text of parts) {
       if (!text) continue;
+      if (isRuntimeAuthenticationPrompt(text)) {
+        this.activeTurn.authRequired = true;
+        continue;
+      }
       this.activeTurn.textChunks += 1;
       this.activeTurn.sources.add(source);
       this.activeTurn.emit({ type: "text", text });
@@ -370,7 +380,8 @@ class AcpConnection {
       emit,
       textChunks: 0,
       sources: new Set(),
-      updateTypes: new Set()
+      updateTypes: new Set(),
+      authRequired: false
     };
     this.activeTurn = turn;
     try {
@@ -379,6 +390,13 @@ class AcpConnection {
         { sessionId: activeSessionId, prompt: [{ type: "text", text }] },
         180_000
       );
+      if (turn.authRequired) {
+        throw new WorkBuddyError(
+          "WorkBuddy Runtime 内部认证未完成。无需在对话中输入 /login；请由服务端注入中国版环境和企业 OAuth 令牌后重新创建会话。",
+          502,
+          "RUNTIME_AUTH_REQUIRED"
+        );
+      }
       if (turn.textChunks === 0 && this.noTextGraceMs > 0) {
         await new Promise(resolve => setTimeout(resolve, this.noTextGraceMs));
       }
@@ -443,6 +461,7 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
     oauthScope: env.WORKBUDDY_OAUTH_SCOPE || "",
     apiBase: (env.WORKBUDDY_API_BASE || DEFAULT_API_BASE).replace(/\/$/, ""),
     sourceApp: env.WORKBUDDY_SOURCE_APP || "dreamworks-succession-main",
+    internetEnvironment: env.WORKBUDDY_INTERNET_ENVIRONMENT || "internal",
     agentId: env.WORKBUDDY_AGENT_ID || DEFAULT_AGENT_ID,
     agentName: env.WORKBUDDY_AGENT_NAME || DEFAULT_AGENT_NAME,
     mock: parseBoolean(env.WORKBUDDY_MOCK),
@@ -470,7 +489,8 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       mode: config.mock ? "mock" : "live",
       authMode: currentAuthMode,
       runtimeSecretConfigured,
-      integrationRevision: "acp-stream-compat-v3",
+      runtimeNetworkEnvironment: config.internetEnvironment,
+      integrationRevision: "runtime-oauth-auth-v4",
       agentId: config.agentId,
       agentName: config.agentName,
       sourceApp: config.sourceApp
@@ -589,6 +609,7 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
   }
 
   async function createLiveSession() {
+    const runtimeAuthToken = authMode() === "oauth" ? await getBearerToken() : "";
     const manifest = {
       id: config.agentId,
       name: config.agentName,
@@ -598,6 +619,12 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
     // OAuth authenticates the web service to the Runtime control plane, while
     // the published expert requires CODEBUDDY_API_KEY inside its private sandbox.
     manifest.secrets = [{ key: "CODEBUDDY_API_KEY", value: config.apiKey }];
+    if (runtimeAuthToken) {
+      manifest.secrets.push({ key: "CODEBUDDY_AUTH_TOKEN", value: runtimeAuthToken });
+    }
+    manifest.envs = [
+      { key: "CODEBUDDY_INTERNET_ENVIRONMENT", value: config.internetEnvironment }
+    ];
     const created = await apiRequest("/runtimes", {
       method: "POST",
       body: JSON.stringify({

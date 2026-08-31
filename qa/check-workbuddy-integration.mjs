@@ -26,6 +26,8 @@ assert(serverSource.includes('assertWithinRateLimit(req'), 'Public AI routes mus
 assert(agentSource.includes('agent_01M1AB3GRFAR44G0ED9RQ51WY9'), 'Configured expert manifest ID must match the published expert');
 assert(agentSource.includes('session/load'), 'ACP must load the Runtime default session before prompting');
 assert(agentSource.includes('Acp-Connection-Id'), 'ACP calls must carry the negotiated connection ID');
+assert(agentSource.includes('CODEBUDDY_AUTH_TOKEN'), 'Enterprise OAuth token must be injected into the private Runtime');
+assert(agentSource.includes('CODEBUDDY_INTERNET_ENVIRONMENT'), 'Runtime must select the correct CodeBuddy network environment');
 assert(envExample.includes('WORKBUDDY_API_KEY=') && !envExample.match(/WORKBUDDY_API_KEY=\S+/), 'Example environment file must not contain a secret');
 assert(envExample.includes('WORKBUDDY_CLIENT_ID=') && envExample.includes('WORKBUDDY_CLIENT_SECRET='), 'Enterprise OAuth variables must be documented');
 
@@ -141,6 +143,24 @@ async function fakeWorkBuddyFetch(url, options = {}) {
           }
         ]), { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
       }
+      if (livePromptCount === 4) {
+        return fakeResponse(sseStream([
+          {
+            jsonrpc: '2.0',
+            method: 'session/update',
+            params: {
+              update: {
+                sessionUpdate: 'agent_message_chunk',
+                content: {
+                  type: 'text',
+                  text: '401 Authentication required. Please use /login command to sign in to your account'
+                }
+              }
+            }
+          },
+          { jsonrpc: '2.0', id: rpc.id, result: { stopReason: 'end_turn' } }
+        ]), { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
+      }
       return fakeResponse(sseStream([
         {
           jsonrpc: '2.0',
@@ -189,10 +209,16 @@ assert(extendedChunks.some(event => event.type === 'text' && event.text === '扩
 const resultChunks = [];
 await liveService.prompt(liveSession.sessionId, '测试 Prompt 结果回退', event => resultChunks.push(event));
 assert(resultChunks.some(event => event.type === 'text' && event.text === 'Prompt 结果内回复'));
+const authChunks = [];
+await assert.rejects(
+  () => liveService.prompt(liveSession.sessionId, '/login', event => authChunks.push(event)),
+  error => error?.code === 'RUNTIME_AUTH_REQUIRED'
+);
+assert.equal(authChunks.some(event => event.type === 'text'), false, 'Raw Runtime login prompts must not be presented as a usable chat command');
 await liveService.closeSession(liveSession.sessionId);
 assert.deepEqual(
   liveCalls.filter(call => call.url === acpUrl && call.method === 'POST').map(call => JSON.parse(call.body).method),
-  ['initialize', 'session/load', 'session/prompt', 'session/prompt', 'session/prompt'],
+  ['initialize', 'session/load', 'session/prompt', 'session/prompt', 'session/prompt', 'session/prompt'],
   'ACP order must be initialize, load default session, then prompt without rebuilding the Runtime'
 );
 const runtimeCreateBody = JSON.parse(liveCalls.find(call => call.url === `${apiBase}/runtimes`).body);
@@ -200,12 +226,21 @@ assert.equal(runtimeCreateBody.agentManifest.id, 'agent_01M1AB3GRFAR44G0ED9RQ51W
 assert.equal(Object.hasOwn(runtimeCreateBody.agentManifest, 'plugins'), false, 'Runtime must resolve the published expert without committing a signed plugin URL');
 assert.deepEqual(
   runtimeCreateBody.agentManifest.secrets,
-  [{ key: 'CODEBUDDY_API_KEY', value: 'test-runtime-api-key' }],
-  'OAuth control-plane auth must support the API key required inside the expert Runtime'
+  [
+    { key: 'CODEBUDDY_API_KEY', value: 'test-runtime-api-key' },
+    { key: 'CODEBUDDY_AUTH_TOKEN', value: 'test-oauth-token' }
+  ],
+  'Private Runtime must receive both the published expert key and the headless enterprise OAuth token'
+);
+assert.deepEqual(
+  runtimeCreateBody.agentManifest.envs,
+  [{ key: 'CODEBUDDY_INTERNET_ENVIRONMENT', value: 'internal' }],
+  'China-hosted Runtime must select the internal network environment'
 );
 assert.equal(liveCalls.filter(call => call.url === tokenUrl).length, 1, 'OAuth access token must be cached across Runtime API calls');
 assert.equal(liveService.status().runtimeSecretConfigured, true, 'Runtime secret readiness must be visible without exposing its value');
-assert.equal(liveService.status().integrationRevision, 'acp-stream-compat-v3');
+assert.equal(liveService.status().runtimeNetworkEnvironment, 'internal');
+assert.equal(liveService.status().integrationRevision, 'runtime-oauth-auth-v4');
 
 const service = createWealthAgentService({
   env: {

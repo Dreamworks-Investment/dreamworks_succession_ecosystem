@@ -21,6 +21,7 @@
 - `WORKBUDDY_API_KEY`：当前发布的专家要求的 Runtime secret；即使使用 OAuth 控制面认证也必须设置。
 - 后端会把上面的 Key 自动映射成 `CODEBUDDY_API_KEY`，仅注入本次私有 Runtime，浏览器不可见；不再需要额外的注入开关。
 - `WORKBUDDY_SOURCE_APP=dreamworks-succession-main`：用于 Runtime 可见性隔离，后续保持不变。
+- `WORKBUDDY_INTERNET_ENVIRONMENT=internal`：中国版必须设置；后端会把它注入 Runtime。企业 OAuth access token 也会以 `CODEBUDDY_AUTH_TOKEN` 安全注入，不需要用户在聊天框输入 `/login`。
 - `WORKBUDDY_AGENT_ID=agent_01M1AB3GRFAR44G0ED9RQ51WY9`：已发布的“身家诊断专家”Manifest ID。
 - `WORKBUDDY_AGENT_NAME=身家诊断专家`。
 - `WORKBUDDY_API_BASE=https://www.codebuddy.cn/v2/agentos`。
