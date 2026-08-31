@@ -9,7 +9,10 @@
     mode: 'live',
     authMode: 'none',
     sessionId: '',
-    busy: false
+    busy: false,
+    diagnostics: [],
+    clientEvents: [],
+    latestTraceId: ''
   };
 
   const get = id => document.getElementById(id);
@@ -146,12 +149,101 @@
     ].join('\n');
   }
 
+  function recordClientEvent(stage, status, data) {
+    state.clientEvents.push({ timestamp: new Date().toISOString(), stage, status, data: data || {} });
+    if (state.clientEvents.length > 80) state.clientEvents.shift();
+  }
+
+  function renderDiagnostic(diagnostic, fallbackTraceId) {
+    if (!diagnostic && !fallbackTraceId) return;
+    const traceId = diagnostic?.traceId || fallbackTraceId || '';
+    if (diagnostic) {
+      const existing = state.diagnostics.findIndex(item => item.traceId === diagnostic.traceId);
+      if (existing >= 0) state.diagnostics[existing] = diagnostic;
+      else state.diagnostics.push(diagnostic);
+      if (state.diagnostics.length > 20) state.diagnostics.shift();
+    }
+    state.latestTraceId = traceId || state.latestTraceId;
+    const panel = get('wealth-agent-diagnostics');
+    if (!panel) return;
+    panel.hidden = false;
+    const trace = get('wealth-agent-diagnostic-trace');
+    if (trace) trace.textContent = state.latestTraceId || '尚未生成 Trace ID';
+    const latest = diagnostic || state.diagnostics[state.diagnostics.length - 1];
+    const summary = get('wealth-agent-diagnostic-summary');
+    if (summary && latest) {
+      const failedStage = [...(latest.events || [])].reverse().find(event => event.status === 'error');
+      summary.textContent = `${latest.operation || '诊断请求'} · ${latest.outcome || '运行中'} · ${latest.durationMs || 0} ms` +
+        (failedStage ? ` · 失败阶段：${failedStage.stage}` : '');
+    }
+    const timeline = get('wealth-agent-diagnostic-timeline');
+    if (timeline && latest) {
+      timeline.textContent = '';
+      (latest.events || []).slice(-18).forEach(event => {
+        const row = document.createElement('li');
+        row.className = `is-${event.status || 'info'}`;
+        const offset = Number.isFinite(event.offsetMs) ? `+${event.offsetMs}ms` : '';
+        row.textContent = `${offset}  ${event.stage}  [${event.status}]`;
+        timeline.appendChild(row);
+      });
+    }
+  }
+
+  function makeApiError(payload, fallback) {
+    const error = new Error(payload?.error?.message || fallback);
+    error.code = payload?.error?.code || 'REQUEST_FAILED';
+    error.traceId = payload?.traceId || '';
+    error.diagnostic = payload?.diagnostic || null;
+    return error;
+  }
+
   async function readApiError(response, fallback) {
     try {
       const payload = await response.json();
-      return payload?.error?.message || fallback;
+      return makeApiError(payload, fallback);
     } catch (error) {
-      return fallback;
+      return new Error(fallback);
+    }
+  }
+
+  function downloadDiagnostics() {
+    const payload = {
+      schemaVersion: 'dreamworks-browser-diagnostic-bundle-v1',
+      exportedAt: new Date().toISOString(),
+      page: location.href.split('#')[0],
+      browser: navigator.userAgent,
+      latestTraceId: state.latestTraceId,
+      clientEvents: state.clientEvents,
+      serverTraces: state.diagnostics
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dreamworks-workbuddy-diagnostics-${state.latestTraceId || Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    recordClientEvent('diagnostics.downloaded', 'success', { traceCount: state.diagnostics.length });
+  }
+
+  async function copyDiagnosticReference() {
+    const latest = state.diagnostics[state.diagnostics.length - 1];
+    const failedStage = [...(latest?.events || [])].reverse().find(event => event.status === 'error');
+    const text = [
+      `Trace ID: ${state.latestTraceId || '无'}`,
+      `Operation: ${latest?.operation || '无'}`,
+      `Outcome: ${latest?.outcome || '无'}`,
+      `Duration: ${latest?.durationMs || 0} ms`,
+      `Failed stage: ${failedStage?.stage || '无'}`,
+      `Error: ${latest?.error?.code || '无'} ${latest?.error?.message || ''}`
+    ].join('\n');
+    try {
+      await navigator.clipboard.writeText(text);
+      showWealthToast('诊断引用已复制，可直接发给技术支持。');
+    } catch (error) {
+      showWealthToast('浏览器未允许复制，请下载诊断日志。', true);
     }
   }
 
@@ -176,6 +268,8 @@
       const response = await fetch('/api/wealth-agent/status', { headers: { Accept: 'application/json' } });
       if (!response.ok) throw new Error('status unavailable');
       const payload = await response.json();
+      renderDiagnostic(payload.diagnostic, payload.traceId);
+      recordClientEvent('status.checked', 'success', { traceId: payload.traceId, configured: Boolean(payload.configured) });
       state.configured = Boolean(payload.configured);
       state.mode = payload.mode || 'live';
       state.authMode = payload.authMode || 'none';
@@ -195,6 +289,7 @@
         get('wealth-agent-setup-note').textContent = '请先在部署平台设置企业 OAuth 凭据或 API Key。';
       }
     } catch (error) {
+      recordClientEvent('status.checked', 'error', { message: error.message });
       state.configured = false;
       setAvailability('offline', '接口不可用');
       get('wealth-agent-setup-note').textContent = '当前页面未连接到支持 WorkBuddy 的 Node 服务。';
@@ -233,6 +328,8 @@
     setBusy(true, '专家正在分析…');
     const assistantContent = appendMessage('assistant', '');
     let receivedText = false;
+    let promptTraceId = '';
+    recordClientEvent('prompt.requested', 'start', { byteLength: new Blob([prompt]).size });
 
     try {
       const response = await fetch(`/api/wealth-agent/session/${encodeURIComponent(state.sessionId)}/prompt`, {
@@ -240,13 +337,13 @@
         headers: { 'Content-Type': 'application/json', Accept: 'application/x-ndjson' },
         body: JSON.stringify({ prompt })
       });
-      if (!response.ok) throw new Error(await readApiError(response, '专家诊断请求失败。'));
+      if (!response.ok) throw await readApiError(response, '专家诊断请求失败。');
       if (!response.body) throw new Error('浏览器未收到流式响应。');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
-      let streamError = '';
+      let streamError = null;
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
@@ -257,22 +354,35 @@
           if (!line.trim()) continue;
           let event;
           try { event = JSON.parse(line); } catch (error) { continue; }
-          if (event.type === 'text' && typeof event.text === 'string') {
+          if (event.type === 'trace' && event.traceId) {
+            promptTraceId = event.traceId;
+            state.latestTraceId = event.traceId;
+          } else if (event.type === 'text' && typeof event.text === 'string') {
             receivedText = true;
             assistantContent.textContent += event.text;
             get('wealth-agent-messages').scrollTop = get('wealth-agent-messages').scrollHeight;
           } else if (event.type === 'status' && event.text) {
             get('wealth-agent-live-status').textContent = event.text;
           } else if (event.type === 'error') {
-            streamError = event.error?.message || '专家诊断未完成。';
+            renderDiagnostic(event.diagnostic, event.traceId || promptTraceId);
+            streamError = makeApiError(event, '专家诊断未完成。');
+          } else if (event.type === 'done') {
+            renderDiagnostic(event.diagnostic, event.traceId || promptTraceId);
           }
         }
       }
-      if (streamError) throw new Error(streamError);
+      if (streamError) throw streamError;
       if (!receivedText) assistantContent.textContent = '本轮没有收到可显示的文本，请重试或重新进入专家会话。';
       setBusy(false, '本轮诊断完成');
+      recordClientEvent('prompt.requested', 'success', { traceId: promptTraceId, receivedText });
       get('wealth-agent-input')?.focus();
     } catch (error) {
+      renderDiagnostic(error.diagnostic, error.traceId || promptTraceId);
+      recordClientEvent('prompt.requested', 'error', {
+        traceId: error.traceId || promptTraceId,
+        code: error.code || 'PROMPT_FAILED',
+        message: error.message
+      });
       assistantContent.textContent = error.message || '专家诊断暂时不可用，请稍后重试。';
       assistantContent.parentElement?.classList.add('is-error');
       setBusy(false, '连接出现问题');
@@ -284,6 +394,7 @@
     setBusy(true, '正在创建私有会话…');
     const start = get('wealth-agent-start');
     start.textContent = '正在连接 WorkBuddy…';
+    recordClientEvent('session.create', 'start');
     try {
       const context = buildDiagnosisContext();
       const response = await fetch('/api/wealth-agent/session', {
@@ -291,8 +402,10 @@
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ consent: true, context })
       });
-      if (!response.ok) throw new Error(await readApiError(response, '无法创建专家会话。'));
+      if (!response.ok) throw await readApiError(response, '无法创建专家会话。');
       const payload = await response.json();
+      renderDiagnostic(payload.diagnostic, payload.traceId);
+      recordClientEvent('session.create', 'success', { traceId: payload.traceId });
       state.sessionId = payload.sessionId;
       state.mode = payload.mode || state.mode;
       get('wealth-agent-launch').hidden = true;
@@ -303,6 +416,12 @@
       setBusy(false, '已连接');
       await streamPrompt(buildInitialPrompt(context), '已提交五步诊断摘要（名称及主体信息已脱敏）');
     } catch (error) {
+      renderDiagnostic(error.diagnostic, error.traceId);
+      recordClientEvent('session.create', 'error', {
+        traceId: error.traceId,
+        code: error.code || 'SESSION_CREATE_FAILED',
+        message: error.message
+      });
       setBusy(false, '连接失败');
       showWealthToast(error.message || '无法连接身家诊断专家。', true);
     } finally {
@@ -325,11 +444,13 @@
     returnToResults();
     if (!sessionId) return;
     try {
-      await fetch(`/api/wealth-agent/session/${encodeURIComponent(sessionId)}/close`, {
+      const response = await fetch(`/api/wealth-agent/session/${encodeURIComponent(sessionId)}/close`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}'
       });
+      const payload = await response.json();
+      renderDiagnostic(payload.diagnostic, payload.traceId);
     } catch (error) {}
   }
 
@@ -340,6 +461,8 @@
     start.addEventListener('click', startSession);
     get('wealth-agent-back')?.addEventListener('click', returnToResults);
     get('wealth-agent-end')?.addEventListener('click', endSession);
+    get('wealth-agent-diagnostic-download')?.addEventListener('click', downloadDiagnostics);
+    get('wealth-agent-diagnostic-copy')?.addEventListener('click', copyDiagnosticReference);
     get('wealth-agent-form')?.addEventListener('submit', event => {
       event.preventDefault();
       const input = get('wealth-agent-input');

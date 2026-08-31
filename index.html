@@ -13,7 +13,7 @@
 <link href="css/strategy-case-gallery.css?v=2" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
 <link href="css/wealth-diagnosis.css?v=1" rel="stylesheet"/>
-<link href="css/wealth-agent.css?v=1" rel="stylesheet"/>
+<link href="css/wealth-agent.css?v=2" rel="stylesheet"/>
 <link href="css/family-trust-system.css?v=1" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <link href="css/final-business-pages.css?v=1" rel="stylesheet"/>
@@ -2650,6 +2650,18 @@
 <button class="wealth-agent-end" id="wealth-agent-end" type="button">结束并清除本次专家会话</button>
 </div>
 </section>
+<details class="wealth-agent-diagnostics" hidden id="wealth-agent-diagnostics">
+<summary>技术诊断日志 · Trace <code id="wealth-agent-diagnostic-trace">尚未生成</code></summary>
+<div class="wealth-agent-diagnostic-body">
+<p id="wealth-agent-diagnostic-summary">每次连接、Runtime 创建和 ACP 对话都会生成一条脱敏时间线。</p>
+<ol aria-label="最近一次调用时间线" class="wealth-agent-diagnostic-timeline" id="wealth-agent-diagnostic-timeline"></ol>
+<div class="wealth-agent-diagnostic-actions">
+<button class="btn btn-secondary btn-sm" id="wealth-agent-diagnostic-download" type="button">下载完整诊断日志 JSON</button>
+<button class="wealth-agent-diagnostic-copy" id="wealth-agent-diagnostic-copy" type="button">复制 Trace 引用</button>
+</div>
+<small>日志不包含 API Key、OAuth Token、密码或完整资产/对话内容；部署平台可用同一 Trace ID 检索服务端结构化日志。</small>
+</div>
+</details>
 </div>
 </div>
 </div>
@@ -2675,7 +2687,7 @@
 <script src="js/enterprise.js"></script>
 <script src="js/wealth-model.js?v=1"></script>
 <script src="js/wealth.js?v=12"></script>
-<script src="js/wealth-agent.js?v=2"></script>
+<script src="js/wealth-agent.js?v=3"></script>
 <script src="js/report.js?v=2"></script>
 <script src="js/family-trust-model.js?v=1"></script>
 <script src="js/family-trust-system.js?v=1"></script>
@@ -2687,8 +2699,6 @@
 <script src="js/final-business-pages.js?v=1"></script>
 </body>
 </html>
-
-
 
 
 

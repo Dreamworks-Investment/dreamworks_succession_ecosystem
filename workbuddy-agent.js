@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { createDiagnosticStore } from "./wealth-agent-diagnostics.js";
 
 const DEFAULT_AGENT_ID = "agent_01M1AB3GRFAR44G0ED9RQ51WY9";
 const DEFAULT_AGENT_NAME = "身家诊断专家";
@@ -9,11 +10,12 @@ const MAX_CONTEXT_BYTES = 180 * 1024;
 const MAX_PROMPT_BYTES = 20 * 1024;
 
 class WorkBuddyError extends Error {
-  constructor(message, statusCode = 502, code = "WORKBUDDY_ERROR") {
+  constructor(message, statusCode = 502, code = "WORKBUDDY_ERROR", details = undefined) {
     super(message);
     this.name = "WorkBuddyError";
     this.statusCode = statusCode;
     this.code = code;
+    this.details = details;
   }
 }
 
@@ -41,6 +43,28 @@ function isRuntimeAuthenticationPrompt(text) {
   return typeof text === "string" &&
     /authentication required/i.test(text) &&
     /\/login/i.test(text);
+}
+
+function runtimeAuthenticationDetails(text) {
+  if (!isRuntimeAuthenticationPrompt(text)) return {};
+  const capture = pattern => text.match(pattern)?.[1] || null;
+  return {
+    authType: capture(/auth-type:([^,\s)]+)/i),
+    tokenType: capture(/token-type:([^,\s)]+)/i),
+    credentialLength: safeNumber(capture(/token-length:(\d+)/i), null),
+    target: capture(/target:\s*([^\s)]+)/i),
+    providerReference: capture(/\)\s*\(([^)]+)\)\s*$/)
+  };
+}
+
+function safeHost(value) {
+  try { return new URL(value).host; } catch { return "invalid-url"; }
+}
+
+function diagnosticApiPath(path) {
+  return String(path)
+    .replace(/\/runtimes\/[^/]+/g, "/runtimes/:runtimeId")
+    .replace(/\/sessions\/[^/]+/g, "/sessions/:sessionId");
 }
 
 function extractRuntimeId(rawText, parsed) {
@@ -176,6 +200,11 @@ class AcpConnection {
       if (!text) continue;
       if (isRuntimeAuthenticationPrompt(text)) {
         this.activeTurn.authRequired = true;
+        this.activeTurn.authDetails = runtimeAuthenticationDetails(text);
+        this.activeTurn.trace?.event("runtime.authentication_required", "error", {
+          source,
+          ...this.activeTurn.authDetails
+        });
         continue;
       }
       this.activeTurn.textChunks += 1;
@@ -247,29 +276,42 @@ class AcpConnection {
     return promise;
   }
 
-  async connect() {
+  async connect(trace) {
+    const finish = trace?.span("acp.notification.connect", {
+      endpointHost: safeHost(this.url),
+      credentialLength: this.token.length
+    });
     this.notificationAbort?.abort();
     const notificationAbort = new AbortController();
     this.notificationAbort = notificationAbort;
     this.closed = false;
-    const response = await fetchHeadersWithTimeout(
-      this.fetchImpl,
-      this.url,
-      {
-        method: "GET",
-        headers: this.authHeaders({ Accept: "text/event-stream", "Cache-Control": "no-cache" }),
-        signal: notificationAbort.signal
-      },
-      20_000,
-      "连接 WorkBuddy ACP 通知通道超时。"
-    );
+    let response;
+    try {
+      response = await fetchHeadersWithTimeout(
+        this.fetchImpl,
+        this.url,
+        {
+          method: "GET",
+          headers: this.authHeaders({ Accept: "text/event-stream", "Cache-Control": "no-cache" }),
+          signal: notificationAbort.signal
+        },
+        20_000,
+        "连接 WorkBuddy ACP 通知通道超时。"
+      );
+    } catch (error) {
+      finish?.("error", { errorCode: error.code || "FETCH_ERROR", message: error.message });
+      throw error;
+    }
     if (!response.ok) {
+      finish?.("error", { httpStatus: response.status });
       throw new WorkBuddyError(`WorkBuddy ACP 连接失败（HTTP ${response.status}）。`, 502, "ACP_CONNECT_FAILED");
     }
     this.connectionId = response.headers.get("Acp-Connection-Id") || response.headers.get("acp-connection-id") || "";
     if (!this.connectionId) {
+      finish?.("error", { httpStatus: response.status, connectionIdPresent: false });
       throw new WorkBuddyError("WorkBuddy ACP 未返回连接标识。", 502, "ACP_CONNECTION_ID_MISSING");
     }
+    finish?.("success", { httpStatus: response.status, connectionIdPresent: true });
     this.notificationAlive = true;
     this.notificationTask = consumeSse(response.body, envelope => this.handleEnvelope(envelope))
       .catch(error => {
@@ -286,7 +328,8 @@ class AcpConnection {
       });
   }
 
-  async rpc(method, params, timeoutMs = this.rpcTimeoutMs) {
+  async rpc(method, params, timeoutMs = this.rpcTimeoutMs, trace) {
+    const finishTransport = trace?.span("acp.rpc.transport", { method, timeoutMs });
     const id = ++this.rpcId;
     const pending = this.createPending(id, method, timeoutMs);
     let response;
@@ -307,6 +350,7 @@ class AcpConnection {
         `发送 ${method} 请求超时。`
       );
     } catch (error) {
+      finishTransport?.("error", { errorCode: error.code || "FETCH_ERROR", message: error.message });
       const waiting = this.pending.get(id);
       waiting?.clear();
       waiting?.reject(error);
@@ -315,6 +359,7 @@ class AcpConnection {
     }
 
     if (![200, 202].includes(response.status)) {
+      finishTransport?.("error", { httpStatus: response.status });
       const error = new WorkBuddyError(`WorkBuddy ACP ${method} 失败（HTTP ${response.status}）。`, 502, "ACP_HTTP_ERROR");
       const waiting = this.pending.get(id);
       waiting?.clear();
@@ -324,6 +369,10 @@ class AcpConnection {
     }
 
     const contentType = response.headers.get("content-type") || "";
+    finishTransport?.("success", {
+      httpStatus: response.status,
+      contentType: contentType.split(";")[0] || "unspecified"
+    });
     if (response.status === 200 && contentType.includes("text/event-stream")) {
       void consumeSse(response.body, envelope => this.handleEnvelope(envelope)).catch(error => {
         const waiting = this.pending.get(id);
@@ -341,60 +390,79 @@ class AcpConnection {
     return pending;
   }
 
-  async initializeAndLoad(sessionId) {
-    await this.rpc("initialize", {
-      protocolVersion: 1,
-      clientCapabilities: { fs: { readTextFile: false, writeTextFile: false } },
-      clientInfo: { name: "dreamworks-succession-ecosystem", version: "1.0.0" }
-    });
-
+  async initializeAndLoad(sessionId, trace) {
+    const finishInitialize = trace?.span("acp.initialize");
     try {
-      await this.rpc("session/load", { sessionId, cwd: "/workspace", mcpServers: [] }, 45_000);
+      await this.rpc("initialize", {
+        protocolVersion: 1,
+        clientCapabilities: { fs: { readTextFile: false, writeTextFile: false } },
+        clientInfo: { name: "dreamworks-succession-ecosystem", version: "1.0.0" }
+      }, this.rpcTimeoutMs, trace);
+      finishInitialize?.("success");
+    } catch (error) {
+      finishInitialize?.("error", { errorCode: error.code, message: error.message });
+      throw error;
+    }
+
+    const finishLoad = trace?.span("acp.session.load", { sessionIdPresent: Boolean(sessionId) });
+    try {
+      await this.rpc("session/load", { sessionId, cwd: "/workspace", mcpServers: [] }, 45_000, trace);
+      finishLoad?.("success");
       return sessionId;
     } catch (error) {
+      finishLoad?.("error", { errorCode: error.code, message: error.message });
       if (error.code !== "ACP_RPC_ERROR" && error.code !== "ACP_TIMEOUT") throw error;
-      const result = await this.rpc("session/new", { cwd: "/workspace", mcpServers: [] }, 45_000);
+      const finishNew = trace?.span("acp.session.new", { fallbackFromLoad: true });
+      const result = await this.rpc("session/new", { cwd: "/workspace", mcpServers: [] }, 45_000, trace);
+      finishNew?.("success", { sessionIdPresent: Boolean(result.sessionId || result.id) });
       return String(result.sessionId || result.id || sessionId);
     }
   }
 
-  async setMode(sessionId, mode) {
+  async setMode(sessionId, mode, trace) {
     if (!mode || mode === "default") return;
     try {
-      await this.rpc("session/set_mode", { sessionId, modeId: mode }, 20_000);
-    } catch {
+      await this.rpc("session/set_mode", { sessionId, modeId: mode }, 20_000, trace);
+      trace?.event("acp.session.mode", "success", { mode });
+    } catch (error) {
+      trace?.event("acp.session.mode", "warning", { mode, errorCode: error.code });
       // Optional compatibility setting. The diagnostic chat still works in default mode.
     }
   }
 
-  async prompt(sessionId, text, emit) {
+  async prompt(sessionId, text, emit, trace) {
     if (this.activeTurn) {
       throw new WorkBuddyError("上一轮专家诊断尚未结束，请稍候。", 409, "PROMPT_IN_PROGRESS");
     }
     let activeSessionId = sessionId;
     if (!this.notificationAlive && !this.closed) {
-      await this.connect();
-      activeSessionId = await this.initializeAndLoad(sessionId);
+      trace?.event("acp.reconnect", "start", { reason: "notification_channel_inactive" });
+      await this.connect(trace);
+      activeSessionId = await this.initializeAndLoad(sessionId, trace);
     }
     const turn = {
       emit,
       textChunks: 0,
       sources: new Set(),
       updateTypes: new Set(),
-      authRequired: false
+      authRequired: false,
+      authDetails: null,
+      trace
     };
     this.activeTurn = turn;
     try {
       const result = await this.rpc(
         "session/prompt",
         { sessionId: activeSessionId, prompt: [{ type: "text", text }] },
-        180_000
+        180_000,
+        trace
       );
       if (turn.authRequired) {
         throw new WorkBuddyError(
           "WorkBuddy Runtime 内部认证未完成。无需在对话中输入 /login；请由服务端注入中国版环境和企业 OAuth 令牌后重新创建会话。",
           502,
-          "RUNTIME_AUTH_REQUIRED"
+          "RUNTIME_AUTH_REQUIRED",
+          turn.authDetails
         );
       }
       if (turn.textChunks === 0 && this.noTextGraceMs > 0) {
@@ -402,6 +470,10 @@ class AcpConnection {
       }
       if (turn.textChunks === 0) {
         const received = [...turn.updateTypes].slice(0, 8).join("、") || "无 session/update 通知";
+        trace?.event("acp.prompt.no_text", "error", {
+          receivedUpdateTypes: [...turn.updateTypes].slice(0, 8),
+          notificationAlive: this.notificationAlive
+        });
         this.notificationAbort?.abort();
         this.notificationAlive = false;
         throw new WorkBuddyError(
@@ -410,6 +482,12 @@ class AcpConnection {
           "ACP_NO_TEXT"
         );
       }
+      trace?.event("acp.prompt.completed", "success", {
+        stopReason: result.stopReason || "end_turn",
+        textChunks: turn.textChunks,
+        textSources: [...turn.sources],
+        updateTypes: [...turn.updateTypes].slice(0, 12)
+      });
       return { stopReason: result.stopReason || "end_turn" };
     } finally {
       if (this.activeTurn === turn) this.activeTurn = null;
@@ -452,9 +530,19 @@ function buildMockReply(prompt, turn) {
   ];
 }
 
-export function createWealthAgentService({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
+export function createWealthAgentService({
+  env = process.env,
+  fetchImpl = globalThis.fetch,
+  diagnostics = createDiagnosticStore()
+} = {}) {
+  const workbuddyApiKey = env.WORKBUDDY_API_KEY || "";
+  const codebuddyApiKey = env.CODEBUDDY_API_KEY || "";
   const config = {
-    apiKey: env.WORKBUDDY_API_KEY || env.CODEBUDDY_API_KEY || "",
+    apiKey: workbuddyApiKey || codebuddyApiKey,
+    credentialSource: workbuddyApiKey ? "WORKBUDDY_API_KEY" : codebuddyApiKey ? "CODEBUDDY_API_KEY" : "none",
+    credentialConflict: Boolean(workbuddyApiKey && codebuddyApiKey && workbuddyApiKey !== codebuddyApiKey),
+    workbuddyCredentialLength: workbuddyApiKey.length,
+    codebuddyCredentialLength: codebuddyApiKey.length,
     clientId: env.WORKBUDDY_CLIENT_ID || "",
     clientSecret: env.WORKBUDDY_CLIENT_SECRET || "",
     tokenUrl: env.WORKBUDDY_TOKEN_URL || DEFAULT_TOKEN_URL,
@@ -474,6 +562,27 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
   const sessions = new Map();
   let oauthToken = null;
 
+  function diagnosticMetadata() {
+    return {
+      integrationRevision: "runtime-oauth-diagnostics-v5",
+      nodeVersion: process.version,
+      mode: config.mock ? "mock" : "live",
+      authMode: authMode(),
+      agentId: config.agentId,
+      agentName: config.agentName,
+      sourceApp: config.sourceApp,
+      apiBaseHost: safeHost(config.apiBase),
+      tokenEndpointHost: safeHost(config.tokenUrl),
+      internetEnvironment: config.internetEnvironment,
+      credentialSource: config.credentialSource,
+      credentialLength: config.apiKey.length,
+      credentialConflict: config.credentialConflict,
+      workbuddyCredentialLength: config.workbuddyCredentialLength,
+      codebuddyCredentialLength: config.codebuddyCredentialLength,
+      oauthClientConfigured: Boolean(config.clientId && config.clientSecret)
+    };
+  }
+
   function authMode() {
     if (config.mock) return "mock";
     if (config.clientId && config.clientSecret) return "oauth";
@@ -489,8 +598,15 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       mode: config.mock ? "mock" : "live",
       authMode: currentAuthMode,
       runtimeSecretConfigured,
+      credentialDiagnostics: {
+        source: config.credentialSource,
+        length: config.apiKey.length,
+        duplicateConflict: config.credentialConflict,
+        workbuddyLength: config.workbuddyCredentialLength,
+        codebuddyLength: config.codebuddyCredentialLength
+      },
       runtimeNetworkEnvironment: config.internetEnvironment,
-      integrationRevision: "runtime-oauth-auth-v4",
+      integrationRevision: "runtime-oauth-diagnostics-v5",
       agentId: config.agentId,
       agentName: config.agentName,
       sourceApp: config.sourceApp
@@ -514,14 +630,26 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
     }
   }
 
-  async function getBearerToken({ forceRefresh = false } = {}) {
+  async function getBearerToken({ forceRefresh = false, trace } = {}) {
     if (authMode() === "api-key") return config.apiKey;
     if (authMode() !== "oauth") {
       throw new WorkBuddyError("缺少 WorkBuddy 认证凭据。", 503, "NOT_CONFIGURED");
     }
     if (!forceRefresh && oauthToken && oauthToken.expiresAt > Date.now() + 60_000) {
+      trace?.event("oauth.token.cache", "success", {
+        cacheHit: true,
+        expiresInMs: oauthToken.expiresAt - Date.now()
+      });
       return oauthToken.value;
     }
+
+    const finish = trace?.span("oauth.token.request", {
+      endpointHost: safeHost(config.tokenUrl),
+      grantType: "client_credentials",
+      clientIdConfigured: Boolean(config.clientId),
+      clientSecretConfigured: Boolean(config.clientSecret),
+      forceRefresh
+    });
 
     const form = new URLSearchParams({
       grant_type: "client_credentials",
@@ -529,22 +657,39 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       client_secret: config.clientSecret
     });
     if (config.oauthScope) form.set("scope", config.oauthScope);
-    const response = await fetchHeadersWithTimeout(
-      fetchImpl,
-      config.tokenUrl,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Accept: "application/json"
+    let response;
+    try {
+      response = await fetchHeadersWithTimeout(
+        fetchImpl,
+        config.tokenUrl,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Accept: "application/json"
+          },
+          body: form.toString()
         },
-        body: form.toString()
-      },
-      20_000,
-      "获取 CodeBuddy 企业访问令牌超时。"
-    );
-    const { payload } = await readJsonResponse(response);
+        20_000,
+        "获取 CodeBuddy 企业访问令牌超时。"
+      );
+    } catch (error) {
+      finish?.("error", { errorCode: error.code || "FETCH_ERROR", message: error.message });
+      throw error;
+    }
+    let payload;
+    try {
+      ({ payload } = await readJsonResponse(response));
+    } catch (error) {
+      finish?.("error", { httpStatus: response.status, errorCode: error.code, message: error.message });
+      throw error;
+    }
     if (!response.ok || typeof payload.access_token !== "string" || !payload.access_token) {
+      finish?.("error", {
+        httpStatus: response.status,
+        providerCode: payload.code || payload.error || null,
+        providerMessage: sanitizeProviderMessage(payload, "OAuth token response did not contain access_token")
+      });
       throw new WorkBuddyError(
         sanitizeProviderMessage(payload, "CodeBuddy 企业 OAuth 认证失败，请检查 Client ID 和 Client Secret。"),
         502,
@@ -556,46 +701,94 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       value: payload.access_token,
       expiresAt: Date.now() + expiresIn * 1000
     };
+    finish?.("success", {
+      httpStatus: response.status,
+      expiresInSeconds: expiresIn,
+      credentialLength: payload.access_token.length
+    });
     return oauthToken.value;
   }
 
-  async function apiRequest(path, options = {}, allowAuthRetry = true) {
-    const bearerToken = await getBearerToken();
-    const response = await fetchHeadersWithTimeout(
-      fetchImpl,
-      `${config.apiBase}${path}`,
-      {
-        ...options,
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          "X-Source-App": config.sourceApp,
-          "Content-Type": "application/json",
-          ...(options.headers || {})
-        }
-      },
-      20_000,
-      "连接 WorkBuddy Runtime API 超时。"
-    );
-    if (response.status === 401 && authMode() === "oauth" && allowAuthRetry) {
-      oauthToken = null;
-      await getBearerToken({ forceRefresh: true });
-      return apiRequest(path, options, false);
+  async function apiRequest(path, options = {}, allowAuthRetry = true, trace) {
+    const bearerToken = await getBearerToken({ trace });
+    const method = options.method || "GET";
+    const safePath = diagnosticApiPath(path);
+    const finish = trace?.span("workbuddy.api.request", {
+      method,
+      path: safePath,
+      endpointHost: safeHost(config.apiBase),
+      authMode: authMode()
+    });
+    let response;
+    try {
+      response = await fetchHeadersWithTimeout(
+        fetchImpl,
+        `${config.apiBase}${path}`,
+        {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            "X-Source-App": config.sourceApp,
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          }
+        },
+        20_000,
+        "连接 WorkBuddy Runtime API 超时。"
+      );
+    } catch (error) {
+      finish?.("error", { errorCode: error.code || "FETCH_ERROR", message: error.message });
+      throw error;
     }
-    const { payload, rawText } = await readJsonResponse(response);
+    if (response.status === 401 && authMode() === "oauth" && allowAuthRetry) {
+      finish?.("warning", { httpStatus: 401, action: "refresh_oauth_and_retry" });
+      oauthToken = null;
+      await getBearerToken({ forceRefresh: true, trace });
+      return apiRequest(path, options, false, trace);
+    }
+    let payload;
+    let rawText;
+    try {
+      ({ payload, rawText } = await readJsonResponse(response));
+    } catch (error) {
+      finish?.("error", { httpStatus: response.status, errorCode: error.code, message: error.message });
+      throw error;
+    }
     if (!response.ok || (payload.code != null && payload.code !== 0)) {
+      finish?.("error", {
+        httpStatus: response.status,
+        providerCode: payload.code ?? null,
+        providerRequestId: payload.requestId || null,
+        providerMessage: sanitizeProviderMessage(payload, "Runtime API failure")
+      });
       throw new WorkBuddyError(
         sanitizeProviderMessage(payload, `WorkBuddy Runtime API 请求失败（HTTP ${response.status}）。`),
         response.status === 401 || response.status === 403 ? 502 : 502,
-        "RUNTIME_API_ERROR"
+        "RUNTIME_API_ERROR",
+        {
+          method,
+          path: safePath,
+          httpStatus: response.status,
+          providerCode: payload.code ?? null,
+          providerRequestId: payload.requestId || null
+        }
       );
     }
+    finish?.("success", {
+      httpStatus: response.status,
+      providerCode: payload.code ?? 0,
+      providerRequestId: payload.requestId || null
+    });
     return { data: payload.data || {}, rawText };
   }
 
-  async function waitForRuntime(runtimeId, initialData) {
+  async function waitForRuntime(runtimeId, initialData, trace) {
     let runtime = initialData;
     const deadline = Date.now() + config.runtimeTimeoutMs;
+    let attempts = 0;
     while (runtime?.status !== "RUNNING") {
+      attempts += 1;
+      trace?.event("runtime.status", "info", { status: runtime?.status || "unknown", pollAttempt: attempts });
       if (runtime?.status === "FAILED") {
         throw new WorkBuddyError("WorkBuddy Runtime 初始化失败。", 502, "RUNTIME_FAILED");
       }
@@ -603,13 +796,24 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
         throw new WorkBuddyError("WorkBuddy Runtime 仍在初始化，请稍后重试。", 504, "RUNTIME_START_TIMEOUT");
       }
       await new Promise(resolve => setTimeout(resolve, 1_200));
-      runtime = (await apiRequest(`/runtimes/${encodeURIComponent(runtimeId)}`, { method: "GET" })).data;
+      runtime = (await apiRequest(`/runtimes/${encodeURIComponent(runtimeId)}`, { method: "GET" }, true, trace)).data;
     }
+    trace?.event("runtime.status", "success", { status: "RUNNING", pollAttempts: attempts });
     return runtime;
   }
 
-  async function createLiveSession() {
-    const runtimeAuthToken = authMode() === "oauth" ? await getBearerToken() : "";
+  async function createLiveSession(trace) {
+    trace?.event("runtime.configuration", config.credentialConflict ? "warning" : "info", {
+      credentialSource: config.credentialSource,
+      credentialLength: config.apiKey.length,
+      duplicateCredentialConflict: config.credentialConflict,
+      workbuddyCredentialLength: config.workbuddyCredentialLength,
+      codebuddyCredentialLength: config.codebuddyCredentialLength,
+      internetEnvironment: config.internetEnvironment,
+      agentId: config.agentId,
+      sourceApp: config.sourceApp
+    });
+    const runtimeAuthToken = authMode() === "oauth" ? await getBearerToken({ trace }) : "";
     const manifest = {
       id: config.agentId,
       name: config.agentName,
@@ -633,10 +837,14 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
         agentManifest: manifest,
         metadata: { source: "wealth-diagnosis", experience: "main-test" }
       })
-    });
+    }, true, trace);
     const runtimeId = extractRuntimeId(created.rawText, { data: created.data });
     if (!runtimeId) throw new WorkBuddyError("WorkBuddy 未返回 Runtime ID。", 502, "RUNTIME_ID_MISSING");
-    const runtime = await waitForRuntime(runtimeId, created.data);
+    trace?.event("runtime.created", "success", {
+      runtimeIdPresent: true,
+      initialStatus: created.data?.status || "unknown"
+    });
+    const runtime = await waitForRuntime(runtimeId, created.data, trace);
     const acpLink = runtime?.links?.acpLink;
     if (!acpLink?.url || !acpLink?.token) {
       throw new WorkBuddyError("WorkBuddy Runtime 已启动，但未返回 ACP 连接信息。", 502, "ACP_LINK_MISSING");
@@ -648,66 +856,130 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       rpcTimeoutMs: config.rpcTimeoutMs,
       noTextGraceMs: config.noTextGraceMs
     });
-    await acp.connect();
-    const acpSessionId = await acp.initializeAndLoad(runtimeId);
-    await acp.setMode(acpSessionId, config.acpMode);
+    await acp.connect(trace);
+    const acpSessionId = await acp.initializeAndLoad(runtimeId, trace);
+    await acp.setMode(acpSessionId, config.acpMode, trace);
     return { runtimeId, acpSessionId, acp };
   }
 
-  async function createSession(context) {
-    assertConfigured();
-    if (!context || typeof context !== "object" || Array.isArray(context)) {
-      throw new WorkBuddyError("缺少可供专家分析的诊断摘要。", 400, "INVALID_CONTEXT");
-    }
-    if (byteLength(context) > MAX_CONTEXT_BYTES) {
-      throw new WorkBuddyError("诊断摘要过大，请精简后重试。", 413, "CONTEXT_TOO_LARGE");
-    }
-    const publicId = randomUUID();
-    const record = config.mock
-      ? { publicId, mock: true, turn: 0, createdAt: Date.now(), lastUsedAt: Date.now(), context }
-      : { publicId, ...(await createLiveSession()), createdAt: Date.now(), lastUsedAt: Date.now(), context };
-    sessions.set(publicId, record);
-    return { sessionId: publicId, agentName: config.agentName, mode: config.mock ? "mock" : "live" };
-  }
-
-  async function prompt(publicId, text, emit) {
-    const record = sessions.get(publicId);
-    if (!record) throw new WorkBuddyError("专家会话已过期，请重新进入。", 404, "SESSION_NOT_FOUND");
-    if (typeof text !== "string" || !text.trim()) {
-      throw new WorkBuddyError("请输入要咨询的问题。", 400, "EMPTY_PROMPT");
-    }
-    if (byteLength(text) > MAX_PROMPT_BYTES) {
-      throw new WorkBuddyError("本次输入过长，请精简后重试。", 413, "PROMPT_TOO_LARGE");
-    }
-    record.lastUsedAt = Date.now();
-    if (record.mock) {
-      record.turn += 1;
-      const chunks = buildMockReply(text, record.turn);
-      emit({ type: "status", text: "身家诊断专家正在分析…" });
-      for (const chunk of chunks) {
-        await new Promise(resolve => setTimeout(resolve, 12));
-        emit({ type: "text", text: chunk });
-      }
-      return { stopReason: "end_turn" };
-    }
-    return record.acp.prompt(record.acpSessionId, text.trim(), emit);
-  }
-
-  async function closeSession(publicId) {
-    const record = sessions.get(publicId);
-    if (!record) return false;
-    sessions.delete(publicId);
-    if (record.mock) return true;
-    await record.acp.close();
+  async function createSession(context, suppliedTrace) {
+    const trace = suppliedTrace || diagnostics.start("wealth-agent.session.create", diagnosticMetadata());
+    const ownsTrace = !suppliedTrace;
     try {
-      await apiRequest(`/runtimes/${encodeURIComponent(record.runtimeId)}/delete`, {
-        method: "POST",
-        body: "{}"
+      assertConfigured();
+      if (!context || typeof context !== "object" || Array.isArray(context)) {
+        throw new WorkBuddyError("缺少可供专家分析的诊断摘要。", 400, "INVALID_CONTEXT");
+      }
+      const contextBytes = byteLength(context);
+      trace.event("diagnosis.context.validated", "success", {
+        byteLength: contextBytes,
+        schemaVersion: context.schemaVersion || "unspecified",
+        namesRemoved: context.privacy?.namesRemoved ?? context.namesRemoved ?? null
       });
-    } catch {
-      // Session is already inaccessible locally. Platform-side TTL remains a fallback.
+      if (contextBytes > MAX_CONTEXT_BYTES) {
+        throw new WorkBuddyError("诊断摘要过大，请精简后重试。", 413, "CONTEXT_TOO_LARGE", {
+          byteLength: contextBytes,
+          limitBytes: MAX_CONTEXT_BYTES
+        });
+      }
+      const publicId = randomUUID();
+      const record = config.mock
+        ? { publicId, mock: true, turn: 0, createdAt: Date.now(), lastUsedAt: Date.now(), context }
+        : { publicId, ...(await createLiveSession(trace)), createdAt: Date.now(), lastUsedAt: Date.now(), context };
+      sessions.set(publicId, record);
+      trace.event("session.registered", "success", {
+        publicSessionIdPresent: true,
+        runtimeIdPresent: Boolean(record.runtimeId),
+        mode: config.mock ? "mock" : "live"
+      });
+      if (ownsTrace) trace.finish("success");
+      return { sessionId: publicId, agentName: config.agentName, mode: config.mock ? "mock" : "live" };
+    } catch (error) {
+      if (ownsTrace) trace.fail(error);
+      throw error;
     }
-    return true;
+  }
+
+  async function prompt(publicId, text, emit, suppliedTrace) {
+    const trace = suppliedTrace || diagnostics.start("wealth-agent.session.prompt", {
+      ...diagnosticMetadata(),
+      publicSessionIdPresent: Boolean(publicId)
+    });
+    const ownsTrace = !suppliedTrace;
+    try {
+      const record = sessions.get(publicId);
+      if (!record) throw new WorkBuddyError("专家会话已过期，请重新进入。", 404, "SESSION_NOT_FOUND");
+      if (typeof text !== "string" || !text.trim()) {
+        throw new WorkBuddyError("请输入要咨询的问题。", 400, "EMPTY_PROMPT");
+      }
+      const promptBytes = byteLength(text);
+      if (promptBytes > MAX_PROMPT_BYTES) {
+        throw new WorkBuddyError("本次输入过长，请精简后重试。", 413, "PROMPT_TOO_LARGE", {
+          byteLength: promptBytes,
+          limitBytes: MAX_PROMPT_BYTES
+        });
+      }
+      trace.event("prompt.validated", "success", {
+        byteLength: promptBytes,
+        mock: Boolean(record.mock),
+        runtimeIdPresent: Boolean(record.runtimeId)
+      });
+      record.lastUsedAt = Date.now();
+      let result;
+      if (record.mock) {
+        record.turn += 1;
+        const chunks = buildMockReply(text, record.turn);
+        emit({ type: "status", text: "身家诊断专家正在分析…" });
+        for (const chunk of chunks) {
+          await new Promise(resolve => setTimeout(resolve, 12));
+          emit({ type: "text", text: chunk });
+        }
+        trace.event("mock.prompt.completed", "success", { turn: record.turn, textChunks: chunks.length });
+        result = { stopReason: "end_turn" };
+      } else {
+        result = await record.acp.prompt(record.acpSessionId, text.trim(), emit, trace);
+      }
+      if (ownsTrace) trace.finish("success", { stopReason: result.stopReason || "end_turn" });
+      return result;
+    } catch (error) {
+      if (ownsTrace) trace.fail(error);
+      throw error;
+    }
+  }
+
+  async function closeSession(publicId, suppliedTrace) {
+    const trace = suppliedTrace || diagnostics.start("wealth-agent.session.close", diagnosticMetadata());
+    const ownsTrace = !suppliedTrace;
+    try {
+      const record = sessions.get(publicId);
+      if (!record) {
+        trace.event("session.lookup", "warning", { found: false });
+        if (ownsTrace) trace.finish("success", { alreadyClosed: true });
+        return false;
+      }
+      sessions.delete(publicId);
+      trace.event("session.lookup", "success", { found: true, mock: Boolean(record.mock) });
+      if (record.mock) {
+        if (ownsTrace) trace.finish("success");
+        return true;
+      }
+      await record.acp.close();
+      try {
+        await apiRequest(`/runtimes/${encodeURIComponent(record.runtimeId)}/delete`, {
+          method: "POST",
+          body: "{}"
+        }, true, trace);
+        trace.event("runtime.deleted", "success");
+      } catch (error) {
+        trace.event("runtime.deleted", "warning", { errorCode: error.code, message: error.message });
+        // Session is already inaccessible locally. Platform-side TTL remains a fallback.
+      }
+      if (ownsTrace) trace.finish("success");
+      return true;
+    } catch (error) {
+      if (ownsTrace) trace.fail(error);
+      throw error;
+    }
   }
 
   async function cleanupExpired() {
