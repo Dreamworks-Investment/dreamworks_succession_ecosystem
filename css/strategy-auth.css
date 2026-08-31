@@ -1,5 +1,6 @@
 /* Server-backed access covers for the strategy case library and positioning agent. */
 .strategy-agent-auth-view { display: none; }
+.strategy-cases-auth-stage[hidden] { display: none !important; }
 .strategy-agent-auth-active .strategy-system-intro,
 .strategy-agent-auth-active .strategy-case-hub,
 .strategy-agent-auth-active .strategy-agent-websdk-view,

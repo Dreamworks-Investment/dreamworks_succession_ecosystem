@@ -77,6 +77,8 @@ try {
   const casesIndexResponse = await request('/#strategy-library', { headers: { Cookie: casesCookie } });
   const casesIndex = await casesIndexResponse.text();
   assert(casesIndex.includes('十个合作项目，一套通用翻阅方式'), 'Case grant must reveal the case library');
+  assert(!casesIndex.includes('data-strategy-auth-form="cases"'), 'Case grant must remove the blocker instead of rendering it beside the library');
+  assert(!casesIndex.includes('id="strategy-cases-access"'), 'The authenticated case-library HTML must not contain the blocker stage');
   assert(casesIndex.includes('js/strategy-cases-data.js'), 'Case grant must load the protected case router');
   assert(!casesIndex.includes('id="strategy-agent-websdk-view"'), 'Case grant must not reveal the independently protected agent');
   const protectedAsset = await request('/assets/strategy/scene-home.png', { headers: { Cookie: casesCookie } });

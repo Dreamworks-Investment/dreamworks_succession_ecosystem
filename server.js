@@ -21,7 +21,8 @@ const STRATEGY_PROTECTED_PATHS = [
 ];
 const STRATEGY_BLOCKS = {
   cases: ["STRATEGY_CASES_PROTECTED_START", "STRATEGY_CASES_PROTECTED_END"],
-  agent: ["STRATEGY_AGENT_PROTECTED_START", "STRATEGY_AGENT_PROTECTED_END"]
+  agent: ["STRATEGY_AGENT_PROTECTED_START", "STRATEGY_AGENT_PROTECTED_END"],
+  casesGate: ["STRATEGY_CASES_GATE_START", "STRATEGY_CASES_GATE_END"]
 };
 
 const MIME_TYPES = {
@@ -105,6 +106,7 @@ function renderIndex(authStatus) {
   let html = readFileSync(join(ROOT, "index.html"), "utf8");
   html = removeOrUnwrapProtectedBlocks(html, "cases", authStatus.grants.cases);
   html = removeOrUnwrapProtectedBlocks(html, "agent", authStatus.grants.agent);
+  html = removeOrUnwrapProtectedBlocks(html, "casesGate", !authStatus.grants.cases);
   const bootstrap = JSON.stringify(authStatus).replace(/</g, "\\u003c");
   return html.replace(
     "<!-- STRATEGY_AUTH_BOOTSTRAP -->",
