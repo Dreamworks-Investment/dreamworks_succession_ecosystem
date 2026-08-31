@@ -40,6 +40,7 @@ const tokenUrl = 'https://copilot.test/oauth2/token';
 const acpUrl = 'https://runtime.test/acp';
 const liveCalls = [];
 let notificationController;
+let livePromptCount = 0;
 
 function fakeResponse(bodyValue, { status = 200, headers = {} } = {}) {
   const normalizedHeaders = new Map(Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]));
@@ -112,6 +113,34 @@ async function fakeWorkBuddyFetch(url, options = {}) {
     assert.equal(options.headers.Accept, 'application/json, text/event-stream');
     const rpc = JSON.parse(options.body);
     if (rpc.method === 'session/prompt') {
+      livePromptCount += 1;
+      if (livePromptCount === 2) {
+        return fakeResponse(sseStream([
+          {
+            jsonrpc: '2.0',
+            method: 'session/update',
+            params: {
+              update: {
+                session_update: 'agent_message',
+                content: [{ type: 'text', text: '扩展消息格式回复' }]
+              }
+            }
+          },
+          { jsonrpc: '2.0', id: rpc.id, result: { stopReason: 'end_turn' } }
+        ]), { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
+      }
+      if (livePromptCount === 3) {
+        return fakeResponse(sseStream([
+          {
+            jsonrpc: '2.0',
+            id: rpc.id,
+            result: {
+              stopReason: 'end_turn',
+              output: [{ type: 'text', text: 'Prompt 结果内回复' }]
+            }
+          }
+        ]), { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
+      }
       return fakeResponse(sseStream([
         {
           jsonrpc: '2.0',
@@ -144,7 +173,8 @@ const liveService = createWealthAgentService({
     WORKBUDDY_AGENT_ID: 'agent_01M1AB3GRFAR44G0ED9RQ51WY9',
     WORKBUDDY_AGENT_NAME: '身家诊断专家',
     WORKBUDDY_RUNTIME_TIMEOUT_MS: '5000',
-    WORKBUDDY_RPC_TIMEOUT_MS: '5000'
+    WORKBUDDY_RPC_TIMEOUT_MS: '5000',
+    WORKBUDDY_NO_TEXT_GRACE_MS: '20'
   },
   fetchImpl: fakeWorkBuddyFetch
 });
@@ -153,11 +183,17 @@ const liveChunks = [];
 const liveResult = await liveService.prompt(liveSession.sessionId, '开始诊断', event => liveChunks.push(event));
 assert.equal(liveResult.stopReason, 'end_turn');
 assert(liveChunks.some(event => event.type === 'text' && event.text === '真实协议模拟回复'));
+const extendedChunks = [];
+await liveService.prompt(liveSession.sessionId, '测试扩展消息格式', event => extendedChunks.push(event));
+assert(extendedChunks.some(event => event.type === 'text' && event.text === '扩展消息格式回复'));
+const resultChunks = [];
+await liveService.prompt(liveSession.sessionId, '测试 Prompt 结果回退', event => resultChunks.push(event));
+assert(resultChunks.some(event => event.type === 'text' && event.text === 'Prompt 结果内回复'));
 await liveService.closeSession(liveSession.sessionId);
 assert.deepEqual(
   liveCalls.filter(call => call.url === acpUrl && call.method === 'POST').map(call => JSON.parse(call.body).method),
-  ['initialize', 'session/load', 'session/prompt'],
-  'ACP order must be initialize, load default session, then prompt'
+  ['initialize', 'session/load', 'session/prompt', 'session/prompt', 'session/prompt'],
+  'ACP order must be initialize, load default session, then prompt without rebuilding the Runtime'
 );
 const runtimeCreateBody = JSON.parse(liveCalls.find(call => call.url === `${apiBase}/runtimes`).body);
 assert.equal(runtimeCreateBody.agentManifest.id, 'agent_01M1AB3GRFAR44G0ED9RQ51WY9');
@@ -169,7 +205,7 @@ assert.deepEqual(
 );
 assert.equal(liveCalls.filter(call => call.url === tokenUrl).length, 1, 'OAuth access token must be cached across Runtime API calls');
 assert.equal(liveService.status().runtimeSecretConfigured, true, 'Runtime secret readiness must be visible without exposing its value');
-assert.equal(liveService.status().integrationRevision, 'oauth-runtime-secret-v2');
+assert.equal(liveService.status().integrationRevision, 'acp-stream-compat-v3');
 
 const service = createWealthAgentService({
   env: {

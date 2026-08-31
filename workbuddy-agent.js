@@ -85,6 +85,41 @@ async function readJsonResponse(response) {
   return { payload, rawText };
 }
 
+function extractTextParts(value, depth = 0, seen = new Set()) {
+  if (depth > 6 || value == null) return [];
+  if (typeof value === "string") return value ? [value] : [];
+  if (typeof value !== "object" || seen.has(value)) return [];
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    return value.flatMap(item => extractTextParts(item, depth + 1, seen));
+  }
+
+  if (typeof value.text === "string" && value.text) return [value.text];
+  const parts = [];
+  for (const key of ["content", "message", "output", "parts", "delta"]) {
+    if (value[key] != null) parts.push(...extractTextParts(value[key], depth + 1, seen));
+  }
+  return parts;
+}
+
+function processSseBlock(block, onEnvelope) {
+  const data = block
+    .split(/\r?\n|\r/)
+    .filter(line => line.startsWith("data:"))
+    .map(line => line.slice(5).trimStart())
+    .join("\n")
+    .trim();
+  if (!data || data === "[DONE]") return;
+  try {
+    const payload = JSON.parse(data);
+    if (Array.isArray(payload)) payload.forEach(onEnvelope);
+    else onEnvelope(payload);
+  } catch {
+    // Ignore keep-alive or non-JSON events. ACP payloads are JSON-RPC envelopes.
+  }
+}
+
 async function consumeSse(body, onEnvelope) {
   if (!body) return;
   const reader = body.getReader();
@@ -94,39 +129,31 @@ async function consumeSse(body, onEnvelope) {
   while (true) {
     const { value, done } = await reader.read();
     if (done) break;
-    buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n");
-    const blocks = buffer.split("\n\n");
+    buffer += decoder.decode(value, { stream: true });
+    const blocks = buffer.split(/\r\n\r\n|\n\n|\r\r/);
     buffer = blocks.pop() || "";
-
-    for (const block of blocks) {
-      const data = block
-        .split("\n")
-        .filter(line => line.startsWith("data:"))
-        .map(line => line.slice(5).trim())
-        .join("\n")
-        .trim();
-      if (!data || data === "[DONE]") continue;
-      try {
-        onEnvelope(JSON.parse(data));
-      } catch {
-        // Ignore keep-alive or non-JSON events. ACP payloads are JSON-RPC envelopes.
-      }
-    }
+    blocks.forEach(block => processSseBlock(block, onEnvelope));
   }
+
+  buffer += decoder.decode();
+  if (buffer.trim()) processSseBlock(buffer, onEnvelope);
 }
 
 class AcpConnection {
-  constructor({ url, token, fetchImpl, rpcTimeoutMs }) {
+  constructor({ url, token, fetchImpl, rpcTimeoutMs, noTextGraceMs }) {
     this.url = url;
     this.token = token;
     this.fetchImpl = fetchImpl;
     this.rpcTimeoutMs = rpcTimeoutMs;
+    this.noTextGraceMs = noTextGraceMs;
     this.connectionId = "";
     this.rpcId = 0;
     this.pending = new Map();
     this.notificationAbort = null;
     this.notificationTask = null;
-    this.activeEmit = null;
+    this.notificationAlive = false;
+    this.closed = false;
+    this.activeTurn = null;
   }
 
   authHeaders(extra = {}) {
@@ -136,7 +163,27 @@ class AcpConnection {
     };
   }
 
+  emitText(value, source) {
+    if (!this.activeTurn) return;
+    const parts = extractTextParts(value);
+    for (const text of parts) {
+      if (!text) continue;
+      this.activeTurn.textChunks += 1;
+      this.activeTurn.sources.add(source);
+      this.activeTurn.emit({ type: "text", text });
+    }
+  }
+
   handleEnvelope(envelope) {
+    if (Array.isArray(envelope)) {
+      envelope.forEach(item => this.handleEnvelope(item));
+      return;
+    }
+    if (envelope?.data && !envelope.method && !Object.prototype.hasOwnProperty.call(envelope, "id")) {
+      this.handleEnvelope(envelope.data);
+      return;
+    }
+
     if (envelope && Object.prototype.hasOwnProperty.call(envelope, "id") &&
       (Object.prototype.hasOwnProperty.call(envelope, "result") || Object.prototype.hasOwnProperty.call(envelope, "error"))) {
       const id = Number(envelope.id);
@@ -151,28 +198,33 @@ class AcpConnection {
             "ACP_RPC_ERROR"
           ));
         } else {
+          if (pending.method === "session/prompt" && this.activeTurn?.textChunks === 0) {
+            this.emitText(envelope.result, "prompt_result");
+          }
           pending.resolve(envelope.result || {});
         }
       }
     }
 
     if (envelope?.method !== "session/update") return;
-    const update = envelope.params?.update || {};
-    const type = update.sessionUpdate;
-    if (type === "agent_message_chunk") {
-      const text = update.content?.text;
-      if (typeof text === "string" && text) this.activeEmit?.({ type: "text", text });
+    const update = envelope.params?.update || envelope.params || {};
+    const type = update.sessionUpdate || update.session_update || update.type || "unknown";
+    this.activeTurn?.updateTypes.add(String(type));
+    if (["agent_message_chunk", "agent_message", "assistant_message_chunk", "assistant_message"].includes(type)) {
+      this.emitText(update.content ?? update.message ?? update, type);
+    } else if (type === "agent_thought_chunk") {
+      this.activeTurn?.emit({ type: "status", text: "专家正在推演诊断结论…" });
     } else if (type === "tool_call") {
-      this.activeEmit?.({ type: "status", text: update.title || "专家正在调用诊断工具…" });
+      this.activeTurn?.emit({ type: "status", text: update.title || "专家正在调用诊断工具…" });
     } else if (type === "tool_call_update") {
       const label = update.status === "failed" ? "工具调用未完成" : "诊断工具已完成";
-      this.activeEmit?.({ type: "status", text: label });
+      this.activeTurn?.emit({ type: "status", text: label });
     } else if (type === "plan") {
-      this.activeEmit?.({ type: "status", text: "专家正在形成诊断步骤…" });
+      this.activeTurn?.emit({ type: "status", text: "专家正在形成诊断步骤…" });
     }
   }
 
-  createPending(id, timeoutMs = this.rpcTimeoutMs) {
+  createPending(id, method, timeoutMs = this.rpcTimeoutMs) {
     let timer;
     const promise = new Promise((resolve, reject) => {
       timer = setTimeout(() => {
@@ -180,20 +232,23 @@ class AcpConnection {
         reject(new WorkBuddyError("等待 WorkBuddy ACP 响应超时。", 504, "ACP_TIMEOUT"));
       }, timeoutMs);
       timer.unref?.();
-      this.pending.set(id, { resolve, reject, clear: () => clearTimeout(timer) });
+      this.pending.set(id, { method, resolve, reject, clear: () => clearTimeout(timer) });
     });
     return promise;
   }
 
   async connect() {
-    this.notificationAbort = new AbortController();
+    this.notificationAbort?.abort();
+    const notificationAbort = new AbortController();
+    this.notificationAbort = notificationAbort;
+    this.closed = false;
     const response = await fetchHeadersWithTimeout(
       this.fetchImpl,
       this.url,
       {
         method: "GET",
         headers: this.authHeaders({ Accept: "text/event-stream", "Cache-Control": "no-cache" }),
-        signal: this.notificationAbort.signal
+        signal: notificationAbort.signal
       },
       20_000,
       "连接 WorkBuddy ACP 通知通道超时。"
@@ -205,6 +260,7 @@ class AcpConnection {
     if (!this.connectionId) {
       throw new WorkBuddyError("WorkBuddy ACP 未返回连接标识。", 502, "ACP_CONNECTION_ID_MISSING");
     }
+    this.notificationAlive = true;
     this.notificationTask = consumeSse(response.body, envelope => this.handleEnvelope(envelope))
       .catch(error => {
         if (error?.name !== "AbortError") {
@@ -214,12 +270,15 @@ class AcpConnection {
           }
           this.pending.clear();
         }
+      })
+      .finally(() => {
+        if (this.notificationAbort === notificationAbort) this.notificationAlive = false;
       });
   }
 
   async rpc(method, params, timeoutMs = this.rpcTimeoutMs) {
     const id = ++this.rpcId;
-    const pending = this.createPending(id, timeoutMs);
+    const pending = this.createPending(id, method, timeoutMs);
     let response;
     try {
       response = await fetchHeadersWithTimeout(
@@ -275,7 +334,7 @@ class AcpConnection {
   async initializeAndLoad(sessionId) {
     await this.rpc("initialize", {
       protocolVersion: 1,
-      clientCapabilities: {},
+      clientCapabilities: { fs: { readTextFile: false, writeTextFile: false } },
       clientInfo: { name: "dreamworks-succession-ecosystem", version: "1.0.0" }
     });
 
@@ -299,23 +358,49 @@ class AcpConnection {
   }
 
   async prompt(sessionId, text, emit) {
-    if (this.activeEmit) {
+    if (this.activeTurn) {
       throw new WorkBuddyError("上一轮专家诊断尚未结束，请稍候。", 409, "PROMPT_IN_PROGRESS");
     }
-    this.activeEmit = emit;
+    let activeSessionId = sessionId;
+    if (!this.notificationAlive && !this.closed) {
+      await this.connect();
+      activeSessionId = await this.initializeAndLoad(sessionId);
+    }
+    const turn = {
+      emit,
+      textChunks: 0,
+      sources: new Set(),
+      updateTypes: new Set()
+    };
+    this.activeTurn = turn;
     try {
       const result = await this.rpc(
         "session/prompt",
-        { sessionId, prompt: [{ type: "text", text }] },
+        { sessionId: activeSessionId, prompt: [{ type: "text", text }] },
         180_000
       );
+      if (turn.textChunks === 0 && this.noTextGraceMs > 0) {
+        await new Promise(resolve => setTimeout(resolve, this.noTextGraceMs));
+      }
+      if (turn.textChunks === 0) {
+        const received = [...turn.updateTypes].slice(0, 8).join("、") || "无 session/update 通知";
+        this.notificationAbort?.abort();
+        this.notificationAlive = false;
+        throw new WorkBuddyError(
+          `WorkBuddy 已结束本轮，但未返回可显示文本（收到：${received}）。系统将在下一次提问时重连专家会话。`,
+          502,
+          "ACP_NO_TEXT"
+        );
+      }
       return { stopReason: result.stopReason || "end_turn" };
     } finally {
-      this.activeEmit = null;
+      if (this.activeTurn === turn) this.activeTurn = null;
     }
   }
 
   async close() {
+    this.closed = true;
+    this.notificationAlive = false;
     this.notificationAbort?.abort();
     if (!this.connectionId) return;
     try {
@@ -364,6 +449,7 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
     acpMode: env.WORKBUDDY_ACP_MODE || "default",
     runtimeTimeoutMs: safeNumber(env.WORKBUDDY_RUNTIME_TIMEOUT_MS, 50_000),
     rpcTimeoutMs: safeNumber(env.WORKBUDDY_RPC_TIMEOUT_MS, 60_000),
+    noTextGraceMs: safeNumber(env.WORKBUDDY_NO_TEXT_GRACE_MS, 1_200),
     sessionTtlMs: safeNumber(env.WORKBUDDY_SESSION_TTL_MS, SESSION_TTL_MS)
   };
   const sessions = new Map();
@@ -384,7 +470,7 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       mode: config.mock ? "mock" : "live",
       authMode: currentAuthMode,
       runtimeSecretConfigured,
-      integrationRevision: "oauth-runtime-secret-v2",
+      integrationRevision: "acp-stream-compat-v3",
       agentId: config.agentId,
       agentName: config.agentName,
       sourceApp: config.sourceApp
@@ -532,7 +618,8 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
       url: acpLink.url,
       token: acpLink.token,
       fetchImpl,
-      rpcTimeoutMs: config.rpcTimeoutMs
+      rpcTimeoutMs: config.rpcTimeoutMs,
+      noTextGraceMs: config.noTextGraceMs
     });
     await acp.connect();
     const acpSessionId = await acp.initializeAndLoad(runtimeId);
