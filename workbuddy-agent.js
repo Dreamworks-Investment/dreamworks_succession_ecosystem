@@ -457,11 +457,12 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
     apiKey: env.WORKBUDDY_API_KEY || env.CODEBUDDY_API_KEY || "",
     clientId: env.WORKBUDDY_CLIENT_ID || "",
     clientSecret: env.WORKBUDDY_CLIENT_SECRET || "",
+    runtimeAuthToken: env.WORKBUDDY_AUTH_TOKEN || env.CODEBUDDY_AUTH_TOKEN || "",
     tokenUrl: env.WORKBUDDY_TOKEN_URL || DEFAULT_TOKEN_URL,
     oauthScope: env.WORKBUDDY_OAUTH_SCOPE || "",
     apiBase: (env.WORKBUDDY_API_BASE || DEFAULT_API_BASE).replace(/\/$/, ""),
     sourceApp: env.WORKBUDDY_SOURCE_APP || "dreamworks-succession-main",
-    internetEnvironment: env.WORKBUDDY_INTERNET_ENVIRONMENT || "internal",
+    internetEnvironment: env.WORKBUDDY_INTERNET_ENVIRONMENT || env.CODEBUDDY_INTERNET_ENVIRONMENT || "internal",
     agentId: env.WORKBUDDY_AGENT_ID || DEFAULT_AGENT_ID,
     agentName: env.WORKBUDDY_AGENT_NAME || DEFAULT_AGENT_NAME,
     mock: parseBoolean(env.WORKBUDDY_MOCK),
@@ -609,7 +610,7 @@ export function createWealthAgentService({ env = process.env, fetchImpl = global
   }
 
   async function createLiveSession() {
-    const runtimeAuthToken = authMode() === "oauth" ? await getBearerToken() : "";
+    const runtimeAuthToken = config.runtimeAuthToken || (authMode() === "oauth" ? await getBearerToken() : "");
     const manifest = {
       id: config.agentId,
       name: config.agentName,
