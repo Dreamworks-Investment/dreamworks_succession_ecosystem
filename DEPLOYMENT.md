@@ -32,3 +32,32 @@
 建议把 Web Service 的请求执行超时调至至少 `120 Sec`。接口会每 15 秒发送一次流式心跳以避免空闲连接被代理提前关闭，但平台若采用总时长硬限制，仍需要提高该上限。
 
 部署后的无密钥检查：访问 `GET /api/wealth-agent/status`，只会返回是否已配置、认证模式、Agent ID 和运行模式，不会返回 Client Secret、Access Token 或 ACP Token。首次真实验证建议使用一个无敏感身份信息的演示案例；成功标准为换取企业 Access Token、创建私有 Runtime、收到首轮流式回复，并在结束会话后完成 Runtime 清理。
+
+## 战略与实践分级访问
+
+“战略与实践”的系统介绍和“定位是中心，价值才是核心”页面保持公开；案例库与梦工场定位智体分别由两组服务端凭据保护。请在部署平台为当前环境设置以下变量：
+
+- `STRATEGY_CASES_USERNAME`：内部案例库账号。
+- `STRATEGY_CASES_PASSWORD`：内部案例库密码。
+- `STRATEGY_AGENT_USERNAME`：梦工场定位智体客户账号。
+- `STRATEGY_AGENT_PASSWORD`：梦工场定位智体客户密码。
+- `STRATEGY_AUTH_SESSION_SECRET`：会话签名密钥，至少 32 个随机字符。可用 `openssl rand -hex 32` 生成；它不是任何用户的登录密码。
+- `STRATEGY_AUTH_SESSION_TTL_SECONDS=28800`：登录有效期，默认 8 小时，可选范围为 5 分钟至 24 小时。
+- `STRATEGY_AILY_CHANNEL_TOKEN`：飞书智能体 Web SDK 页面“代码”区域给出的 `channelToken`。
+- `STRATEGY_AILY_SDK_VERSION=0.0.12`。
+- `STRATEGY_AILY_IFRAME_ORIGIN=https://aily.feishu.cn`。
+- `STRATEGY_AILY_ALLOWED_HOST`：已加入飞书 Web SDK 域名白名单的本站线上域名，仅填主机名，不带 `https://` 和路径。
+
+两组账号可以使用完全不同的命名和密码。不要把任何真实值写进 `.env.example`、HTML、浏览器脚本或 Git；修改环境变量后必须重新部署实例才能生效。
+
+旧版曾把定位智体的 Web SDK `channelToken` 放在浏览器配置文件中。新版本已移除该文件；为了让历史构建包或 Git 历史中的旧值失效，建议先在飞书后台轮换/重新生成该渠道 Token，再把新值写入 `STRATEGY_AILY_CHANNEL_TOKEN`。
+
+实现采用由服务器签名的 `HttpOnly; SameSite=Strict` 会话 Cookie。未获得案例权限时，服务器会从 HTML 中移除案例正文与数据脚本，并拒绝 `/assets/strategy/`、案例数据脚本和章节脚本的直接请求；未获得智体权限时，服务器不会下发智体页面或 Web SDK `channelToken`。因此这不是可用开发者工具绕过的前端遮罩。
+
+部署后的检查顺序：
+
+1. 无痕窗口访问 `#strategy`，确认公开介绍和价值核心页面可见。
+2. 点击“翻阅合作案例”或“查看创维完整案例”，确认停留在案例库验证页；直接访问 `/assets/strategy/` 下的已知图片应返回 `404`。
+3. 使用案例库凭据登录，确认十个案例及创维完整章节可见，但定位智体仍要求另一组凭据。
+4. 退出无痕窗口后重新打开，点击“梦工场定位智体”，使用智体凭据登录并确认飞书会话面板加载。
+5. 访问 `GET /api/strategy-auth/status` 只能看到权限和配置状态布尔值，不应出现账号、密码、会话密钥或飞书 Token。

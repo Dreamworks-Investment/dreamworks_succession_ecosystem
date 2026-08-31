@@ -1,9 +1,10 @@
 import http from "node:http";
-import { createReadStream, statSync, existsSync } from "node:fs";
+import { createReadStream, statSync, existsSync, readFileSync } from "node:fs";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { createWealthAgentService, WorkBuddyError } from "./workbuddy-agent.js";
 import { createDiagnosticStore } from "./wealth-agent-diagnostics.js";
+import { createStrategyAuthService } from "./strategy-auth.js";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
 const DEFAULT_PORT = Number(process.env.PORT || 8000);
@@ -11,6 +12,17 @@ const DEFAULT_HOST = "0.0.0.0";
 const MAX_JSON_BODY_BYTES = 220 * 1024;
 const REQUEST_BUCKETS = new Map();
 const DEFAULT_DIAGNOSTICS = createDiagnosticStore();
+const STRATEGY_PROTECTED_PATHS = [
+  "/assets/strategy/",
+  "/docs/strategy/",
+  "/js/strategy-cases-data.js",
+  "/js/strategy-cases.js",
+  "/js/strategy.js"
+];
+const STRATEGY_BLOCKS = {
+  cases: ["STRATEGY_CASES_PROTECTED_START", "STRATEGY_CASES_PROTECTED_END"],
+  agent: ["STRATEGY_AGENT_PROTECTED_START", "STRATEGY_AGENT_PROTECTED_END"]
+};
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -38,14 +50,15 @@ function safePath(urlPath) {
   return candidate.startsWith(resolve(ROOT)) ? candidate : null;
 }
 
-function sendFile(req, res, filePath) {
+function sendFile(req, res, filePath, extraHeaders = {}) {
   try {
     const stat = statSync(filePath);
     if (!stat.isFile()) return false;
     res.writeHead(200, {
       "Content-Type": MIME_TYPES[extname(filePath).toLowerCase()] || "application/octet-stream",
       "Content-Length": stat.size,
-      "Cache-Control": extname(filePath).toLowerCase() === ".html" ? "no-cache" : "public, max-age=3600"
+      "Cache-Control": extname(filePath).toLowerCase() === ".html" ? "no-cache" : "public, max-age=3600",
+      ...extraHeaders
     });
     if (req.method === "HEAD") res.end();
     else createReadStream(filePath).pipe(res);
@@ -64,6 +77,43 @@ function sendJson(res, statusCode, payload, traceId = "") {
     ...(traceId ? { "X-Dreamworks-Trace-Id": traceId } : {})
   });
   res.end(JSON.stringify(payload));
+}
+
+function sendHtml(req, res, html) {
+  const body = Buffer.from(html, "utf8");
+  res.writeHead(200, {
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Length": body.length,
+    "Cache-Control": "private, no-store",
+    Vary: "Cookie",
+    "X-Content-Type-Options": "nosniff"
+  });
+  if (req.method === "HEAD") res.end();
+  else res.end(body);
+}
+
+function removeOrUnwrapProtectedBlocks(html, scope, allowed) {
+  const [start, end] = STRATEGY_BLOCKS[scope];
+  const block = new RegExp(`<!-- ${start} -->[\\s\\S]*?<!-- ${end} -->`, "g");
+  if (!allowed) return html.replace(block, "");
+  return html
+    .replaceAll(`<!-- ${start} -->`, "")
+    .replaceAll(`<!-- ${end} -->`, "");
+}
+
+function renderIndex(authStatus) {
+  let html = readFileSync(join(ROOT, "index.html"), "utf8");
+  html = removeOrUnwrapProtectedBlocks(html, "cases", authStatus.grants.cases);
+  html = removeOrUnwrapProtectedBlocks(html, "agent", authStatus.grants.agent);
+  const bootstrap = JSON.stringify(authStatus).replace(/</g, "\\u003c");
+  return html.replace(
+    "<!-- STRATEGY_AUTH_BOOTSTRAP -->",
+    `<script>window.DREAMWORKS_STRATEGY_AUTH=Object.freeze(${bootstrap});</script>`
+  );
+}
+
+function isStrategyProtectedPath(pathname) {
+  return STRATEGY_PROTECTED_PATHS.some(prefix => pathname === prefix || pathname.startsWith(prefix));
 }
 
 function readJsonBody(req) {
@@ -249,12 +299,88 @@ export async function handleWealthAgentApi(req, res, pathname, agentService, dia
   }
 }
 
+export async function handleStrategyAuthApi(req, res, pathname, authService) {
+  if (!pathname.startsWith("/api/strategy-auth")) return false;
+  if (!isSameOrigin(req)) {
+    sendJson(res, 403, { ok: false, error: { code: "ORIGIN_REJECTED", message: "仅允许从本站发起访问验证。" } });
+    return true;
+  }
+
+  if (pathname === "/api/strategy-auth/status" && req.method === "GET") {
+    sendJson(res, 200, { ok: true, ...authService.status(req) });
+    return true;
+  }
+
+  if (pathname === "/api/strategy-auth/login" && req.method === "POST") {
+    try {
+      const body = await readJsonBody(req);
+      const scope = body.scope === "agent" ? "agent" : body.scope === "cases" ? "cases" : "";
+      assertWithinRateLimit(req, `strategy-auth:${scope || "invalid"}`, 8, 15 * 60 * 1000);
+      if (!scope) {
+        sendJson(res, 400, { ok: false, error: { code: "INVALID_SCOPE", message: "访问区域无效。" } });
+        return true;
+      }
+      const result = authService.authenticate(scope, body.username, body.password);
+      if (result.reason === "not_configured") {
+        sendJson(res, 503, { ok: false, error: { code: "AUTH_NOT_CONFIGURED", message: "该访问区域尚未完成服务端凭据配置。" } });
+        return true;
+      }
+      if (!result.ok) {
+        sendJson(res, 401, { ok: false, error: { code: "INVALID_CREDENTIALS", message: "账号或密码不正确。" } });
+        return true;
+      }
+      res.setHeader("Set-Cookie", authService.grant(req, scope));
+      sendJson(res, 200, { ok: true, scope, ...authService.status({ headers: { cookie: res.getHeader("Set-Cookie")?.split(";")[0] || "" } }) });
+      return true;
+    } catch (error) {
+      const statusCode = error instanceof WorkBuddyError ? error.statusCode : 500;
+      const code = error instanceof WorkBuddyError ? error.code : "INTERNAL_ERROR";
+      const message = error instanceof WorkBuddyError ? error.message : "验证服务暂时不可用，请稍后重试。";
+      sendJson(res, statusCode, { ok: false, error: { code, message } });
+      return true;
+    }
+  }
+
+  if (pathname === "/api/strategy-auth/logout" && req.method === "POST") {
+    try {
+      const body = await readJsonBody(req);
+      const scope = body.scope === "cases" || body.scope === "agent" ? body.scope : "all";
+      res.setHeader("Set-Cookie", authService.revoke(req, scope));
+      sendJson(res, 200, { ok: true, scope });
+      return true;
+    } catch (error) {
+      const statusCode = error instanceof WorkBuddyError ? error.statusCode : 500;
+      sendJson(res, statusCode, { ok: false, error: { code: error.code || "INTERNAL_ERROR", message: error.message || "退出失败。" } });
+      return true;
+    }
+  }
+
+  if (pathname === "/api/strategy-auth/agent-config" && req.method === "GET") {
+    if (!authService.status(req).grants.agent) {
+      sendJson(res, 401, { ok: false, error: { code: "AUTH_REQUIRED", message: "请先通过定位智体访问验证。" } });
+      return true;
+    }
+    const config = authService.agentConfig();
+    if (!config.channelToken) {
+      sendJson(res, 503, { ok: false, error: { code: "AGENT_NOT_CONFIGURED", message: "定位智体渠道配置尚未完成。" } });
+      return true;
+    }
+    sendJson(res, 200, { ok: true, config });
+    return true;
+  }
+
+  sendJson(res, 404, { ok: false, error: { code: "API_NOT_FOUND", message: "接口不存在。" } });
+  return true;
+}
+
 export function createDreamworksServer(options = {}) {
   const diagnostics = options.diagnostics || DEFAULT_DIAGNOSTICS;
   const agentService = options.agentService || createWealthAgentService({ diagnostics });
+  const strategyAuthService = options.strategyAuthService || createStrategyAuthService();
   return http.createServer(async (req, res) => {
     const pathname = new URL(req.url || "/", "http://localhost").pathname;
     if (await handleWealthAgentApi(req, res, pathname, agentService, diagnostics)) return;
+    if (await handleStrategyAuthApi(req, res, pathname, strategyAuthService)) return;
 
     if (!["GET", "HEAD"].includes(req.method || "")) {
       res.writeHead(405, { "Content-Type": "text/plain; charset=utf-8" });
@@ -267,14 +393,30 @@ export function createDreamworksServer(options = {}) {
       res.end("Bad Request");
       return;
     }
+    const authStatus = strategyAuthService.status(req);
+    if (isStrategyProtectedPath(pathname) && !authStatus.grants.cases) {
+      res.writeHead(404, {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "private, no-store",
+        Vary: "Cookie",
+        "X-Content-Type-Options": "nosniff"
+      });
+      res.end("Not Found");
+      return;
+    }
     if (pathname === "/" || (existsSync(filePath) && statSync(filePath).isDirectory())) {
       filePath = join(pathname === "/" ? ROOT : filePath, "index.html");
     }
-    if (sendFile(req, res, filePath)) return;
-    const fallback = join(ROOT, "index.html");
-    if (sendFile(req, res, fallback)) return;
-    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-    res.end("Not Found");
+    if (filePath === join(ROOT, "index.html")) {
+      sendHtml(req, res, renderIndex(authStatus));
+      return;
+    }
+    if (sendFile(req, res, filePath, isStrategyProtectedPath(pathname) ? {
+      "Cache-Control": "private, no-store",
+      Vary: "Cookie",
+      "X-Content-Type-Options": "nosniff"
+    } : {})) return;
+    sendHtml(req, res, renderIndex(authStatus));
   });
 }
 

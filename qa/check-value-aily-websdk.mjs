@@ -43,7 +43,7 @@ assert(html.includes('js/app.js?v=8'), 'The modified router must use a new brows
 assert(css.includes('#page-value.value-agent-active .value-intro-document { display: none; }'), 'The agent route must replace rather than overlap the introduction slides');
 assert(css.includes('@media (max-width: 820px)') && css.includes('@media (prefers-reduced-motion: reduce)'), 'The agent view needs mobile and reduced-motion treatments');
 
-assert(vendorSdk.includes("from './internal-slardar.js'"), 'Vendored SDK dependencies must resolve without a package manager in the browser');
+assert(/from\s+["']\.\/internal-slardar\.js["']/.test(vendorSdk), 'Vendored SDK dependencies must resolve without a package manager in the browser');
 assert(!vendorSdk.includes("from '@lark-apaas/internal-slardar'"), 'The browser bundle must not retain a bare dependency import');
 assert(![html, config, client].join('\n').match(/HS256|shared.?secret|client.?secret/i), 'Front-end integration must not contain a JWT shared secret');
 

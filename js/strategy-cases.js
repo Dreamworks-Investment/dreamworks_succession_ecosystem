@@ -69,7 +69,7 @@
     var page = document.getElementById('page-strategy');
     if (!page) return;
     var leavingAgent = page.classList.contains('strategy-agent-active') && view !== 'agent';
-    page.classList.remove('strategy-intro-active', 'strategy-hub-active', 'strategy-case-active', 'strategy-depth-active', 'strategy-agent-active');
+    page.classList.remove('strategy-intro-active', 'strategy-hub-active', 'strategy-case-active', 'strategy-depth-active', 'strategy-agent-active', 'strategy-agent-auth-active');
     page.classList.add(
       view === 'intro' ? 'strategy-intro-active' :
       view === 'detail' ? 'strategy-case-active' :

@@ -12,6 +12,7 @@
 <link href="css/strategy-chapter2-presentation.css" rel="stylesheet"/><link href="css/strategy-chapter-split.css" rel="stylesheet"/>
 <link href="css/strategy-case-gallery.css?v=2" rel="stylesheet"/>
 <link href="css/strategy-agent-websdk.css?v=1" rel="stylesheet"/>
+<link href="css/strategy-auth.css?v=1" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
 <link href="css/value-agent-websdk.css?v=1" rel="stylesheet"/>
 <link href="css/wealth-diagnosis.css?v=1" rel="stylesheet"/>
@@ -22,6 +23,7 @@
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
+<!-- STRATEGY_AUTH_BOOTSTRAP -->
 </head>
 <body>
 <!-- ===================== NAV ===================== -->
@@ -395,6 +397,26 @@
 </div>
 </div>
 </section>
+<section class="strategy-auth-stage strategy-cases-auth-stage" id="strategy-cases-access" aria-labelledby="strategy-cases-auth-title">
+<div class="strategy-auth-card">
+<p class="strategy-auth-kicker">INTERNAL CASE LIBRARY · 分级访问</p>
+<h2 id="strategy-cases-auth-title">合作案例库</h2>
+<p class="strategy-auth-intro">案例库包含合作项目照片、研究附件与受保密安排约束的项目资料。验证通过前，服务器不会向浏览器发送案例页面、数据脚本或相关图片。</p>
+<form class="strategy-auth-form" data-strategy-auth-form="cases" novalidate>
+<label for="strategy-cases-username">请输入账号（必填）</label>
+<input id="strategy-cases-username" name="username" type="text" autocomplete="username" required/>
+<label for="strategy-cases-password">请输入密码（必填）</label>
+<div class="strategy-auth-password-row">
+<input id="strategy-cases-password" name="password" type="password" autocomplete="current-password" required/>
+<button aria-label="显示密码" class="strategy-auth-password-toggle" data-password-toggle="strategy-cases-password" type="button">显示</button>
+</div>
+<p class="strategy-auth-message" data-strategy-auth-message="cases" role="alert" aria-live="polite"></p>
+<button class="strategy-auth-submit" type="submit">验证并进入案例库 <span aria-hidden="true">→</span></button>
+</form>
+<div class="strategy-auth-foot"><span>独立权限 · 案例资料</span><button onclick="strategyShowIntro({ pushHistory: true })" type="button">返回系统介绍</button></div>
+</div>
+</section>
+<!-- STRATEGY_CASES_PROTECTED_START -->
 <section class="strategy-case-showcase" id="strategy-cases" aria-labelledby="strategy-cases-title">
 <div class="strategy-case-shell">
 <header class="strategy-case-heading">
@@ -409,7 +431,30 @@
 <div class="strategy-case-dots" id="strategy-case-dots" aria-label="选择案例"></div>
 </div>
 </section>
+<!-- STRATEGY_CASES_PROTECTED_END -->
 </article>
+<article aria-hidden="true" class="strategy-agent-auth-view" id="strategy-agent-auth-view">
+<section class="strategy-auth-stage strategy-agent-auth-stage" aria-labelledby="strategy-agent-auth-title">
+<div class="strategy-auth-card">
+<p class="strategy-auth-kicker">MENGONGCHANG POSITIONING AGENT · 客户专属</p>
+<h2 id="strategy-agent-auth-title">梦工场定位智体</h2>
+<p class="strategy-auth-intro">该智体面向获得专项服务权限的客户。请使用由梦工场单独提供的智体账号与密码；该凭据与案例库权限相互独立。</p>
+<form class="strategy-auth-form" data-strategy-auth-form="agent" novalidate>
+<label for="strategy-agent-username">请输入账号（必填）</label>
+<input id="strategy-agent-username" name="username" type="text" autocomplete="username" required/>
+<label for="strategy-agent-password">请输入密码（必填）</label>
+<div class="strategy-auth-password-row">
+<input id="strategy-agent-password" name="password" type="password" autocomplete="current-password" required/>
+<button aria-label="显示密码" class="strategy-auth-password-toggle" data-password-toggle="strategy-agent-password" type="button">显示</button>
+</div>
+<p class="strategy-auth-message" data-strategy-auth-message="agent" role="alert" aria-live="polite"></p>
+<button class="strategy-auth-submit" type="submit">验证并进入定位智体 <span aria-hidden="true">→</span></button>
+</form>
+<div class="strategy-auth-foot"><span>独立权限 · 定位智体</span><button onclick="strategyShowHub({ pushHistory: true })" type="button">返回战略与实践</button></div>
+</div>
+</section>
+</article>
+<!-- STRATEGY_AGENT_PROTECTED_START -->
 <article aria-hidden="true" class="strategy-agent-websdk-view" id="strategy-agent-websdk-view">
 <section aria-labelledby="strategy-agent-websdk-title" class="strategy-agent-websdk-stage">
 <div class="strategy-agent-websdk-shell">
@@ -477,6 +522,8 @@
 </div>
 </section>
 </article>
+<!-- STRATEGY_AGENT_PROTECTED_END -->
+<!-- STRATEGY_CASES_PROTECTED_START -->
 <article class="strategy-case-detail" id="strategy-case-detail" aria-live="polite" hidden></article>
 <div class="strategy-case-depth" id="strategy-skyworth-case">
 <!-- Breadcrumb -->
@@ -1956,6 +2003,7 @@
 </div>
 </div>
 </section>
+<!-- STRATEGY_CASES_PROTECTED_END -->
 <!-- ===================== VALUE INVESTING ===================== -->
 <section class="page value-intro-page" id="page-value">
 <article aria-label="狠值投资系统介绍" class="value-intro-document">
@@ -2840,17 +2888,21 @@
 <script src="js/report.js?v=2"></script>
 <script src="js/family-trust-model.js?v=1"></script>
 <script src="js/family-trust-system.js?v=1"></script>
-<script src="js/strategy-agent-config.js"></script><script src="js/value-agent-config.js"></script><script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
+<script src="js/value-agent-config.js"></script><script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
+<!-- STRATEGY_CASES_PROTECTED_START -->
 <script src="js/strategy-cases-data.js"></script>
 <script src="js/strategy-cases.js?v=2"></script>
 <script src="js/strategy.js"></script>
+<!-- STRATEGY_CASES_PROTECTED_END -->
+<script src="js/strategy-access.js?v=1"></script>
+<!-- STRATEGY_AGENT_PROTECTED_START -->
 <script type="module" src="js/strategy-agent-websdk.js?v=1"></script>
+<!-- STRATEGY_AGENT_PROTECTED_END -->
 <script type="module" src="js/value-agent-websdk.js?v=1"></script>
 <script src="js/academy-assessment.js"></script>
 <script src="js/final-business-pages.js?v=1"></script>
 </body>
 </html>
-
 
 
 
