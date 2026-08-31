@@ -65,6 +65,13 @@ function navigateTo(page, options = {}) {
     return;
   }
 
+  if (page !== 'strategy' && document.getElementById('page-strategy')?.classList.contains('strategy-agent-active')) {
+    if (typeof window.strategyAgentDestroy === 'function') void window.strategyAgentDestroy();
+  }
+  if (page !== 'value' && document.getElementById('page-value')?.classList.contains('value-agent-active')) {
+    if (typeof window.valueAgentDestroy === 'function') void window.valueAgentDestroy();
+  }
+
   AppState.currentPage = page;
 
   // Update nav links
@@ -81,6 +88,12 @@ function navigateTo(page, options = {}) {
   // Direct library, case, and chapter routes preserve their requested depth.
   if (page === 'strategy' && !options.preserveStrategyView && typeof window.strategyShowIntro === 'function') {
     window.strategyShowIntro({ pushHistory: false, scroll: false });
+  }
+
+  // Generic navigation to “狠值投资” starts at its explanatory slides.
+  // Direct #value-agent routes preserve the embedded research-assistant view.
+  if (page === 'value' && !options.preserveValueView && typeof window.valueShowIntro === 'function') {
+    window.valueShowIntro({ scroll: false });
   }
 
   // Generic navigation to “身家诊断” always starts at its explanatory cover.
@@ -213,6 +226,14 @@ document.addEventListener('DOMContentLoaded', () => {
         strategyOpenAgent({ replaceHistory: true, scroll: false });
       }
     }, 0);
+  } else if (requested === 'value-agent') {
+    navigateTo('value', { skipHistory: true, scroll: false, preserveValueView: true });
+    try { window.history.replaceState({ page: 'value', valueView: 'agent' }, '', '#value-agent'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.valueOpenAgent === 'function') {
+        window.valueOpenAgent({ replaceHistory: true, scroll: false });
+      }
+    }, 0);
   } else if (requested.startsWith('strategy-case-')) {
     const strategyCase = requested.replace('strategy-case-', '');
     navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
@@ -261,16 +282,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = event.state && event.state.page ? event.state.page : 'home';
     const preserveStrategyView = page === 'strategy' && event.state &&
       (event.state.strategyCase || event.state.strategyChapter || event.state.strategyView);
+    const preserveValueView = page === 'value' && event.state && event.state.valueView === 'agent';
     const preserveWealthView = page === 'wealth' && event.state && event.state.wealthView === 'wizard';
     const preserveTrustView = page === 'trust' && event.state && event.state.trustView === 'wizard';
     const preserveAcademyView = page === 'academy' && event.state && event.state.academyView === 'system';
     navigateTo(page, {
       skipHistory: true,
       preserveStrategyView,
+      preserveValueView,
       preserveWealthView,
       preserveTrustView,
       preserveAcademyView
     });
+    if (preserveValueView) {
+      window.setTimeout(() => {
+        if (typeof window.valueOpenAgent === 'function') {
+          window.valueOpenAgent({ scroll: false });
+        }
+      }, 0);
+    }
     if (preserveWealthView) {
       window.setTimeout(() => {
         if (typeof window.wealthEnterSystem === 'function') {

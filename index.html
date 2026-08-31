@@ -13,6 +13,7 @@
 <link href="css/strategy-case-gallery.css?v=2" rel="stylesheet"/>
 <link href="css/strategy-agent-websdk.css?v=1" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
+<link href="css/value-agent-websdk.css?v=1" rel="stylesheet"/>
 <link href="css/wealth-diagnosis.css?v=1" rel="stylesheet"/>
 <link href="css/wealth-agent.css?v=2" rel="stylesheet"/>
 <link href="css/family-trust-system.css?v=1" rel="stylesheet"/>
@@ -2051,11 +2052,91 @@
 </div>
 <div class="value-investment-bottom">
 <div><strong>品菜</strong><span aria-hidden="true"></span></div>
+<div class="value-system-actions">
 <a class="value-system-enter" href="https://sd85slpdkcofupk4bn66g.apigateway-cn-guangzhou.volceapi.com/" rel="noopener noreferrer" target="_blank">点击进入 狠值投资系统 <span aria-hidden="true">→</span></a>
+<button class="value-system-enter value-agent-enter" onclick="valueOpenAgent({ pushHistory: true })" type="button">点击进入 梦工场投研专员 <span aria-hidden="true">→</span></button>
+</div>
 <p>评估单个标的之后，家族整体身家怎么看？下一页，身家诊断</p>
 </div>
 </div>
 <footer class="value-slide-footer"><span>MENGONGCHANG</span><span>15 / 20 · 五模块分述 · 狠值投资</span></footer>
+</section>
+</article>
+<article aria-hidden="true" class="strategy-agent-websdk-view value-agent-websdk-view" id="value-agent-websdk-view">
+<section aria-labelledby="value-agent-websdk-title" class="strategy-agent-websdk-stage">
+<div class="strategy-agent-websdk-shell">
+<nav aria-label="投研专员路径" class="strategy-agent-websdk-breadcrumb">
+<button onclick="valueShowIntro({ pushHistory: true, scrollToEntry: true })" type="button">狠值投资</button>
+<span aria-hidden="true">/</span>
+<strong>梦工场投研专员</strong>
+</nav>
+<header class="strategy-agent-websdk-heading">
+<div>
+<p>FEISHU AILY · 梦工场投研专员</p>
+<h1 id="value-agent-websdk-title">把零散信息，整理成<span>可讨论、可迭代的深研底稿</span></h1>
+<p>输入公司名称、股票代码或上传研究材料，从经典狠值、现代狠值和红蓝军双向视角判断：这个标的是否值得进入下一轮深研。</p>
+</div>
+<div class="strategy-agent-websdk-meta" aria-label="接入状态">
+<span><b aria-hidden="true"></b>飞书官方会话面板</span>
+<span>双投研技能指引</span>
+<span>SDK v0.0.12</span>
+</div>
+</header>
+<div class="strategy-agent-websdk-layout value-agent-websdk-layout">
+<aside class="strategy-agent-websdk-guide value-agent-websdk-guide" aria-label="投研专员使用说明">
+<div class="strategy-agent-websdk-mark" aria-hidden="true">研</div>
+<h2>先选研究框架，再输入标的</h2>
+<p>复制适用的技能指令，粘贴到右侧会话框，再补充公司名称、股票代码或上传材料。</p>
+<div class="value-agent-skill-list" aria-label="投研技能选择">
+<article>
+<span>通用投研框架</span>
+<code>/dreamworks-full-report-xu-prefin-v2</code>
+<p>适用于一般上市公司、行业或赛道研究，生成完整梦工场深研底稿、红蓝军 PK、证据缺口与下一轮任务。</p>
+<button data-value-skill="general" type="button">复制通用技能指令</button>
+</article>
+<article>
+<span>创新药标的专用</span>
+<code>/dreamworks-innovative-drug-report-xu-prefin-v2</code>
+<p>专门服务创新药标的，重点覆盖研发管线、临床进度、竞争格局、商业化路径与关键证据风险。</p>
+<button data-value-skill="innovative-drug" type="button">复制创新药技能指令</button>
+</article>
+</div>
+<p class="value-agent-copy-status" id="value-agent-copy-status" aria-live="polite">复制后粘贴到右侧输入框，并把“请填写”替换为真实标的信息。</p>
+<div class="strategy-agent-websdk-access-note">
+<strong>当前访问规则</strong>
+<p>需登录飞书账号，并处于后台设置的可用范围内；当前若为“仅自己”，其他用户将无法发送消息。</p>
+</div>
+<button class="btn btn-secondary" onclick="valueShowIntro({ pushHistory: true, scrollToEntry: true })" type="button">← 返回狠值投资</button>
+</aside>
+<section class="strategy-agent-websdk-panel" aria-label="梦工场投研专员会话面板">
+<header>
+<div><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></div>
+<strong>梦工场投研专员</strong>
+<em aria-live="polite" id="value-agent-websdk-status">准备连接</em>
+</header>
+<div class="strategy-agent-websdk-container" id="value-agent-websdk-container">
+<div class="strategy-agent-websdk-loading" id="value-agent-websdk-loading" role="status">
+<span aria-hidden="true"></span>
+<strong>正在载入飞书投研会话面板</strong>
+<small>首次打开可能需要完成飞书登录</small>
+</div>
+</div>
+<div class="strategy-agent-websdk-error" hidden id="value-agent-websdk-error" role="alert">
+<strong>投研专员暂时没有成功载入</strong>
+<p id="value-agent-websdk-error-message">请检查飞书登录状态和域名白名单后重试。</p>
+<button class="btn btn-primary" id="value-agent-websdk-retry" type="button">重新连接</button>
+</div>
+<details class="strategy-agent-websdk-diagnostics" id="value-agent-websdk-diagnostics">
+<summary>连接诊断 · <code id="value-agent-websdk-trace">尚未开始</code></summary>
+<div>
+<ol id="value-agent-websdk-timeline"></ol>
+<p>诊断仅记录加载阶段、页面来源、技能复制动作和错误类型，不记录飞书登录凭据、标的信息或对话内容。</p>
+<button class="strategy-agent-websdk-download" id="value-agent-websdk-download" type="button">下载诊断 JSON</button>
+</div>
+</details>
+</section>
+</div>
+</div>
 </section>
 </article>
 </section>
@@ -2749,7 +2830,7 @@
 </footer>
 <!-- ===================== SCRIPTS ===================== -->
 <script src="js/charts.js"></script>
-<script src="js/app.js?v=7"></script>
+<script src="js/app.js?v=8"></script>
 <script src="js/home.js"></script>
 <script src="js/home-journey.js?v=3"></script>
 <script src="js/enterprise.js"></script>
@@ -2759,16 +2840,16 @@
 <script src="js/report.js?v=2"></script>
 <script src="js/family-trust-model.js?v=1"></script>
 <script src="js/family-trust-system.js?v=1"></script>
-<script src="js/strategy-agent-config.js"></script><script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
+<script src="js/strategy-agent-config.js"></script><script src="js/value-agent-config.js"></script><script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
 <script src="js/strategy-cases-data.js"></script>
 <script src="js/strategy-cases.js?v=2"></script>
 <script src="js/strategy.js"></script>
 <script type="module" src="js/strategy-agent-websdk.js?v=1"></script>
+<script type="module" src="js/value-agent-websdk.js?v=1"></script>
 <script src="js/academy-assessment.js"></script>
 <script src="js/final-business-pages.js?v=1"></script>
 </body>
 </html>
-
 
 
 
