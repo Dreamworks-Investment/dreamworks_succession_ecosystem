@@ -15,9 +15,9 @@
 <link href="css/strategy-auth.css?v=1" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
 <link href="css/value-agent-websdk.css?v=1" rel="stylesheet"/>
-<link href="css/wealth-diagnosis.css?v=1" rel="stylesheet"/>
+<link href="css/wealth-diagnosis.css?v=2" rel="stylesheet"/>
 <link href="css/wealth-agent.css?v=2" rel="stylesheet"/>
-<link href="css/family-trust-system.css?v=1" rel="stylesheet"/>
+<link href="css/family-trust-system.css?v=2" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <link href="css/final-business-pages.css?v=1" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
@@ -2004,8 +2004,8 @@
 </section>
 </div>
 </div>
-</section>
 <!-- STRATEGY_CASES_PROTECTED_END -->
+</section>
 <!-- ===================== VALUE INVESTING ===================== -->
 <section class="page value-intro-page" id="page-value">
 <article aria-label="狠值投资系统介绍" class="value-intro-document">
@@ -2256,9 +2256,14 @@
 <div>
 <span>当前引导问题</span>
 <strong id="trust-guide-question">先简单介绍一下您和家族企业，以及希望传承给下一代的是什么？</strong>
-<p id="trust-voice-status">可直接填写，也可以点击麦克风，用自然语言回答。</p>
+<p id="trust-voice-status">勾选授权后可使用浏览器语音转写；识别文字需确认后才会写入。</p>
+<label class="trust-voice-consent"><input id="trust-voice-consent" type="checkbox"/>我同意浏览器在本次操作中访问麦克风；本站仅接收识别文字，不保存录音。</label>
 </div>
-<button class="trust-voice-button" id="trust-voice-button" type="button"><span aria-hidden="true">●</span> 语音录入</button>
+<button class="trust-voice-button" disabled id="trust-voice-button" type="button"><span aria-hidden="true">●</span> 开始语音转写</button>
+<div class="trust-voice-review" hidden id="trust-voice-review">
+<label for="trust-voice-transcript"><strong>请确认识别结果</strong><textarea id="trust-voice-transcript" placeholder="识别文字会显示在这里，可手动修订后再写入当前步骤。"></textarea></label>
+<div><button class="btn btn-secondary btn-sm" id="trust-voice-discard" type="button">放弃</button><button class="btn btn-primary btn-sm" id="trust-voice-confirm" type="button">确认写入当前步骤</button></div>
+</div>
 </aside>
 
 <div class="trust-step-panels" id="trust-step-panels">
@@ -2629,6 +2634,7 @@
 <h2 tabindex="-1">身家诊断向导</h2>
 <div class="gold-line"></div>
 <p class="text-subtitle">资产盘点 → 身家要求回报率 → 真实身家 DCF → 财富增长曲线 → 行动建议。数据保存在本地浏览器。</p>
+<div aria-live="polite" class="wealth-data-mode wealth-data-mode-self" id="wealth-data-mode"><strong>自主填写</strong><span>当前报告使用您录入的数据</span></div>
 </div>
 <div class="steps">
 <div class="step active" data-step="1"><div class="step-circle">1</div><div class="step-label">资产盘点</div></div>
@@ -2645,7 +2651,7 @@
 <p style="font-size:.88rem;color:var(--text-secondary);margin-bottom:12px;">逐项录入您的资产与负债。所有收益字段均采用年化口径；系统将自动计算净回报率与真实身家。</p>
 <div id="wealth-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:var(--bg-section);border:1px dashed var(--border);border-radius:var(--radius-sm);">
 <button class="btn btn-primary btn-sm" id="btn-load-sample" type="button">🎯 一键演示案例样本</button>
-<button class="btn btn-secondary btn-sm" id="btn-clear-assets" type="button">🗑 清空所有录入</button>
+<button class="btn btn-secondary btn-sm" id="btn-clear-assets" type="button">✍️ 清空并自主填写</button>
 <span style="font-size:.78rem;color:var(--text-muted);align-self:center;margin-left:4px;">演示案例可一键呈现完整诊断流程，便于先看效果再录入真实数据。</span>
 </div>
 <div class="tab-nav" style="flex-wrap:wrap;gap:6px;">
@@ -2771,7 +2777,11 @@
 <tbody id="detail-tbody"></tbody>
 </table>
 </div>
-<div class="chart-wrap"><canvas id="destructionChart"></canvas></div>
+<div class="wealth-chart-grid" aria-label="真实身家图表总览">
+<figure class="wealth-chart-card"><figcaption><strong>资产类别分布</strong><span>按各类别账面值动态生成</span></figcaption><div class="chart-wrap"><canvas id="assetAllocationChart"></canvas></div></figure>
+<figure class="wealth-chart-card"><figcaption><strong>分类价值损毁</strong><span>账面值与折现现值差额</span></figcaption><div class="chart-wrap"><canvas id="destructionChart"></canvas></div></figure>
+<figure class="wealth-chart-card"><figcaption><strong>严重损毁资产比例</strong><span>按资产类别账面值占比统计</span></figcaption><div class="chart-wrap"><canvas id="severeDamageChart"></canvas></div></figure>
+</div>
 <div class="step-actions">
 <button class="btn btn-secondary" onclick="goToStep(2)">← 上一步</button>
 <button class="btn btn-primary" onclick="goToStep(4)">下一步：增长曲线 →</button>
@@ -2782,6 +2792,7 @@
 <div class="step-panel" data-wstep="4">
 <div class="card">
 <h4 style="margin-bottom:16px;">第四步 · 财富增长曲线</h4>
+<p class="wealth-chart-note">两条核心曲线对比“维持当前结构”与“达到要求回报率”的长期结果；M2 购买力作为参考基准同步展示。</p>
 <div class="chart-wrap"><canvas id="growthChart"></canvas></div>
 <div class="table-wrap" style="margin-top:16px;">
 <table>
@@ -2806,6 +2817,7 @@
 <button class="btn btn-primary" onclick="exportWealthReportHandler()">下载身家诊断报告 PDF</button>
 </div>
 <button class="btn btn-secondary btn-sm" onclick="saveWealthDraft()" style="margin-top:12px;">保存草稿到本地</button>
+<!-- WEALTH_INTERNAL_REVIEW_START -->
 <section aria-labelledby="wealth-agent-launch-title" class="wealth-agent-launch" id="wealth-agent-launch">
 <div class="wealth-agent-launch-head">
 <div aria-hidden="true" class="wealth-agent-mark">身</div>
@@ -2861,6 +2873,7 @@
 <small>日志不包含 API Key、OAuth Token、密码或完整资产/对话内容；部署平台可用同一 Trace ID 检索服务端结构化日志。</small>
 </div>
 </details>
+<!-- WEALTH_INTERNAL_REVIEW_END -->
 </div>
 </div>
 </div>
@@ -2880,16 +2893,18 @@
 </footer>
 <!-- ===================== SCRIPTS ===================== -->
 <script src="js/charts.js"></script>
-<script src="js/app.js?v=8"></script>
+<script src="js/app.js?v=9"></script>
 <script src="js/home.js"></script>
 <script src="js/home-journey.js?v=3"></script>
 <script src="js/enterprise.js"></script>
-<script src="js/wealth-model.js?v=1"></script>
-<script src="js/wealth.js?v=12"></script>
+<script src="js/wealth-model.js?v=2"></script>
+<script src="js/wealth.js?v=13"></script>
+<!-- WEALTH_INTERNAL_REVIEW_START -->
 <script src="js/wealth-agent.js?v=3"></script>
-<script src="js/report.js?v=2"></script>
+<!-- WEALTH_INTERNAL_REVIEW_END -->
+<script src="js/report.js?v=3"></script>
 <script src="js/family-trust-model.js?v=1"></script>
-<script src="js/family-trust-system.js?v=1"></script>
+<script src="js/family-trust-system.js?v=2"></script>
 <script src="js/value-agent-config.js"></script><script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
 <!-- STRATEGY_CASES_PROTECTED_START -->
 <script src="js/strategy-cases-data.js"></script>
@@ -2905,12 +2920,6 @@
 <script src="js/final-business-pages.js?v=1"></script>
 </body>
 </html>
-
-
-
-
-
-
 
 
 

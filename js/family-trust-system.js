@@ -13,6 +13,24 @@
     4: '未来谁来管理、谁来监督、谁有权调整规则？哪些底线绝不能突破？',
     5: '请检查这份预演：哪些内容已经确定，哪些事项必须交给专业顾问继续核验？'
   };
+  const STRUCTURED_QUESTIONS = [
+    ['TQ01', 'profile.industry', ['制造业', '科技 / 互联网', '消费 / 专业服务']],
+    ['TQ02', 'profile.assetScale', ['1000万—5000万元', '5000万—2亿元', '2亿元以上']],
+    ['TQ03', 'profile.successionWill', ['隔离企业经营与家庭风险', '减少继承争议并有序分配', '建立接班与家族治理机制']],
+    ['TQ04', 'intent.termYears', ['30', '50', '80']],
+    ['TQ05', 'intent.beneficiaries', ['本人、配偶与子女', '子女与孙辈', '直系家族成员及公益安排']],
+    ['TQ06', 'intent.exclusions', ['姻亲暂不纳入', '未成年人附条件纳入', '高风险或失信成员暂不纳入']],
+    ['TQ07', 'intent.distribution', ['按教育、医疗与养老需求分配', '成年后分阶段定额分配', '创业或重大人生事件经审核分配']],
+    ['TQ08', 'intent.guardrails', ['婚变、重大债务时暂停分配', '挥霍或违法失信时暂停分配', '由保护人复核后恢复或调整']],
+    ['TQ09', 'assets.source', ['企业经营与分红所得，权属清晰', '工资、投资与资产处置所得', '夫妻共有或存在待确权资产']],
+    ['TQ10', 'assets.phaseOne', ['先装入现金、基金及保单', '先装入流动性较好的金融资产', '先装入已确权且无负担的股权']],
+    ['TQ11', 'assets.phaseTwo', ['解押后装入不动产', '解禁或完成估值后装入股权', '跨境合规与税务核验后再装入']],
+    ['TQ12', 'assets.debt', ['暂无重大债务、担保或争议', '存在按揭或经营性负债', '存在对外担保或潜在家事争议']],
+    ['TQ13', 'governance.trusteeCriteria', ['持牌资质、规模与长期稳定性优先', '复杂资产管理和家族服务能力优先', '信息披露、费用与退出机制优先']],
+    ['TQ14', 'governance.protector', ['由可信家族成员担任', '由独立专业人士担任', '家族成员与专业顾问共同监督']],
+    ['TQ15', 'governance.committee', ['核心家庭成员一人一票', '家族成员多数决并设置回避机制', '家族与专业顾问联合决策']],
+    ['TQ16', 'governance.investment', ['稳健保值，限制高波动与杠杆', '长期增值，设置回撤与集中度边界', '流动性分层并建立禁投清单']]
+  ];
 
   let state = globalThis.FamilyTrustModel.createInitialState();
   let recognition = null;
@@ -97,7 +115,67 @@
     document.querySelectorAll('#trust-system-wizard [data-trust-note]').forEach((input) => {
       input.value = state.notes[input.dataset.trustNote] || '';
     });
+    syncStructuredChoices();
     updateLivePreview();
+  }
+
+  function setupStructuredChoices() {
+    STRUCTURED_QUESTIONS.forEach(([code, path, options]) => {
+      const input = document.querySelector(`#trust-system-wizard [data-trust-field="${path}"]`);
+      const label = input?.closest('label');
+      if (!input || !label || label.closest('[data-trust-question]')) return;
+      const fieldset = document.createElement('fieldset');
+      fieldset.className = 'trust-structured-question';
+      ['trust-field-wide', 'trust-field-full'].forEach(className => {
+        if (label.classList.contains(className)) {
+          fieldset.classList.add(className);
+          label.classList.remove(className);
+        }
+      });
+      fieldset.dataset.trustQuestion = code;
+      fieldset.dataset.trustChoiceTarget = path;
+      const originalTitle = label.querySelector(':scope > span')?.textContent || '请选择';
+      const legend = document.createElement('legend');
+      legend.innerHTML = `<span>${code}</span>${escapeHtml(originalTitle)}<small>选择常用答案后仍可补充或修改</small>`;
+      const choiceGroup = document.createElement('div');
+      choiceGroup.className = 'trust-structured-options';
+      choiceGroup.setAttribute('role', 'radiogroup');
+      [...options.map(value => ({ label: value, value })), { label: '其他 / 自定义', value: '' }].forEach(option => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = option.label;
+        button.dataset.trustChoiceValue = option.value;
+        button.setAttribute('aria-pressed', 'false');
+        button.addEventListener('click', () => {
+          fieldset.dataset.customActive = option.value ? 'false' : 'true';
+          input.value = option.value;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+          syncStructuredChoices();
+          if (!option.value) input.focus();
+        });
+        choiceGroup.appendChild(button);
+      });
+      const labelTitle = label.querySelector(':scope > span');
+      if (labelTitle) labelTitle.textContent = '补充说明 / 自定义（可编辑）';
+      label.parentNode.insertBefore(fieldset, label);
+      fieldset.append(legend, choiceGroup, label);
+    });
+  }
+
+  function syncStructuredChoices() {
+    document.querySelectorAll('[data-trust-choice-target]').forEach(fieldset => {
+      const input = document.querySelector(`#trust-system-wizard [data-trust-field="${fieldset.dataset.trustChoiceTarget}"]`);
+      if (!input) return;
+      const buttons = Array.from(fieldset.querySelectorAll('[data-trust-choice-value]'));
+      const exact = buttons.find(button => button.dataset.trustChoiceValue && button.dataset.trustChoiceValue === input.value);
+      buttons.forEach(button => {
+        const selected = exact
+          ? button === exact
+          : (!button.dataset.trustChoiceValue && (Boolean(input.value) || fieldset.dataset.customActive === 'true'));
+        button.setAttribute('aria-pressed', String(selected));
+      });
+    });
   }
 
   function trustSetView(view, options) {
@@ -149,6 +227,7 @@
     const question = document.getElementById('trust-guide-question');
     if (question) question.textContent = GUIDE_QUESTIONS[nextStep];
     stopVoice();
+    discardVoiceDraft();
     updateLivePreview();
     if (nextStep === 5) renderPlan();
     persistState(true);
@@ -234,14 +313,18 @@
 
   function setupVoice() {
     const button = document.getElementById('trust-voice-button');
+    const guide = document.getElementById('trust-voice-guide');
+    const consent = document.getElementById('trust-voice-consent');
+    const confirm = document.getElementById('trust-voice-confirm');
+    const discard = document.getElementById('trust-voice-discard');
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!button) return;
+    if (!button || !guide) return;
     if (!Recognition) {
-      button.disabled = true;
-      button.textContent = '当前浏览器不支持语音';
-      setVoiceStatus('您仍可在“自由补充”框中直接输入。');
+      guide.hidden = true;
       return;
     }
+    guide.hidden = false;
+    button.disabled = !consent?.checked;
     recognition = new Recognition();
     recognition.lang = 'zh-CN';
     recognition.continuous = false;
@@ -249,13 +332,11 @@
     recognition.maxAlternatives = 1;
     recognition.onresult = (event) => {
       const transcript = Array.from(event.results).map((result) => result[0].transcript).join('');
-      const note = document.querySelector(`[data-trust-note="${state.step}"]`);
-      if (note) {
-        note.value = `${note.value}${note.value ? '\n' : ''}${transcript}`;
-        state.notes[state.step] = note.value;
-        scheduleSave();
-      }
-      setVoiceStatus('语音已转成文字，您可以继续修改。');
+      const draft = document.getElementById('trust-voice-transcript');
+      const review = document.getElementById('trust-voice-review');
+      if (draft) draft.value = transcript;
+      if (review) review.hidden = false;
+      setVoiceStatus('识别完成。请先检查或修改文字，再确认写入当前步骤。');
     };
     recognition.onerror = (event) => {
       listening = false;
@@ -271,10 +352,21 @@
       if (listening) stopVoice();
       else startVoice();
     });
+    consent?.addEventListener('change', () => {
+      button.disabled = !consent.checked;
+      if (!consent.checked) stopVoice();
+      setVoiceStatus(consent.checked ? '已获得本次麦克风授权，可以开始语音转写。' : '勾选授权后才能启动麦克风。');
+    });
+    confirm?.addEventListener('click', confirmVoiceDraft);
+    discard?.addEventListener('click', discardVoiceDraft);
   }
 
   function startVoice() {
-    if (!recognition) return;
+    const consent = document.getElementById('trust-voice-consent');
+    if (!recognition || !consent?.checked) {
+      setVoiceStatus('请先勾选麦克风授权确认。');
+      return;
+    }
     try {
       recognition.start();
       listening = true;
@@ -296,8 +388,31 @@
   function updateVoiceButton() {
     const button = document.getElementById('trust-voice-button');
     const guide = document.getElementById('trust-voice-guide');
-    if (button && !button.disabled) button.innerHTML = listening ? '<span aria-hidden="true">■</span> 停止录入' : '<span aria-hidden="true">●</span> 语音录入';
+    if (button && !button.disabled) button.innerHTML = listening ? '<span aria-hidden="true">■</span> 停止转写' : '<span aria-hidden="true">●</span> 开始语音转写';
     if (guide) guide.classList.toggle('is-listening', listening);
+  }
+
+  function confirmVoiceDraft() {
+    const draft = document.getElementById('trust-voice-transcript');
+    const note = document.querySelector(`[data-trust-note="${state.step}"]`);
+    const transcript = draft?.value.trim() || '';
+    if (!transcript || !note) {
+      setVoiceStatus('没有可写入的识别文字。');
+      return;
+    }
+    note.value = `${note.value}${note.value ? '\n' : ''}${transcript}`;
+    note.dispatchEvent(new Event('input', { bubbles: true }));
+    state.notes[state.step] = note.value;
+    discardVoiceDraft();
+    scheduleSave();
+    setVoiceStatus('识别文字已写入当前步骤，您仍可在补充框中手动修订。');
+  }
+
+  function discardVoiceDraft() {
+    const draft = document.getElementById('trust-voice-transcript');
+    const review = document.getElementById('trust-voice-review');
+    if (draft) draft.value = '';
+    if (review) review.hidden = true;
   }
 
   function setVoiceStatus(message) {
@@ -391,6 +506,7 @@
   function setup() {
     if (!globalThis.FamilyTrustModel || !document.getElementById('page-trust')) return;
     loadState();
+    setupStructuredChoices();
     syncDomFromState();
     document.querySelectorAll('#trust-system-wizard input, #trust-system-wizard select, #trust-system-wizard textarea').forEach((input) => {
       input.addEventListener('input', () => { updateLivePreview(); scheduleSave(); });

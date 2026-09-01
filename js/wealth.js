@@ -92,6 +92,7 @@ window.wealthShowIntro = wealthShowIntro;
 window.wealthEnterSystem = wealthEnterSystem;
 
 function setupWealthIntro() {
+  renderWealthDataMode();
   const m2Input = document.getElementById('m2-rate-input');
   if (m2Input) m2Input.value = String(AppState.requiredReturn.r3 ?? 10);
   const principalInput = document.getElementById('investable-principal-input');
@@ -123,6 +124,17 @@ function setupWealthIntro() {
 
 }
 
+function renderWealthDataMode() {
+  const mode = document.getElementById('wealth-data-mode');
+  if (!mode) return;
+  const isSample = AppState.wealthDataMode === 'sample';
+  mode.classList.toggle('wealth-data-mode-sample', isSample);
+  mode.classList.toggle('wealth-data-mode-self', !isSample);
+  mode.innerHTML = isSample
+    ? '<strong>演示样本</strong><span>当前五步诊断与下载报告均使用虚拟样本，不能视为您的真实数据</span>'
+    : '<strong>自主填写</strong><span>当前五步诊断与下载报告使用您录入的数据</span>';
+}
+
 function loadWealthSampleData() {
   AppState.assets = JSON.parse(JSON.stringify(WEALTH_SAMPLE_ASSETS));
   AppState.flags = { usage: false, convenience: false, emotional: false };
@@ -130,6 +142,7 @@ function loadWealthSampleData() {
   AppState.requiredReturn = { r1: null, r2: null, r3: 10, winner: 'r3', computation: null, principalOverride: null };
   AppState.dcfResults = null;
   AppState.wealthStep = 1;
+  AppState.wealthDataMode = 'sample';
 
   document.getElementById('flag-usage').checked = false;
   document.getElementById('flag-convenience').checked = false;
@@ -141,6 +154,7 @@ function loadWealthSampleData() {
 
   renderExpenseRows();
   renderAllAssetTables();
+  renderWealthDataMode();
   goToStep(1);
   updateRequiredReturnDisplay();
 
@@ -160,6 +174,7 @@ function clearWealthAssets() {
   AppState.expenses = [];
   AppState.requiredReturn = { r1: null, r2: null, r3: 10, winner: 'r3', computation: null, principalOverride: null };
   AppState.dcfResults = null;
+  AppState.wealthDataMode = 'self';
   renderExpenseRows();
 
   const r1Display = document.getElementById('r1-display');
@@ -179,6 +194,7 @@ function clearWealthAssets() {
   if (principalInput) principalInput.value = '';
 
   renderAllAssetTables();
+  renderWealthDataMode();
   saveState();
 }
 
@@ -726,7 +742,65 @@ function renderStep3() {
   }
 
   // Render destruction chart
+  renderAssetAllocationChart();
   renderDestructionChart(detailRows);
+  renderSevereDamageChart(detailRows);
+}
+
+function renderAssetAllocationChart() {
+  const canvas = document.getElementById('assetAllocationChart');
+  if (!canvas) return;
+  if (canvas._chart) canvas._chart.destroy();
+  const rows = WealthModel.buildAssetDistribution(AppState.assets).filter(row => row.value > 0);
+  canvas._chart = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: rows.map(row => row.label),
+      datasets: [{
+        label: '账面值（万元）',
+        data: rows.map(row => row.value),
+        backgroundColor: ['#173f62', '#4f83a8', '#d4af37', '#73a27e', '#b56d5d'],
+        borderColor: '#ffffff',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${fmtMoney(ctx.raw)}` } }
+      }
+    }
+  });
+}
+
+function renderSevereDamageChart(detailRows) {
+  const canvas = document.getElementById('severeDamageChart');
+  if (!canvas) return;
+  if (canvas._chart) canvas._chart.destroy();
+  const rows = WealthModel.buildDamageDistribution(detailRows).filter(row => row.value > 0);
+  canvas._chart = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: rows.map(row => `${row.label} ${row.share.toFixed(1)}%`),
+      datasets: [{
+        label: '对应资产账面值（万元）',
+        data: rows.map(row => row.value),
+        backgroundColor: rows.map(row => ({ severe: '#a32d2d', moderate: '#d85a30', light: '#ef9f27', positive: '#1d9e75' }[row.key])),
+        borderColor: '#ffffff',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${fmtMoney(ctx.raw)}` } }
+      }
+    }
+  });
 }
 
 function renderDestructionChart(detailRows) {
@@ -794,12 +868,12 @@ function renderGrowthChart() {
 
   if (totalBook <= 0) return;
 
-  const years = [0, 5, 10, 15, 20, 25, 30, 35, 40];
   const pv = totalBook;
-
-  const currentLine = years.map(y => pv * Math.pow(1 + currentReturn / 100, y));
-  const requiredLine = years.map(y => pv * Math.pow(1 + requiredReturn / 100, y));
-  const m2Line = years.map(y => pv * Math.pow(1 + m2Rate / 100, y));
+  const growth = WealthModel.buildGrowthSeries(pv, currentReturn, requiredReturn, m2Rate);
+  const years = growth.years;
+  const currentLine = growth.current;
+  const requiredLine = growth.required;
+  const m2Line = growth.m2;
 
   canvas._chart = new Chart(canvas, {
     type: 'line',
@@ -1006,7 +1080,8 @@ async function exportWealthReportHandler() {
   persistAssetData();
   persistExpenses(false);
   updateRequiredReturnDisplay();
-  computeDCF();
+  if (!AppState.dcfResults) computeDCF();
+  if (!document.getElementById('growthChart')?._chart) renderGrowthChart();
   generateActionSuggestions();
   const button = document.querySelector('[onclick="exportWealthReportHandler()"]');
   const originalText = button?.textContent;

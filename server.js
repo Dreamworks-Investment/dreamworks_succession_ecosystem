@@ -22,7 +22,8 @@ const STRATEGY_PROTECTED_PATHS = [
 const STRATEGY_BLOCKS = {
   cases: ["STRATEGY_CASES_PROTECTED_START", "STRATEGY_CASES_PROTECTED_END"],
   agent: ["STRATEGY_AGENT_PROTECTED_START", "STRATEGY_AGENT_PROTECTED_END"],
-  casesGate: ["STRATEGY_CASES_GATE_START", "STRATEGY_CASES_GATE_END"]
+  casesGate: ["STRATEGY_CASES_GATE_START", "STRATEGY_CASES_GATE_END"],
+  wealthInternal: ["WEALTH_INTERNAL_REVIEW_START", "WEALTH_INTERNAL_REVIEW_END"]
 };
 
 const MIME_TYPES = {
@@ -107,6 +108,9 @@ function renderIndex(authStatus) {
   html = removeOrUnwrapProtectedBlocks(html, "cases", authStatus.grants.cases);
   html = removeOrUnwrapProtectedBlocks(html, "agent", authStatus.grants.agent);
   html = removeOrUnwrapProtectedBlocks(html, "casesGate", !authStatus.grants.cases);
+  // The WorkBuddy expert is an internal review tool. Reuse the internal case-library
+  // grant so public visitors never receive its UI or client script.
+  html = removeOrUnwrapProtectedBlocks(html, "wealthInternal", authStatus.grants.cases);
   const bootstrap = JSON.stringify(authStatus).replace(/</g, "\\u003c");
   return html.replace(
     "<!-- STRATEGY_AUTH_BOOTSTRAP -->",
@@ -381,6 +385,11 @@ export function createDreamworksServer(options = {}) {
   const strategyAuthService = options.strategyAuthService || createStrategyAuthService();
   return http.createServer(async (req, res) => {
     const pathname = new URL(req.url || "/", "http://localhost").pathname;
+    const authStatus = strategyAuthService.status(req);
+    if (pathname.startsWith("/api/wealth-agent") && !authStatus.grants.cases) {
+      sendJson(res, 404, { ok: false, error: { code: "NOT_FOUND", message: "接口不存在。" } });
+      return;
+    }
     if (await handleWealthAgentApi(req, res, pathname, agentService, diagnostics)) return;
     if (await handleStrategyAuthApi(req, res, pathname, strategyAuthService)) return;
 
@@ -395,7 +404,6 @@ export function createDreamworksServer(options = {}) {
       res.end("Bad Request");
       return;
     }
-    const authStatus = strategyAuthService.status(req);
     if (isStrategyProtectedPath(pathname) && !authStatus.grants.cases) {
       res.writeHead(404, {
         "Content-Type": "text/plain; charset=utf-8",

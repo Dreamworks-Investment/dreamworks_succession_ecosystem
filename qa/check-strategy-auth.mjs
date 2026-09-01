@@ -47,6 +47,12 @@ try {
   assert(!publicIndex.includes('id="strategy-agent-websdk-view"'), 'Public HTML must not contain the protected agent view');
   assert(!publicIndex.includes(env.STRATEGY_AILY_CHANNEL_TOKEN), 'Public HTML must never contain the Aily channel token');
   assert(!publicIndex.includes(env.STRATEGY_CASES_USERNAME), 'Public HTML must never contain login credentials');
+  ['value', 'wealth', 'trust', 'academy', 'charity', 'vision'].forEach(page => {
+    assert(publicIndex.includes(`id="page-${page}"`), `Public render must preserve page-${page}`);
+  });
+  assert(!publicIndex.includes('id="wealth-agent-launch"'), 'Public HTML must not expose the internal WorkBuddy review entry');
+  const publicWealthAgentApi = await request('/api/wealth-agent/status');
+  assert.equal(publicWealthAgentApi.status, 404, 'Public visitors must not be able to call the internal WorkBuddy API');
 
   const publicAsset = await request('/assets/strategy/scene-home.png');
   assert.equal(publicAsset.status, 404, 'Strategy assets must not be directly retrievable before case authentication');
@@ -80,6 +86,9 @@ try {
   assert(!casesIndex.includes('data-strategy-auth-form="cases"'), 'Case grant must remove the blocker instead of rendering it beside the library');
   assert(!casesIndex.includes('id="strategy-cases-access"'), 'The authenticated case-library HTML must not contain the blocker stage');
   assert(casesIndex.includes('js/strategy-cases-data.js'), 'Case grant must load the protected case router');
+  assert(casesIndex.includes('id="wealth-agent-launch"'), 'Internal case-library grant must reveal the controlled WorkBuddy review entry');
+  const internalWealthAgentApi = await request('/api/wealth-agent/status', { headers: { Cookie: casesCookie } });
+  assert.equal(internalWealthAgentApi.status, 200, 'Internal case-library grant must unlock the WorkBuddy review API');
   assert(!casesIndex.includes('id="strategy-agent-websdk-view"'), 'Case grant must not reveal the independently protected agent');
   const protectedAsset = await request('/assets/strategy/scene-home.png', { headers: { Cookie: casesCookie } });
   assert.equal(protectedAsset.status, 200);

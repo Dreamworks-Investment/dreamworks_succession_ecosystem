@@ -19,6 +19,7 @@ const AppState = {
   expenses: [],
   requiredReturn: { r1: null, r2: null, r3: 10, winner: 'r3', computation: null, principalOverride: null },
   dcfResults: null,
+  wealthDataMode: 'self',
   // Autosave
   autosaveTimer: null
 };
@@ -40,6 +41,7 @@ function loadSavedState() {
       AppState.requiredReturn = Object.assign({}, AppState.requiredReturn, data.requiredReturn || {});
       AppState.dcfResults = data.dcfResults || null;
       AppState.wealthStep = data.wealthStep || 1;
+      AppState.wealthDataMode = data.wealthDataMode === 'sample' ? 'sample' : 'self';
     }
   } catch(e) { /* ignore */ }
 }
@@ -52,7 +54,8 @@ function saveState() {
       expenses: AppState.expenses,
       requiredReturn: AppState.requiredReturn,
       dcfResults: AppState.dcfResults,
-      wealthStep: AppState.wealthStep
+      wealthStep: AppState.wealthStep,
+      wealthDataMode: AppState.wealthDataMode
     }));
   } catch(e) { /* ignore */ }
 }
