@@ -1,7 +1,10 @@
 /* 飞书 Aily Web SDK · 梦工场投研专员 */
-#page-value .value-agent-websdk-view { display: none; }
+#page-value .value-agent-websdk-view,
+#page-value .portal-agent-auth-view { display: none; }
 #page-value.value-agent-active .value-intro-document { display: none; }
 #page-value.value-agent-active .value-agent-websdk-view { display: block; }
+#page-value.value-agent-auth-active .value-intro-document { display: none; }
+#page-value.value-agent-auth-active #value-agent-auth-view { display: block; }
 
 .value-system-actions {
   display: grid !important;

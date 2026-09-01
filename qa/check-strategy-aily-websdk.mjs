@@ -23,7 +23,7 @@ assert(html.includes('css/strategy-agent-websdk.css?v=1'), 'The embedded-agent v
 assert(html.includes('data-strategy-auth-form="agent"'), 'The positioning agent must have an independent server-authenticated access cover');
 assert(html.includes('STRATEGY_AGENT_PROTECTED_START'), 'The server needs explicit markers around protected agent HTML');
 
-assert(server.includes('/api/strategy-auth/agent-config'), 'The Aily channel configuration must come from a protected server endpoint');
+assert(server.includes('agentConfigMatch') && server.includes('api\\/strategy-auth\\/agent-config'), 'The Aily channel configuration must come from a protected server endpoint');
 assert(server.includes('authStatus.grants.agent'), 'Agent HTML must only be rendered for the agent grant');
 assert(authService.includes('STRATEGY_AILY_CHANNEL_TOKEN'), 'The channel token must be read from the deployment environment');
 assert(!html.match(/channelToken\s*:\s*['"]wsk_/), 'The HTML must not contain a Web SDK channel token');

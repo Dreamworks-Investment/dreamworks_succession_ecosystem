@@ -6,8 +6,8 @@
   'use strict';
 
   var auth = window.DREAMWORKS_STRATEGY_AUTH || {
-    grants: { cases: false, agent: false },
-    configured: { cases: false, agent: false, session: false }
+    grants: { cases: false, agent: false, value: false, wealth: false, trust: false },
+    configured: { cases: false, agent: false, value: false, wealth: false, trust: false, session: false }
   };
   var grants = auth.grants || {};
   var protectedRouter = {

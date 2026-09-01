@@ -12,13 +12,25 @@ const env = {
   STRATEGY_AILY_CHANNEL_TOKEN: 'wsk_test_token_never_in_public_html',
   STRATEGY_AILY_SDK_VERSION: '0.0.12',
   STRATEGY_AILY_IFRAME_ORIGIN: 'https://aily.feishu.cn',
-  STRATEGY_AILY_ALLOWED_HOST: 'example.test'
+  STRATEGY_AILY_ALLOWED_HOST: 'example.test',
+  VALUE_AGENT_USERNAME: 'research@example.test',
+  VALUE_AGENT_PASSWORD: 'research-password-2026',
+  VALUE_AILY_CHANNEL_TOKEN: 'wsk_value_test_token_never_in_public_html',
+  WEALTH_AGENT_USERNAME: 'wealth@example.test',
+  WEALTH_AGENT_PASSWORD: 'wealth-password-2026',
+  WEALTH_AILY_CHANNEL_TOKEN: 'wsk_wealth_test_token_never_in_public_html',
+  TRUST_AGENT_USERNAME: 'trust@example.test',
+  TRUST_AGENT_PASSWORD: 'trust-password-2026',
+  TRUST_AILY_CHANNEL_TOKEN: 'wsk_trust_test_token_never_in_public_html'
 };
 
 const authService = createStrategyAuthService({ env });
 assert.equal(authService.authenticate('cases', env.STRATEGY_CASES_USERNAME, env.STRATEGY_CASES_PASSWORD).ok, true);
 assert.equal(authService.authenticate('agent', env.STRATEGY_CASES_USERNAME, env.STRATEGY_CASES_PASSWORD).ok, false);
 assert.equal(authService.authenticate('cases', env.STRATEGY_AGENT_USERNAME, env.STRATEGY_AGENT_PASSWORD).ok, false);
+assert.equal(authService.authenticate('value', env.VALUE_AGENT_USERNAME, env.VALUE_AGENT_PASSWORD).ok, true);
+assert.equal(authService.authenticate('wealth', env.WEALTH_AGENT_USERNAME, env.WEALTH_AGENT_PASSWORD).ok, true);
+assert.equal(authService.authenticate('trust', env.TRUST_AGENT_USERNAME, env.TRUST_AGENT_PASSWORD).ok, true);
 
 const server = createDreamworksServer({
   strategyAuthService: authService,
@@ -43,8 +55,14 @@ try {
   assert(publicIndex.includes('定位是中心，<span>价值才是核心</span>'), 'Public strategy hub must remain available');
   assert(publicIndex.includes('data-strategy-auth-form="cases"'), 'Public HTML must include the case-library gate');
   assert(publicIndex.includes('data-strategy-auth-form="agent"'), 'Public HTML must include the positioning-agent gate');
+  assert(publicIndex.includes('data-strategy-auth-form="value"'), 'Public HTML must include the research-agent gate');
+  assert(publicIndex.includes('data-strategy-auth-form="wealth"'), 'Public HTML must include the wealth-agent gate');
+  assert(publicIndex.includes('data-strategy-auth-form="trust"'), 'Public HTML must include the trust-agent gate');
   assert(!publicIndex.includes('十个合作项目，一套通用翻阅方式'), 'Public HTML must not contain the protected case library');
   assert(!publicIndex.includes('id="strategy-agent-websdk-view"'), 'Public HTML must not contain the protected agent view');
+  assert(!publicIndex.includes('id="value-agent-websdk-view"'), 'Public HTML must not contain the protected research-agent view');
+  assert(!publicIndex.includes('id="wealth-agent-websdk-view"'), 'Public HTML must not contain the protected wealth-agent view');
+  assert(!publicIndex.includes('id="trust-agent-websdk-view"'), 'Public HTML must not contain the protected trust-agent view');
   assert(!publicIndex.includes(env.STRATEGY_AILY_CHANNEL_TOKEN), 'Public HTML must never contain the Aily channel token');
   assert(!publicIndex.includes(env.STRATEGY_CASES_USERNAME), 'Public HTML must never contain login credentials');
   ['value', 'wealth', 'trust', 'academy', 'charity', 'vision'].forEach(page => {
@@ -115,14 +133,42 @@ try {
   const agentConfig = await agentConfigResponse.json();
   assert.equal(agentConfig.config.channelToken, env.STRATEGY_AILY_CHANNEL_TOKEN);
 
-  const statusResponse = await request('/api/strategy-auth/status', { headers: { Cookie: combinedCookie } });
+  let allAgentCookie = combinedCookie;
+  const businessAgents = [
+    { scope: 'value', username: env.VALUE_AGENT_USERNAME, password: env.VALUE_AGENT_PASSWORD, token: env.VALUE_AILY_CHANNEL_TOKEN, view: 'value-agent-websdk-view' },
+    { scope: 'wealth', username: env.WEALTH_AGENT_USERNAME, password: env.WEALTH_AGENT_PASSWORD, token: env.WEALTH_AILY_CHANNEL_TOKEN, view: 'wealth-agent-websdk-view' },
+    { scope: 'trust', username: env.TRUST_AGENT_USERNAME, password: env.TRUST_AGENT_PASSWORD, token: env.TRUST_AILY_CHANNEL_TOKEN, view: 'trust-agent-websdk-view' }
+  ];
+  for (const agent of businessAgents) {
+    const unauthorisedConfig = await request(`/api/strategy-auth/agent-config/${agent.scope}`);
+    assert.equal(unauthorisedConfig.status, 401, `${agent.scope} config must require its own grant`);
+    const login = await request('/api/strategy-auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Cookie: allAgentCookie },
+      body: JSON.stringify({ scope: agent.scope, username: agent.username, password: agent.password })
+    });
+    assert.equal(login.status, 200, `${agent.scope} login must succeed`);
+    allAgentCookie = cookieFrom(login);
+    const protectedIndex = await (await request(`/#${agent.scope}-agent`, { headers: { Cookie: allAgentCookie } })).text();
+    assert(protectedIndex.includes(`id="${agent.view}"`), `${agent.scope} grant must reveal its protected agent view`);
+    assert(!protectedIndex.includes(`data-strategy-auth-form="${agent.scope}"`), `${agent.scope} blocker must be removed after login`);
+    assert(!protectedIndex.includes(agent.token), `${agent.scope} token must never be in HTML`);
+    const configResponse = await request(`/api/strategy-auth/agent-config/${agent.scope}`, { headers: { Cookie: allAgentCookie } });
+    assert.equal(configResponse.status, 200);
+    assert.equal((await configResponse.json()).config.channelToken, agent.token);
+  }
+
+  const statusResponse = await request('/api/strategy-auth/status', { headers: { Cookie: allAgentCookie } });
   const statusText = await statusResponse.text();
   assert(!statusText.includes(env.STRATEGY_CASES_USERNAME));
   assert(!statusText.includes(env.STRATEGY_CASES_PASSWORD));
   assert(!statusText.includes(env.STRATEGY_AUTH_SESSION_SECRET));
   assert(!statusText.includes(env.STRATEGY_AILY_CHANNEL_TOKEN));
+  assert(!statusText.includes(env.VALUE_AILY_CHANNEL_TOKEN));
+  assert(!statusText.includes(env.WEALTH_AILY_CHANNEL_TOKEN));
+  assert(!statusText.includes(env.TRUST_AILY_CHANNEL_TOKEN));
   const status = JSON.parse(statusText);
-  assert.deepEqual(status.grants, { cases: true, agent: true });
+  assert.deepEqual(status.grants, { cases: true, agent: true, value: true, wealth: true, trust: true });
 } finally {
   await new Promise(resolve => {
     server.close(resolve);

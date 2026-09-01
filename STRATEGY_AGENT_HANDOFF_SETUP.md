@@ -20,11 +20,23 @@ STRATEGY_AILY_CHANNEL_TOKEN=
 STRATEGY_AILY_SDK_VERSION=0.0.12
 STRATEGY_AILY_IFRAME_ORIGIN=https://aily.feishu.cn
 STRATEGY_AILY_ALLOWED_HOST=你的线上域名（仅主机名）
+
+VALUE_AGENT_USERNAME=
+VALUE_AGENT_PASSWORD=
+VALUE_AILY_CHANNEL_TOKEN=
+WEALTH_AGENT_USERNAME=
+WEALTH_AGENT_PASSWORD=
+WEALTH_AILY_CHANNEL_TOKEN=
+TRUST_AGENT_USERNAME=
+TRUST_AGENT_PASSWORD=
+TRUST_AILY_CHANNEL_TOKEN=
 ```
 
 `STRATEGY_AUTH_SESSION_SECRET` 是服务器签名会话的随机密钥，不是用户登录密码。请用 `openssl rand -hex 32` 生成至少 32 个随机字符。两组用户密码由管理员自行设定，并通过安全渠道分别交给内部人员和获授权客户。
 
 飞书 Token 在 Aily 智能体的 Web SDK 渠道详情页“代码”区域取得。将该页显示的 `channelToken` 填入 `STRATEGY_AILY_CHANNEL_TOKEN`，并确认本站生产域名已加入飞书域名白名单。
+
+投研、身家诊断与家族信托三个智体分别把各自 Web SDK 页面显示的 `channelToken` 填入 `VALUE_AILY_CHANNEL_TOKEN`、`WEALTH_AILY_CHANNEL_TOKEN`、`TRUST_AILY_CHANNEL_TOKEN`。九个业务变量只存放在部署平台；三组认证共用同一个服务端 `STRATEGY_AUTH_SESSION_SECRET`，不需要也不应由每位用户或每台设备各自生成。
 
 旧版浏览器配置曾包含这一 Token，因此首次启用服务端保护时应在飞书后台轮换渠道 Token，并只把新值放入部署环境变量。
 

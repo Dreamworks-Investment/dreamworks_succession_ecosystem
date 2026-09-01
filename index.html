@@ -15,6 +15,7 @@
 <link href="css/strategy-auth.css?v=1" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
 <link href="css/value-agent-websdk.css?v=1" rel="stylesheet"/>
+<link href="css/service-agent-websdk.css?v=1" rel="stylesheet"/>
 <link href="css/wealth-diagnosis.css?v=2" rel="stylesheet"/>
 <link href="css/wealth-agent.css?v=2" rel="stylesheet"/>
 <link href="css/family-trust-system.css?v=2" rel="stylesheet"/>
@@ -2112,6 +2113,27 @@
 <footer class="value-slide-footer"><span>MENGONGCHANG</span><span>15 / 20 · 五模块分述 · 狠值投资</span></footer>
 </section>
 </article>
+<!-- VALUE_AGENT_GATE_START -->
+<article aria-hidden="true" class="portal-agent-auth-view" id="value-agent-auth-view">
+<section class="strategy-auth-stage" aria-labelledby="value-agent-auth-title">
+<div class="strategy-auth-card">
+<p class="strategy-auth-kicker">MENGONGCHANG RESEARCH AGENT · 专属访问</p>
+<h2 id="value-agent-auth-title">梦工场投研专员</h2>
+<p class="strategy-auth-intro">请输入由梦工场提供的投研智体账号与密码。验证通过后，本认证封面会从服务端响应中移除，再载入飞书官方会话面板。</p>
+<form class="strategy-auth-form" data-strategy-auth-form="value" novalidate>
+<label for="value-agent-username">请输入账号（必填）</label>
+<input id="value-agent-username" name="username" type="text" autocomplete="username" required/>
+<label for="value-agent-password">请输入密码（必填）</label>
+<div class="strategy-auth-password-row"><input id="value-agent-password" name="password" type="password" autocomplete="current-password" required/><button aria-label="显示密码" class="strategy-auth-password-toggle" data-password-toggle="value-agent-password" type="button">显示</button></div>
+<p class="strategy-auth-message" data-strategy-auth-message="value" role="alert" aria-live="polite"></p>
+<button class="strategy-auth-submit" type="submit">验证并进入投研专员 <span aria-hidden="true">→</span></button>
+</form>
+<div class="strategy-auth-foot"><span>独立权限 · 狠值投研</span><button onclick="valueShowIntro({ pushHistory: true, scrollToEntry: true })" type="button">返回狠值投资</button></div>
+</div>
+</section>
+</article>
+<!-- VALUE_AGENT_GATE_END -->
+<!-- VALUE_AGENT_PROTECTED_START -->
 <article aria-hidden="true" class="strategy-agent-websdk-view value-agent-websdk-view" id="value-agent-websdk-view">
 <section aria-labelledby="value-agent-websdk-title" class="strategy-agent-websdk-stage">
 <div class="strategy-agent-websdk-shell">
@@ -2189,6 +2211,7 @@
 </div>
 </section>
 </article>
+<!-- VALUE_AGENT_PROTECTED_END -->
 </section>
 <!-- ===================== TRUST ===================== -->
 <section class="page family-trust-page trust-intro-active" id="page-trust">
@@ -2221,12 +2244,33 @@
 </div>
 <div class="trust-cover-bottom">
 <div><strong>M2</strong><span aria-hidden="true"></span><p>把确定性狠值嵌进法律架构 · 让财富按意志精准传递</p></div>
-<button class="trust-cover-enter" onclick="trustEnterSystem({ pushHistory: true })" type="button">点击进入家族信托系统 <span aria-hidden="true">→</span></button>
+<div class="portal-cover-actions"><button class="trust-cover-enter" onclick="trustEnterSystem({ pushHistory: true })" type="button">点击进入家族信托系统 <span aria-hidden="true">→</span></button><button class="trust-cover-enter portal-agent-enter" onclick="trustAilyOpen({ pushHistory: true })" type="button">点击进入 家族信托设立系统顾问 <span aria-hidden="true">→</span></button></div>
 </div>
 <footer class="trust-cover-folio"><span>MENGONGCHANG</span><span>五模块分述 · 家族信托</span></footer>
 </div>
 </section>
 </article>
+
+<!-- TRUST_AILY_GATE_START -->
+<article aria-hidden="true" class="portal-agent-auth-view" id="trust-agent-auth-view">
+<section class="strategy-auth-stage" aria-labelledby="trust-agent-auth-title"><div class="strategy-auth-card">
+<p class="strategy-auth-kicker">MENGONGCHANG FAMILY TRUST AGENT · 专属访问</p><h2 id="trust-agent-auth-title">家族信托设立系统顾问</h2>
+<p class="strategy-auth-intro">请输入由梦工场提供的家族信托智体账号与密码。验证通过后才会由服务端下发对应 Channel Token。</p>
+<form class="strategy-auth-form" data-strategy-auth-form="trust" novalidate><label for="trust-agent-username">请输入账号（必填）</label><input id="trust-agent-username" name="username" type="text" autocomplete="username" required/><label for="trust-agent-password">请输入密码（必填）</label><div class="strategy-auth-password-row"><input id="trust-agent-password" name="password" type="password" autocomplete="current-password" required/><button aria-label="显示密码" class="strategy-auth-password-toggle" data-password-toggle="trust-agent-password" type="button">显示</button></div><p class="strategy-auth-message" data-strategy-auth-message="trust" role="alert" aria-live="polite"></p><button class="strategy-auth-submit" type="submit">验证并进入信托顾问 <span aria-hidden="true">→</span></button></form>
+<div class="strategy-auth-foot"><span>独立权限 · 家族信托智体</span><button onclick="trustShowIntro({ pushHistory: true })" type="button">返回家族信托</button></div>
+</div></section>
+</article>
+<!-- TRUST_AILY_GATE_END -->
+<!-- TRUST_AILY_PROTECTED_START -->
+<article aria-hidden="true" class="strategy-agent-websdk-view portal-agent-websdk-view" id="trust-agent-websdk-view">
+<section class="strategy-agent-websdk-stage" aria-labelledby="trust-agent-websdk-title"><div class="strategy-agent-websdk-shell">
+<nav aria-label="家族信托顾问路径" class="strategy-agent-websdk-breadcrumb"><button onclick="trustShowIntro({ pushHistory: true })" type="button">家族信托</button><span aria-hidden="true">/</span><strong>家族信托设立系统顾问</strong></nav>
+<header class="strategy-agent-websdk-heading"><div><p>FEISHU AILY · 家族信托设立系统顾问</p><h1 id="trust-agent-websdk-title">把传承意愿，转化为<span>可讨论、可归档的设立路径</span></h1><p>围绕家族信托、家族基金与慈善信托的设立流程、资料准备、备忘录访谈及持续管理继续对话。</p></div><div class="strategy-agent-websdk-meta"><span><b aria-hidden="true"></b>飞书官方会话面板</span><span>服务端独立授权</span><span>SDK v0.0.12</span></div></header>
+<div class="strategy-agent-websdk-layout"><aside class="strategy-agent-websdk-guide"><div class="strategy-agent-websdk-mark" aria-hidden="true">信</div><h2>先说清家族目标，再逐步完善安排</h2><p>可以直接询问设立流程、资料清单、费用结构与合规要求，也可以让顾问从新委托人的背景访谈开始。</p><div class="strategy-agent-websdk-prompts"><span>家族信托设立流程是怎样的？</span><span>设立家族信托需要准备哪些资料？</span><span>帮我开始一个新委托人的交互</span></div><div class="strategy-agent-websdk-access-note"><strong>访问说明</strong><p>本站账号验证与飞书账号可用范围是两层独立校验；进入后仍需使用获授权的飞书账号。</p></div><button class="btn btn-secondary" onclick="trustShowIntro({ pushHistory: true })" type="button">← 返回家族信托</button></aside>
+<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>家族信托设立系统顾问</strong><em aria-live="polite" id="trust-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="trust-agent-container"><div class="strategy-agent-websdk-loading" role="status"><span></span><strong>正在载入飞书信托顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="trust-agent-error" role="alert"><strong>信托顾问暂时没有成功载入</strong><p id="trust-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="trust-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="trust-agent-trace">尚未开始</code></summary><div><ol id="trust-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="trust-agent-download" type="button">下载诊断 JSON</button></div></details></section>
+</div></div></section>
+</article>
+<!-- TRUST_AILY_PROTECTED_END -->
 
 <article aria-hidden="true" class="trust-system-wizard" id="trust-system-wizard">
 <button class="btn btn-secondary btn-sm trust-wizard-back" onclick="trustShowIntro({ pushHistory: true })" type="button">← 返回家族信托介绍</button>
@@ -2620,12 +2664,32 @@
 </div>
 <footer class="wealth-system-bottom">
 <div><strong>M1</strong><span aria-hidden="true"></span><p>身家 ≠ 账面资产 · 身家 ＝ 未来自由现金流折现总和</p></div>
-<button class="wealth-system-enter" onclick="wealthEnterSystem({ pushHistory: true })" type="button">点击进入 身家诊断系统 <span aria-hidden="true">→</span></button>
+<div class="portal-cover-actions"><button class="wealth-system-enter" onclick="wealthEnterSystem({ pushHistory: true })" type="button">点击进入 身家诊断系统 <span aria-hidden="true">→</span></button><button class="wealth-system-enter portal-agent-enter" onclick="wealthAilyOpen({ pushHistory: true })" type="button">点击进入 身家诊断顾问 <span aria-hidden="true">→</span></button></div>
 </footer>
 <div class="wealth-system-folio" aria-hidden="true"><span>MENGONGCHANG</span><span>16 / 20 · 五模块分述 · 身家诊断</span></div>
 </div>
 </section>
 </article>
+<!-- WEALTH_AILY_GATE_START -->
+<article aria-hidden="true" class="portal-agent-auth-view" id="wealth-agent-auth-view">
+<section class="strategy-auth-stage" aria-labelledby="wealth-agent-auth-title"><div class="strategy-auth-card">
+<p class="strategy-auth-kicker">MENGONGCHANG WEALTH DIAGNOSIS AGENT · 专属访问</p><h2 id="wealth-agent-auth-title">身家诊断顾问</h2>
+<p class="strategy-auth-intro">请输入由梦工场提供的身家诊断智体账号与密码。验证通过前，服务器不会下发该智体页面或 Channel Token。</p>
+<form class="strategy-auth-form" data-strategy-auth-form="wealth" novalidate><label for="wealth-agent-username">请输入账号（必填）</label><input id="wealth-agent-username" name="username" type="text" autocomplete="username" required/><label for="wealth-agent-password">请输入密码（必填）</label><div class="strategy-auth-password-row"><input id="wealth-agent-password" name="password" type="password" autocomplete="current-password" required/><button aria-label="显示密码" class="strategy-auth-password-toggle" data-password-toggle="wealth-agent-password" type="button">显示</button></div><p class="strategy-auth-message" data-strategy-auth-message="wealth" role="alert" aria-live="polite"></p><button class="strategy-auth-submit" type="submit">验证并进入身家诊断顾问 <span aria-hidden="true">→</span></button></form>
+<div class="strategy-auth-foot"><span>独立权限 · 身家诊断智体</span><button onclick="wealthShowIntro({ pushHistory: true })" type="button">返回身家诊断</button></div>
+</div></section>
+</article>
+<!-- WEALTH_AILY_GATE_END -->
+<!-- WEALTH_AILY_PROTECTED_START -->
+<article aria-hidden="true" class="strategy-agent-websdk-view portal-agent-websdk-view" id="wealth-agent-websdk-view">
+<section class="strategy-agent-websdk-stage" aria-labelledby="wealth-agent-websdk-title"><div class="strategy-agent-websdk-shell">
+<nav aria-label="身家诊断顾问路径" class="strategy-agent-websdk-breadcrumb"><button onclick="wealthShowIntro({ pushHistory: true })" type="button">身家诊断</button><span aria-hidden="true">/</span><strong>身家诊断顾问</strong></nav>
+<header class="strategy-agent-websdk-heading"><div><p>FEISHU AILY · 身家诊断顾问</p><h1 id="wealth-agent-websdk-title">从资产盘点开始，厘清<span>真实身家与调整方向</span></h1><p>围绕要求回报率、三情景 DCF、资产集中度、无意识财富损毁与完整报告继续咨询。</p></div><div class="strategy-agent-websdk-meta"><span><b aria-hidden="true"></b>飞书官方会话面板</span><span>服务端独立授权</span><span>SDK v0.0.12</span></div></header>
+<div class="strategy-agent-websdk-layout"><aside class="strategy-agent-websdk-guide"><div class="strategy-agent-websdk-mark" aria-hidden="true">诊</div><h2>先说明对象与目标，再逐步补齐数据</h2><p>您可以从完整诊断开始，也可以单独测算要求回报率、重算某类资产的三情景现值。</p><div class="strategy-agent-websdk-prompts"><span>开始为王总做身家诊断</span><span>帮我测算家庭的要求回报率（三角度取 max）</span><span>把我的资产按悲观/中性/乐观三情景做现值重算</span></div><div class="strategy-agent-websdk-access-note"><strong>访问说明</strong><p>本站账号验证与飞书账号可用范围是两层独立校验；进入后仍需使用获授权的飞书账号。</p></div><button class="btn btn-secondary" onclick="wealthShowIntro({ pushHistory: true })" type="button">← 返回身家诊断</button></aside>
+<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>身家诊断顾问</strong><em aria-live="polite" id="wealth-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="wealth-agent-container"><div class="strategy-agent-websdk-loading" role="status"><span></span><strong>正在载入飞书身家诊断顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="wealth-agent-error" role="alert"><strong>身家诊断顾问暂时没有成功载入</strong><p id="wealth-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="wealth-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="wealth-agent-trace">尚未开始</code></summary><div><ol id="wealth-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="wealth-agent-download" type="button">下载诊断 JSON</button></div></details></section>
+</div></div></section>
+</article>
+<!-- WEALTH_AILY_PROTECTED_END -->
 <article class="wealth-diagnosis-wizard" id="wealth-diagnosis-wizard">
 <button class="btn btn-secondary wealth-wizard-back" onclick="wealthShowIntro({ pushHistory: true })" type="button">← 返回身家诊断介绍</button>
 <div class="section" style="padding-top:56px;">
@@ -2905,7 +2969,7 @@
 <script src="js/report.js?v=3"></script>
 <script src="js/family-trust-model.js?v=1"></script>
 <script src="js/family-trust-system.js?v=2"></script>
-<script src="js/value-agent-config.js"></script><script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
+<script src="js/home-interactive-pyramid.js"></script><script src="js/watermelon-interactive.js"></script>
 <!-- STRATEGY_CASES_PROTECTED_START -->
 <script src="js/strategy-cases-data.js"></script>
 <script src="js/strategy-cases.js?v=2"></script>
@@ -2916,12 +2980,11 @@
 <script type="module" src="js/strategy-agent-websdk.js?v=1"></script>
 <!-- STRATEGY_AGENT_PROTECTED_END -->
 <script type="module" src="js/value-agent-websdk.js?v=1"></script>
+<script type="module" src="js/service-agent-websdk.js?v=1"></script>
 <script src="js/academy-assessment.js"></script>
 <script src="js/final-business-pages.js?v=1"></script>
 </body>
 </html>
-
-
 
 
 

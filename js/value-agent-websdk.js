@@ -1,7 +1,14 @@
 import { initAgentChat } from '../vendor/aily-web-sdk/aily-web-sdk.js';
 
-const config = window.VALUE_AILY_WEB_SDK || {};
+let config = {
+  channelToken: '',
+  sdkVersion: '0.0.12',
+  iframeOrigin: 'https://aily.feishu.cn',
+  allowedHost: ''
+};
+const auth = window.DREAMWORKS_STRATEGY_AUTH || { grants: {} };
 const page = document.getElementById('page-value');
+const authView = document.getElementById('value-agent-auth-view');
 const view = document.getElementById('value-agent-websdk-view');
 const root = document.getElementById('value-agent-websdk-container');
 const status = document.getElementById('value-agent-websdk-status');
@@ -30,6 +37,34 @@ let sdkInstance = null;
 let mountPromise = null;
 let generation = 0;
 let trace = null;
+let configPromise = null;
+
+async function loadProtectedConfig() {
+  if (config.channelToken) return config;
+  if (configPromise) return configPromise;
+  configPromise = (async () => {
+    const response = await fetch('/api/strategy-auth/agent-config/value', {
+      method: 'GET',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { Accept: 'application/json' }
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.ok || !payload.config?.channelToken) {
+      const error = new Error(payload.error?.message || '投研专员的受保护配置未能载入。');
+      error.code = payload.error?.code || 'CONFIG_LOAD_FAILED';
+      throw error;
+    }
+    config = {
+      channelToken: String(payload.config.channelToken),
+      sdkVersion: String(payload.config.sdkVersion || '0.0.12'),
+      iframeOrigin: String(payload.config.iframeOrigin || 'https://aily.feishu.cn'),
+      allowedHost: String(payload.config.allowedHost || '')
+    };
+    return config;
+  })().finally(() => { configPromise = null; });
+  return configPromise;
+}
 
 function traceId() {
   if (window.crypto && typeof window.crypto.randomUUID === 'function') {
@@ -181,9 +216,21 @@ async function mountAgent() {
   if (mountPromise) return mountPromise;
 
   const currentGeneration = ++generation;
-  beginTrace();
   root.innerHTML = loadingMarkup();
   if (errorBox) errorBox.hidden = true;
+  setStatus('正在验证访问会话');
+
+  try {
+    await loadProtectedConfig();
+    beginTrace();
+    addTrace('protected.config', 'success', { tokenPresent: true });
+  } catch (error) {
+    beginTrace();
+    addTrace('protected.config', 'error', { code: error.code || 'CONFIG_LOAD_FAILED' });
+    showError(explainError(error), error.code || 'CONFIG_LOAD_FAILED');
+    return null;
+  }
+
   setStatus('正在连接');
 
   const onAllowedHost = !config.allowedHost || window.location.hostname === config.allowedHost;
@@ -345,17 +392,24 @@ function ensureValuePage() {
 
 function valueOpenAgent(options = {}) {
   ensureValuePage();
-  if (page) page.classList.add('value-agent-active');
-  if (view) view.setAttribute('aria-hidden', 'false');
+  const granted = Boolean(auth.grants?.value);
+  if (page) {
+    page.classList.remove('value-agent-active', 'value-agent-auth-active');
+    page.classList.add(granted ? 'value-agent-active' : 'value-agent-auth-active');
+  }
+  if (authView) authView.setAttribute('aria-hidden', String(granted));
+  if (view) view.setAttribute('aria-hidden', String(!granted));
   setHistory({ ...options, agent: true });
   if (options.scroll !== false) window.scrollTo({ top: 0, behavior: 'auto' });
-  document.title = '梦工场投研专员 · 狠值投资';
-  void mountAgent();
+  document.title = granted ? '梦工场投研专员 · 狠值投资' : '访问验证 · 梦工场投研专员';
+  if (granted) void mountAgent();
+  else window.setTimeout(() => document.getElementById('value-agent-username')?.focus({ preventScroll: true }), 50);
 }
 
 function valueShowIntro(options = {}) {
   ensureValuePage();
-  if (page) page.classList.remove('value-agent-active');
+  if (page) page.classList.remove('value-agent-active', 'value-agent-auth-active');
+  if (authView) authView.setAttribute('aria-hidden', 'true');
   if (view) view.setAttribute('aria-hidden', 'true');
   setHistory({ ...options, agent: false });
   void destroyAgent();

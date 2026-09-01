@@ -62,11 +62,16 @@ function wealthSetView(view, options = {}) {
   const page = document.getElementById('page-wealth');
   if (!page) return;
 
+  const leavingAgent = page.classList.contains('wealth-agent-active');
   const wizardActive = view === 'wizard';
+  page.classList.remove('wealth-agent-active', 'wealth-agent-auth-active');
   page.classList.toggle('wealth-intro-active', !wizardActive);
   page.classList.toggle('wealth-wizard-active', wizardActive);
   document.getElementById('wealth-system-intro')?.setAttribute('aria-hidden', String(wizardActive));
   document.getElementById('wealth-diagnosis-wizard')?.setAttribute('aria-hidden', String(!wizardActive));
+  document.getElementById('wealth-agent-auth-view')?.setAttribute('aria-hidden', 'true');
+  document.getElementById('wealth-agent-websdk-view')?.setAttribute('aria-hidden', 'true');
+  if (leavingAgent && typeof window.wealthAilyAgentDestroy === 'function') void window.wealthAilyAgentDestroy();
 
   if (options.pushHistory || options.replaceHistory) {
     const method = options.replaceHistory ? 'replaceState' : 'pushState';

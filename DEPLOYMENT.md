@@ -61,3 +61,17 @@
 3. 使用案例库凭据登录，确认十个案例及创维完整章节可见，但定位智体仍要求另一组凭据。
 4. 退出无痕窗口后重新打开，点击“梦工场定位智体”，使用智体凭据登录并确认飞书会话面板加载。
 5. 访问 `GET /api/strategy-auth/status` 只能看到权限和配置状态布尔值，不应出现账号、密码、会话密钥或飞书 Token。
+
+## 狠值投资、身家诊断与家族信托智体
+
+三个业务智体沿用同一套服务端认证机制，但账号、密码和 Channel Token 完全独立。请在部署平台增加以下九个环境变量：
+
+- `VALUE_AGENT_USERNAME`、`VALUE_AGENT_PASSWORD`、`VALUE_AILY_CHANNEL_TOKEN`：梦工场投研专员。
+- `WEALTH_AGENT_USERNAME`、`WEALTH_AGENT_PASSWORD`、`WEALTH_AILY_CHANNEL_TOKEN`：身家诊断顾问。
+- `TRUST_AGENT_USERNAME`、`TRUST_AGENT_PASSWORD`、`TRUST_AILY_CHANNEL_TOKEN`：家族信托设立系统顾问。
+
+三组智体共用现有的 `STRATEGY_AUTH_SESSION_SECRET`、`STRATEGY_AUTH_SESSION_TTL_SECONDS`、`STRATEGY_AILY_SDK_VERSION`、`STRATEGY_AILY_IFRAME_ORIGIN` 和 `STRATEGY_AILY_ALLOWED_HOST`。因此无需为每台设备生成 Session Secret：它是部署实例统一使用的服务端签名密钥，所有访问者由服务器签发各自的 HttpOnly 会话 Cookie。
+
+登录某一智体只授予该智体的权限，不会解锁其他智体。未登录时，服务器会移除对应智体正文；登录成功并刷新后，认证封面也会从 HTML 中移除，再通过该智体专属接口下发 Channel Token。
+
+部署检查：分别用无痕窗口打开 `#value-agent`、`#wealth-agent`、`#trust-agent`，确认各自只接受对应账号密码；登录后检查会话面板能载入，且页面源代码与 `GET /api/strategy-auth/status` 均不包含任何真实凭据或 Token。

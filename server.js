@@ -23,6 +23,12 @@ const STRATEGY_BLOCKS = {
   cases: ["STRATEGY_CASES_PROTECTED_START", "STRATEGY_CASES_PROTECTED_END"],
   agent: ["STRATEGY_AGENT_PROTECTED_START", "STRATEGY_AGENT_PROTECTED_END"],
   casesGate: ["STRATEGY_CASES_GATE_START", "STRATEGY_CASES_GATE_END"],
+  valueAgent: ["VALUE_AGENT_PROTECTED_START", "VALUE_AGENT_PROTECTED_END"],
+  valueAgentGate: ["VALUE_AGENT_GATE_START", "VALUE_AGENT_GATE_END"],
+  wealthAily: ["WEALTH_AILY_PROTECTED_START", "WEALTH_AILY_PROTECTED_END"],
+  wealthAilyGate: ["WEALTH_AILY_GATE_START", "WEALTH_AILY_GATE_END"],
+  trustAily: ["TRUST_AILY_PROTECTED_START", "TRUST_AILY_PROTECTED_END"],
+  trustAilyGate: ["TRUST_AILY_GATE_START", "TRUST_AILY_GATE_END"],
   wealthInternal: ["WEALTH_INTERNAL_REVIEW_START", "WEALTH_INTERNAL_REVIEW_END"]
 };
 
@@ -108,6 +114,12 @@ function renderIndex(authStatus) {
   html = removeOrUnwrapProtectedBlocks(html, "cases", authStatus.grants.cases);
   html = removeOrUnwrapProtectedBlocks(html, "agent", authStatus.grants.agent);
   html = removeOrUnwrapProtectedBlocks(html, "casesGate", !authStatus.grants.cases);
+  html = removeOrUnwrapProtectedBlocks(html, "valueAgent", authStatus.grants.value);
+  html = removeOrUnwrapProtectedBlocks(html, "valueAgentGate", !authStatus.grants.value);
+  html = removeOrUnwrapProtectedBlocks(html, "wealthAily", authStatus.grants.wealth);
+  html = removeOrUnwrapProtectedBlocks(html, "wealthAilyGate", !authStatus.grants.wealth);
+  html = removeOrUnwrapProtectedBlocks(html, "trustAily", authStatus.grants.trust);
+  html = removeOrUnwrapProtectedBlocks(html, "trustAilyGate", !authStatus.grants.trust);
   // The WorkBuddy expert is an internal review tool. Reuse the internal case-library
   // grant so public visitors never receive its UI or client script.
   html = removeOrUnwrapProtectedBlocks(html, "wealthInternal", authStatus.grants.cases);
@@ -320,7 +332,7 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
   if (pathname === "/api/strategy-auth/login" && req.method === "POST") {
     try {
       const body = await readJsonBody(req);
-      const scope = body.scope === "agent" ? "agent" : body.scope === "cases" ? "cases" : "";
+      const scope = ["cases", "agent", "value", "wealth", "trust"].includes(body.scope) ? body.scope : "";
       assertWithinRateLimit(req, `strategy-auth:${scope || "invalid"}`, 8, 15 * 60 * 1000);
       if (!scope) {
         sendJson(res, 400, { ok: false, error: { code: "INVALID_SCOPE", message: "访问区域无效。" } });
@@ -350,7 +362,7 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
   if (pathname === "/api/strategy-auth/logout" && req.method === "POST") {
     try {
       const body = await readJsonBody(req);
-      const scope = body.scope === "cases" || body.scope === "agent" ? body.scope : "all";
+      const scope = ["cases", "agent", "value", "wealth", "trust"].includes(body.scope) ? body.scope : "all";
       res.setHeader("Set-Cookie", authService.revoke(req, scope));
       sendJson(res, 200, { ok: true, scope });
       return true;
@@ -361,14 +373,16 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
     }
   }
 
-  if (pathname === "/api/strategy-auth/agent-config" && req.method === "GET") {
-    if (!authService.status(req).grants.agent) {
-      sendJson(res, 401, { ok: false, error: { code: "AUTH_REQUIRED", message: "请先通过定位智体访问验证。" } });
+  const agentConfigMatch = pathname.match(/^\/api\/strategy-auth\/agent-config(?:\/(value|wealth|trust))?$/);
+  if (agentConfigMatch && req.method === "GET") {
+    const scope = agentConfigMatch[1] || "agent";
+    if (!authService.status(req).grants[scope]) {
+      sendJson(res, 401, { ok: false, error: { code: "AUTH_REQUIRED", message: "请先通过对应智体的访问验证。" } });
       return true;
     }
-    const config = authService.agentConfig();
+    const config = authService.agentConfig(scope);
     if (!config.channelToken) {
-      sendJson(res, 503, { ok: false, error: { code: "AGENT_NOT_CONFIGURED", message: "定位智体渠道配置尚未完成。" } });
+      sendJson(res, 503, { ok: false, error: { code: "AGENT_NOT_CONFIGURED", message: "该智体渠道配置尚未完成。" } });
       return true;
     }
     sendJson(res, 200, { ok: true, config });

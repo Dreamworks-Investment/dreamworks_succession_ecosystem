@@ -74,6 +74,12 @@ function navigateTo(page, options = {}) {
   if (page !== 'value' && document.getElementById('page-value')?.classList.contains('value-agent-active')) {
     if (typeof window.valueAgentDestroy === 'function') void window.valueAgentDestroy();
   }
+  if (page !== 'wealth' && document.getElementById('page-wealth')?.classList.contains('wealth-agent-active')) {
+    if (typeof window.wealthAilyAgentDestroy === 'function') void window.wealthAilyAgentDestroy();
+  }
+  if (page !== 'trust' && document.getElementById('page-trust')?.classList.contains('trust-agent-active')) {
+    if (typeof window.trustAilyAgentDestroy === 'function') void window.trustAilyAgentDestroy();
+  }
 
   AppState.currentPage = page;
 
@@ -254,6 +260,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.wealthEnterSystem({ pushHistory: false, scroll: false });
       }
     }, 0);
+  } else if (requested === 'wealth-agent') {
+    navigateTo('wealth', { skipHistory: true, scroll: false, preserveWealthView: true });
+    try { window.history.replaceState({ page: 'wealth', wealthView: 'agent' }, '', '#wealth-agent'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.wealthAilyOpen === 'function') window.wealthAilyOpen({ replaceHistory: true, scroll: false });
+    }, 0);
   } else if (requested === 'trust-system') {
     navigateTo('trust', { skipHistory: true, scroll: false, preserveTrustView: true });
     try { window.history.replaceState({ page: 'trust', trustView: 'wizard' }, '', '#trust-system'); } catch (error) {}
@@ -261,6 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof window.trustEnterSystem === 'function') {
         window.trustEnterSystem({ pushHistory: false, scroll: false });
       }
+    }, 0);
+  } else if (requested === 'trust-agent') {
+    navigateTo('trust', { skipHistory: true, scroll: false, preserveTrustView: true });
+    try { window.history.replaceState({ page: 'trust', trustView: 'agent' }, '', '#trust-agent'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.trustAilyOpen === 'function') window.trustAilyOpen({ replaceHistory: true, scroll: false });
     }, 0);
   } else if (requested === 'academy-system') {
     navigateTo('academy', { skipHistory: true, scroll: false, preserveAcademyView: true });
@@ -286,8 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const preserveStrategyView = page === 'strategy' && event.state &&
       (event.state.strategyCase || event.state.strategyChapter || event.state.strategyView);
     const preserveValueView = page === 'value' && event.state && event.state.valueView === 'agent';
-    const preserveWealthView = page === 'wealth' && event.state && event.state.wealthView === 'wizard';
-    const preserveTrustView = page === 'trust' && event.state && event.state.trustView === 'wizard';
+    const preserveWealthView = page === 'wealth' && event.state && ['wizard', 'agent'].includes(event.state.wealthView);
+    const preserveTrustView = page === 'trust' && event.state && ['wizard', 'agent'].includes(event.state.trustView);
     const preserveAcademyView = page === 'academy' && event.state && event.state.academyView === 'system';
     navigateTo(page, {
       skipHistory: true,
@@ -304,19 +322,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }, 0);
     }
-    if (preserveWealthView) {
+    if (preserveWealthView && event.state.wealthView === 'wizard') {
       window.setTimeout(() => {
         if (typeof window.wealthEnterSystem === 'function') {
           window.wealthEnterSystem({ pushHistory: false, scroll: false });
         }
       }, 0);
     }
-    if (preserveTrustView) {
+    if (preserveWealthView && event.state.wealthView === 'agent') {
+      window.setTimeout(() => window.wealthAilyOpen?.({ scroll: false }), 0);
+    }
+    if (preserveTrustView && event.state.trustView === 'wizard') {
       window.setTimeout(() => {
         if (typeof window.trustEnterSystem === 'function') {
           window.trustEnterSystem({ pushHistory: false, scroll: false });
         }
       }, 0);
+    }
+    if (preserveTrustView && event.state.trustView === 'agent') {
+      window.setTimeout(() => window.trustAilyOpen?.({ scroll: false }), 0);
     }
     if (preserveAcademyView) {
       window.setTimeout(() => {

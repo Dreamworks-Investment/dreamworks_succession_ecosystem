@@ -2,7 +2,7 @@ import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 
 const COOKIE_NAME = "dw_strategy_auth";
 const DEFAULT_TTL_SECONDS = 8 * 60 * 60;
-const VALID_SCOPES = new Set(["cases", "agent"]);
+const VALID_SCOPES = new Set(["cases", "agent", "value", "wealth", "trust"]);
 
 function clean(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -62,6 +62,18 @@ export function createStrategyAuthService(options = {}) {
     agent: {
       username: clean(env.STRATEGY_AGENT_USERNAME),
       password: String(env.STRATEGY_AGENT_PASSWORD || "")
+    },
+    value: {
+      username: clean(env.VALUE_AGENT_USERNAME),
+      password: String(env.VALUE_AGENT_PASSWORD || "")
+    },
+    wealth: {
+      username: clean(env.WEALTH_AGENT_USERNAME),
+      password: String(env.WEALTH_AGENT_PASSWORD || "")
+    },
+    trust: {
+      username: clean(env.TRUST_AGENT_USERNAME),
+      password: String(env.TRUST_AGENT_PASSWORD || "")
     }
   };
 
@@ -112,11 +124,17 @@ export function createStrategyAuthService(options = {}) {
     return {
       grants: {
         cases: current.grants.includes("cases"),
-        agent: current.grants.includes("agent")
+        agent: current.grants.includes("agent"),
+        value: current.grants.includes("value"),
+        wealth: current.grants.includes("wealth"),
+        trust: current.grants.includes("trust")
       },
       configured: {
         cases: configured("cases"),
         agent: configured("agent"),
+        value: configured("value"),
+        wealth: configured("wealth"),
+        trust: configured("trust"),
         session: configured("session")
       },
       expiresAt: current.expiresAt
@@ -154,9 +172,15 @@ export function createStrategyAuthService(options = {}) {
     return remaining.length ? cookie(req, remaining) : clearCookie(req);
   }
 
-  function agentConfig() {
+  function agentConfig(scope = "agent") {
+    const tokenVariables = {
+      agent: "STRATEGY_AILY_CHANNEL_TOKEN",
+      value: "VALUE_AILY_CHANNEL_TOKEN",
+      wealth: "WEALTH_AILY_CHANNEL_TOKEN",
+      trust: "TRUST_AILY_CHANNEL_TOKEN"
+    };
     return {
-      channelToken: clean(env.STRATEGY_AILY_CHANNEL_TOKEN),
+      channelToken: clean(env[tokenVariables[scope] || ""]),
       sdkVersion: clean(env.STRATEGY_AILY_SDK_VERSION) || "0.0.12",
       iframeOrigin: clean(env.STRATEGY_AILY_IFRAME_ORIGIN) || "https://aily.feishu.cn",
       allowedHost: clean(env.STRATEGY_AILY_ALLOWED_HOST)

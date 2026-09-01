@@ -182,11 +182,16 @@
     const settings = options || {};
     const page = document.getElementById('page-trust');
     if (!page) return;
+    const leavingAgent = page.classList.contains('trust-agent-active');
     const wizardActive = view === 'wizard';
+    page.classList.remove('trust-agent-active', 'trust-agent-auth-active');
     page.classList.toggle('trust-intro-active', !wizardActive);
     page.classList.toggle('trust-wizard-active', wizardActive);
     document.getElementById('trust-system-intro')?.setAttribute('aria-hidden', String(wizardActive));
     document.getElementById('trust-system-wizard')?.setAttribute('aria-hidden', String(!wizardActive));
+    document.getElementById('trust-agent-auth-view')?.setAttribute('aria-hidden', 'true');
+    document.getElementById('trust-agent-websdk-view')?.setAttribute('aria-hidden', 'true');
+    if (leavingAgent && typeof window.trustAilyAgentDestroy === 'function') void window.trustAilyAgentDestroy();
 
     if (settings.pushHistory || settings.replaceHistory) {
       const method = settings.replaceHistory ? 'replaceState' : 'pushState';
