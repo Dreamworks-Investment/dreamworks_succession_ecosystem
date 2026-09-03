@@ -179,14 +179,20 @@
   text-decoration: none;
 }
 
+.academy-poster-section {
+  overflow: visible;
+}
+
 .academy-poster-frame {
-  width: min(560px, 100%);
-  margin: 0 auto;
-  padding: 14px;
-  border: 1px solid rgba(16, 45, 71, .14);
-  border-radius: 22px;
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
   background: #fff;
-  box-shadow: 0 28px 80px rgba(17, 38, 55, .14);
+  box-shadow: none;
 }
 
 .academy-poster-frame img,
@@ -195,6 +201,10 @@
   width: 100%;
   height: auto;
   border-radius: 12px;
+}
+
+.academy-poster-frame img {
+  border-radius: 0;
 }
 
 .academy-brochure-grid {
@@ -426,7 +436,8 @@
   transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
 }
 
-.academy-milestone button::before {
+.academy-milestone button::before,
+.academy-milestone > div::before {
   content: '';
   width: 72px;
   height: 2px;
@@ -439,7 +450,8 @@
   pointer-events: none;
 }
 
-.academy-milestone button::after {
+.academy-milestone button::after,
+.academy-milestone > div::after {
   content: '';
   width: clamp(84px, 8vw, 128px);
   aspect-ratio: 1;
@@ -456,16 +468,22 @@
 }
 
 .milestone-two button::before,
+.milestone-two > div::before,
 .milestone-four button::before,
-.milestone-six button::before {
+.milestone-four > div::before,
+.milestone-six button::before,
+.milestone-six > div::before {
   left: -72px;
   right: auto;
   background: linear-gradient(270deg, rgba(215, 172, 43, .86), rgba(215, 172, 43, .08));
 }
 
 .milestone-two button::after,
+.milestone-two > div::after,
 .milestone-four button::after,
-.milestone-six button::after {
+.milestone-four > div::after,
+.milestone-six button::after,
+.milestone-six > div::after {
   left: clamp(-170px, -11vw, -112px);
   right: auto;
 }
@@ -561,13 +579,15 @@
   font-weight: 800;
 }
 
-.academy-milestone.is-pending > button {
+.academy-milestone.is-pending > button,
+.academy-milestone.is-pending > div {
   opacity: .9;
   background: linear-gradient(145deg, rgba(246, 243, 236, .9), rgba(224, 225, 220, .8));
 }
 .academy-milestone.is-pending .academy-milestone-icon { filter: grayscale(.45); }
 .academy-milestone.is-pending em { color: #817b6f; }
-.academy-milestone.is-continuing > button {
+.academy-milestone.is-continuing > button,
+.academy-milestone.is-continuing > div {
   border-color: rgba(232, 199, 91, .34);
   background: linear-gradient(145deg, rgba(7, 28, 51, .96), rgba(13, 54, 72, .92));
   color: #fff;
@@ -727,7 +747,9 @@
   .academy-milestone button,
   .academy-milestone > div { min-height: 0; padding: 18px 20px; }
   .academy-milestone button::before,
-  .academy-milestone button::after { display: none; }
+  .academy-milestone > div::before,
+  .academy-milestone button::after,
+  .academy-milestone > div::after { display: none; }
   .academy-milestone-icon { width: 44px; height: 44px; }
   .academy-milestone strong { font-size: 1.08rem; }
   .academy-milestone small { font-size: .73rem; }
