@@ -19,6 +19,7 @@ const AppState = {
   expenses: [],
   requiredReturn: { r1: null, r2: null, r3: 10, winner: 'r3', computation: null, principalOverride: null },
   dcfResults: null,
+  wealthDataMode: 'self',
   // Autosave
   autosaveTimer: null
 };
@@ -40,6 +41,7 @@ function loadSavedState() {
       AppState.requiredReturn = Object.assign({}, AppState.requiredReturn, data.requiredReturn || {});
       AppState.dcfResults = data.dcfResults || null;
       AppState.wealthStep = data.wealthStep || 1;
+      AppState.wealthDataMode = data.wealthDataMode === 'sample' ? 'sample' : 'self';
     }
   } catch(e) { /* ignore */ }
 }
@@ -52,7 +54,8 @@ function saveState() {
       expenses: AppState.expenses,
       requiredReturn: AppState.requiredReturn,
       dcfResults: AppState.dcfResults,
-      wealthStep: AppState.wealthStep
+      wealthStep: AppState.wealthStep,
+      wealthDataMode: AppState.wealthDataMode
     }));
   } catch(e) { /* ignore */ }
 }
@@ -63,6 +66,19 @@ function navigateTo(page, options = {}) {
   if (!targetPage) {
     console.warn('[navigation] Page not found:', page);
     return;
+  }
+
+  if (page !== 'strategy' && document.getElementById('page-strategy')?.classList.contains('strategy-agent-active')) {
+    if (typeof window.strategyAgentDestroy === 'function') void window.strategyAgentDestroy();
+  }
+  if (page !== 'value' && document.getElementById('page-value')?.classList.contains('value-agent-active')) {
+    if (typeof window.valueAgentDestroy === 'function') void window.valueAgentDestroy();
+  }
+  if (page !== 'wealth' && document.getElementById('page-wealth')?.classList.contains('wealth-agent-active')) {
+    if (typeof window.wealthAilyAgentDestroy === 'function') void window.wealthAilyAgentDestroy();
+  }
+  if (page !== 'trust' && document.getElementById('page-trust')?.classList.contains('trust-agent-active')) {
+    if (typeof window.trustAilyAgentDestroy === 'function') void window.trustAilyAgentDestroy();
   }
 
   AppState.currentPage = page;
@@ -83,6 +99,12 @@ function navigateTo(page, options = {}) {
     window.strategyShowIntro({ pushHistory: false, scroll: false });
   }
 
+  // Generic navigation to “狠值投资” starts at its explanatory slides.
+  // Direct #value-agent routes preserve the embedded research-assistant view.
+  if (page === 'value' && !options.preserveValueView && typeof window.valueShowIntro === 'function') {
+    window.valueShowIntro({ scroll: false });
+  }
+
   // Generic navigation to “身家诊断” always starts at its explanatory cover.
   // Direct #wealth-system routes and browser history can preserve the wizard view.
   if (page === 'wealth' && !options.preserveWealthView && typeof window.wealthShowIntro === 'function') {
@@ -96,7 +118,7 @@ function navigateTo(page, options = {}) {
   }
 
   // Generic navigation to “传承学院” starts at its explanatory cover.
-  // Direct #academy-system routes and browser history preserve the assessment view.
+  // Direct intro, case, material, and assessment routes preserve their requested depth.
   if (page === 'academy' && !options.preserveAcademyView && typeof window.academyShowCover === 'function') {
     window.academyShowCover({ pushHistory: false, scroll: false });
   }
@@ -205,6 +227,22 @@ document.addEventListener('DOMContentLoaded', () => {
         strategyShowHub({ replaceHistory: true, scroll: false });
       }
     }, 0);
+  } else if (requested === 'strategy-agent') {
+    navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
+    try { window.history.replaceState({ page: 'strategy', strategyView: 'agent' }, '', '#strategy-agent'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof strategyOpenAgent === 'function') {
+        strategyOpenAgent({ replaceHistory: true, scroll: false });
+      }
+    }, 0);
+  } else if (requested === 'value-agent') {
+    navigateTo('value', { skipHistory: true, scroll: false, preserveValueView: true });
+    try { window.history.replaceState({ page: 'value', valueView: 'agent' }, '', '#value-agent'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.valueOpenAgent === 'function') {
+        window.valueOpenAgent({ replaceHistory: true, scroll: false });
+      }
+    }, 0);
   } else if (requested.startsWith('strategy-case-')) {
     const strategyCase = requested.replace('strategy-case-', '');
     navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
@@ -222,6 +260,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.wealthEnterSystem({ pushHistory: false, scroll: false });
       }
     }, 0);
+  } else if (requested === 'wealth-agent') {
+    navigateTo('wealth', { skipHistory: true, scroll: false, preserveWealthView: true });
+    try { window.history.replaceState({ page: 'wealth', wealthView: 'agent' }, '', '#wealth-agent'); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.wealthAilyOpen === 'function') window.wealthAilyOpen({ replaceHistory: true, scroll: false });
+    }, 0);
   } else if (requested === 'trust-system') {
     navigateTo('trust', { skipHistory: true, scroll: false, preserveTrustView: true });
     try { window.history.replaceState({ page: 'trust', trustView: 'wizard' }, '', '#trust-system'); } catch (error) {}
@@ -230,12 +274,35 @@ document.addEventListener('DOMContentLoaded', () => {
         window.trustEnterSystem({ pushHistory: false, scroll: false });
       }
     }, 0);
-  } else if (requested === 'academy-system') {
-    navigateTo('academy', { skipHistory: true, scroll: false, preserveAcademyView: true });
-    try { window.history.replaceState({ page: 'academy', academyView: 'system' }, '', '#academy-system'); } catch (error) {}
+  } else if (requested === 'trust-agent') {
+    navigateTo('trust', { skipHistory: true, scroll: false, preserveTrustView: true });
+    try { window.history.replaceState({ page: 'trust', trustView: 'agent' }, '', '#trust-agent'); } catch (error) {}
     window.setTimeout(() => {
-      if (typeof window.academyEnterSystem === 'function') {
-        window.academyEnterSystem({ pushHistory: false, scroll: false });
+      if (typeof window.trustAilyOpen === 'function') window.trustAilyOpen({ replaceHistory: true, scroll: false });
+    }, 0);
+  } else if (
+    requested === 'academy-system' ||
+    requested === 'academy-about' ||
+    requested === 'academy-cases' ||
+    requested.startsWith('academy-material-')
+  ) {
+    const academyView = requested === 'academy-system'
+      ? 'system'
+      : requested === 'academy-about'
+        ? 'about'
+        : requested === 'academy-cases'
+          ? 'cases'
+          : 'material';
+    const academyMilestone = academyView === 'material'
+      ? requested.replace('academy-material-', '')
+      : '';
+    const academyState = { page: 'academy', academyView };
+    if (academyMilestone) academyState.academyMilestone = academyMilestone;
+    navigateTo('academy', { skipHistory: true, scroll: false, preserveAcademyView: true });
+    try { window.history.replaceState(academyState, '', '#' + requested); } catch (error) {}
+    window.setTimeout(() => {
+      if (typeof window.academyRestoreView === 'function') {
+        window.academyRestoreView(academyState, { pushHistory: false, scroll: false });
       }
     }, 0);
   } else if (internalPages.includes(requested)) {
@@ -253,34 +320,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = event.state && event.state.page ? event.state.page : 'home';
     const preserveStrategyView = page === 'strategy' && event.state &&
       (event.state.strategyCase || event.state.strategyChapter || event.state.strategyView);
-    const preserveWealthView = page === 'wealth' && event.state && event.state.wealthView === 'wizard';
-    const preserveTrustView = page === 'trust' && event.state && event.state.trustView === 'wizard';
-    const preserveAcademyView = page === 'academy' && event.state && event.state.academyView === 'system';
+    const preserveValueView = page === 'value' && event.state && event.state.valueView === 'agent';
+    const preserveWealthView = page === 'wealth' && event.state && ['wizard', 'agent'].includes(event.state.wealthView);
+    const preserveTrustView = page === 'trust' && event.state && ['wizard', 'agent'].includes(event.state.trustView);
+    const preserveAcademyView = page === 'academy' && event.state &&
+      ['system', 'about', 'cases', 'material'].includes(event.state.academyView);
     navigateTo(page, {
       skipHistory: true,
       preserveStrategyView,
+      preserveValueView,
       preserveWealthView,
       preserveTrustView,
       preserveAcademyView
     });
-    if (preserveWealthView) {
+    if (preserveValueView) {
+      window.setTimeout(() => {
+        if (typeof window.valueOpenAgent === 'function') {
+          window.valueOpenAgent({ scroll: false });
+        }
+      }, 0);
+    }
+    if (preserveWealthView && event.state.wealthView === 'wizard') {
       window.setTimeout(() => {
         if (typeof window.wealthEnterSystem === 'function') {
           window.wealthEnterSystem({ pushHistory: false, scroll: false });
         }
       }, 0);
     }
-    if (preserveTrustView) {
+    if (preserveWealthView && event.state.wealthView === 'agent') {
+      window.setTimeout(() => window.wealthAilyOpen?.({ scroll: false }), 0);
+    }
+    if (preserveTrustView && event.state.trustView === 'wizard') {
       window.setTimeout(() => {
         if (typeof window.trustEnterSystem === 'function') {
           window.trustEnterSystem({ pushHistory: false, scroll: false });
         }
       }, 0);
     }
+    if (preserveTrustView && event.state.trustView === 'agent') {
+      window.setTimeout(() => window.trustAilyOpen?.({ scroll: false }), 0);
+    }
     if (preserveAcademyView) {
       window.setTimeout(() => {
-        if (typeof window.academyEnterSystem === 'function') {
-          window.academyEnterSystem({ pushHistory: false, scroll: false });
+        if (typeof window.academyRestoreView === 'function') {
+          window.academyRestoreView(event.state, { pushHistory: false, scroll: false });
         }
       }, 0);
     }

@@ -60,4 +60,48 @@ const aboveLimit = model.solveExpenseRate(1, [
 ]);
 assert(aboveLimit.status === 'above-limit' && aboveLimit.rate === null, 'Unrealistic required rates must return an explicit warning state');
 
-console.log('Wealth model checks passed (8 scenarios).');
+const noPrincipal = model.computeRequiredReturn(
+  { ...emptyAssets, cash: [{ bookValue: 100, fiveYearReturn: 4 }] },
+  [{ description: '医疗', amount: 10, firstYear: 2, frequency: 'once' }],
+  3,
+  0
+);
+assert(noPrincipal.investable.overridden && noPrincipal.r2.status === 'no-principal', 'A zero principal override must remain an explicit zero rather than falling back');
+
+const debtExceedsAssets = model.computeR1({
+  ...emptyAssets,
+  cash: [{ bookValue: 100, fiveYearReturn: 8 }],
+  debt: [{ amount: 120, rate: 5 }]
+});
+assert(debtExceedsAssets.netAssets === -20 && debtExceedsAssets.rate === null, 'Non-positive net assets must not produce a misleading R1');
+
+const clampedM2 = model.computeRequiredReturn(emptyAssets, [], -5, null);
+assert(clampedM2.r3 === 0 && clampedM2.requiredRate === 0, 'Negative M2 assumptions must clamp to zero');
+
+const tieWinner = model.computeRequiredReturn(
+  { ...emptyAssets, cash: [{ bookValue: 100, fiveYearReturn: 10 }] },
+  [],
+  10,
+  null
+);
+assert(tieWinner.winner === 'r1' && tieWinner.requiredRate === 10, 'Exact ties must resolve deterministically in calculation order');
+
+const distribution = model.buildAssetDistribution({
+  ...emptyAssets,
+  cash: [{ bookValue: 25 }],
+  financial: [{ marketValue: 75 }]
+});
+assert(distribution.find(row => row.key === 'cash').share === 25, 'Asset chart shares must derive from current asset data');
+assert(distribution.reduce((sum, row) => sum + row.share, 0) === 100, 'Non-empty asset chart shares must total 100%');
+
+const damage = model.buildDamageDistribution([
+  { assessment: '严重损毁', bookVal: 40 },
+  { assessment: '价值增进', bookVal: 60 }
+]);
+assert(damage.find(row => row.key === 'severe').share === 40, 'Severe-damage chart must use the same category book values as the table');
+
+const growth = model.buildGrowthSeries(100, 5, 10, 8, [0, 1]);
+assert(growth.current[0] === 100 && Math.abs(growth.current[1] - 105) < 1e-8, 'Growth chart must start from the table base and compound the current rate');
+assert(Math.abs(growth.required[1] - 110) < 1e-8 && Math.abs(growth.m2[1] - 108) < 1e-8, 'Required-return and M2 chart series must share the same formula');
+
+console.log('Wealth model checks passed (16 scenarios).');

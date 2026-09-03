@@ -61,6 +61,17 @@ async function generatePDF(element, filename) {
   }
 }
 
+function readWealthChartImage(id) {
+  const canvas = document.getElementById(id);
+  if (!canvas || canvas.width < 2 || canvas.height < 2) return '';
+  try { return canvas.toDataURL('image/png'); } catch (error) { return ''; }
+}
+
+function wealthReportChart(title, image, alt) {
+  if (!image) return '';
+  return `<figure data-report-chart="${title}" style="margin:18px 0 0;padding:14px;border:1px solid #e5e2d8;border-radius:8px;break-inside:avoid;page-break-inside:avoid"><figcaption style="margin-bottom:8px;color:#1a1a2e;font-size:.86rem;font-weight:700">${title}</figcaption><img alt="${alt}" src="${image}" style="display:block;width:100%;height:auto"/></figure>`;
+}
+
 /**
  * 导出身家诊断完整报告
  * 严格按照 身家诊断报告_交付模板.md 的结构
@@ -90,6 +101,13 @@ async function exportWealthReport() {
   const currentR = Number.isFinite(calculation.r1.rate) ? calculation.r1.rate : 0;
   const requiredR = calculation.requiredRate;
   const m2Rate = calculation.r3;
+  const isSample = AppState.wealthDataMode === 'sample';
+  const chartImages = {
+    allocation: readWealthChartImage('assetAllocationChart'),
+    destruction: readWealthChartImage('destructionChart'),
+    severe: readWealthChartImage('severeDamageChart'),
+    growth: readWealthChartImage('growthChart')
+  };
 
   const kpiPassed = currentR >= requiredR;
 
@@ -97,6 +115,7 @@ async function exportWealthReport() {
     <div style="text-align:center;margin-bottom:32px;padding-bottom:24px;border-bottom:3px solid #d4af37;">
       <h1 style="font-size:1.8rem;margin-bottom:8px;color:#1a1a2e;">身家诊断报告</h1>
       <p style="color:#999;font-size:.85rem;">梦工场 · 家族传承系统 | ${today}</p>
+      ${isSample ? '<p style="display:inline-block;margin:10px 0 0;padding:5px 11px;border:1px solid #d4af37;border-radius:999px;color:#8a6418;background:#fff8df;font-size:.78rem;font-weight:700">演示样本 · 非用户真实数据</p>' : ''}
     </div>
 
     <!-- KPI Emphasis Box -->
@@ -149,6 +168,7 @@ async function exportWealthReport() {
           `).join('')}
         </tbody>
       </table>
+      ${wealthReportChart('资产类别分布', chartImages.allocation, '按账面值展示的资产类别分布图')}
     </div>
 
     <!-- Part 2: Annualized return -->
@@ -235,6 +255,8 @@ async function exportWealthReport() {
           </tr>
         </tbody>
       </table>
+      ${wealthReportChart('分类价值损毁', chartImages.destruction, '各资产类别价值损毁柱状图')}
+      ${wealthReportChart('严重损毁资产比例', chartImages.severe, '严重、中度、轻微损毁与价值增进资产比例图')}
 
       <p style="margin-top:16px;font-size:.95rem;color:#555;text-align:center;">
         以 ${fmtPct(requiredR)} 要求回报率和 ${dcf?.horizonYears || 10} 年评估期衡量，您的真实身家为 <strong>${fmtMoney(totalPV)}</strong>，
@@ -248,6 +270,7 @@ async function exportWealthReport() {
     <!-- Part 5: Wealth Growth -->
     <div style="margin-bottom:32px;">
       <h2 style="font-size:1.3rem;color:#1a1a2e;border-bottom:1px solid #e5e2d8;padding-bottom:8px;margin-bottom:16px;">第五部分：财富增长曲线</h2>
+      ${wealthReportChart('当前结构与要求回报率增长曲线', chartImages.growth, '当前结构、要求回报率与M2购买力的长期增长曲线')}
       <table style="width:100%;border-collapse:collapse;font-size:.9rem;">
         <thead>
           <tr style="background:#f6f5f0;">
@@ -319,7 +342,7 @@ async function exportWealthReport() {
         <tr><td>R₃</td><td>${fmtPct(m2Rate)}</td><td>本次诊断采用的可编辑 M2 假设</td></tr>
         <tr><td>评估期</td><td>${dcf?.horizonYears || 10} 年</td><td>中性单情景 DCF</td></tr>
       </table>
-      <p style="margin-top:12px;">报告由浏览器本地生成，输入数据保存在当前设备浏览器中。本报告用于诊断演示与顾问复核。</p>
+      <p style="margin-top:12px;">报告由浏览器本地生成，输入数据保存在当前设备浏览器中。本报告用于诊断演示与顾问复核。数据来源：${isSample ? '演示样本（非用户真实数据）' : '用户自主填写'}。</p>
     </div>
 
     <div style="text-align:center;margin-top:40px;padding-top:24px;border-top:1px solid #e5e2d8;">

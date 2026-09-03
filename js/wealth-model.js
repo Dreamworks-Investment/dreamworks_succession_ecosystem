@@ -169,6 +169,52 @@
     };
   }
 
+  function buildAssetDistribution(assets) {
+    const rows = ASSET_CONFIGS.map(config => ({
+      key: config.cat,
+      label: config.label,
+      value: sum(assets?.[config.cat], item => Math.max(0, number(item[config.value])))
+    }));
+    const total = sum(rows, row => row.value);
+    return rows.map(row => ({
+      ...row,
+      share: total > 0 ? row.value / total * 100 : 0
+    }));
+  }
+
+  function buildDamageDistribution(detailRows) {
+    const groups = [
+      { key: 'severe', label: '严重损毁', value: 0 },
+      { key: 'moderate', label: '中度损毁', value: 0 },
+      { key: 'light', label: '轻微损毁', value: 0 },
+      { key: 'positive', label: '价值增进', value: 0 }
+    ];
+    const byLabel = new Map(groups.map(group => [group.label, group]));
+    (detailRows || []).forEach(row => {
+      const group = byLabel.get(row.assessment) || byLabel.get('轻微损毁');
+      group.value += Math.max(0, number(row.bookVal));
+    });
+    const total = sum(groups, group => group.value);
+    return groups.map(group => ({
+      ...group,
+      share: total > 0 ? group.value / total * 100 : 0
+    }));
+  }
+
+  function buildGrowthSeries(baseValue, currentRate, requiredRate, m2Rate, years) {
+    const timeline = Array.isArray(years) && years.length
+      ? years.map(year => Math.max(0, number(year)))
+      : [0, 5, 10, 15, 20, 25, 30, 35, 40];
+    const base = Math.max(0, number(baseValue));
+    const grow = rate => timeline.map(year => base * Math.pow(1 + number(rate) / 100, year));
+    return {
+      years: timeline,
+      current: grow(currentRate),
+      required: grow(requiredRate),
+      m2: grow(m2Rate)
+    };
+  }
+
   root.WealthModel = {
     ASSET_CONFIGS,
     number,
@@ -178,6 +224,9 @@
     expandExpenseCashFlows,
     presentValue,
     solveExpenseRate,
-    computeRequiredReturn
+    computeRequiredReturn,
+    buildAssetDistribution,
+    buildDamageDistribution,
+    buildGrowthSeries
   };
 })(typeof window !== 'undefined' ? window : globalThis);

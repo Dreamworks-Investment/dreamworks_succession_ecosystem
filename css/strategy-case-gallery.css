@@ -5,6 +5,7 @@
 .strategy-case-detail { min-height:70vh; background:#f5f0e6; }
 .strategy-system-intro,
 .strategy-case-hub,
+.strategy-agent-websdk-view,
 .strategy-case-detail,
 .strategy-case-depth { display:none; }
 .strategy-intro-active .strategy-system-intro { display:block; }
@@ -17,6 +18,11 @@
 .strategy-depth-active .strategy-case-hub,
 .strategy-depth-active .strategy-case-detail { display:none; }
 .strategy-depth-active .strategy-case-depth { display:block; }
+.strategy-agent-active .strategy-system-intro,
+.strategy-agent-active .strategy-case-hub,
+.strategy-agent-active .strategy-case-detail,
+.strategy-agent-active .strategy-case-depth { display:none; }
+.strategy-agent-active .strategy-agent-websdk-view { display:block; }
 
 /* Slide 12: the first layer of “战略与实践”. */
 .strategy-system-cover {

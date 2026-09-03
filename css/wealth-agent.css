@@ -1,0 +1,187 @@
+.wealth-agent-launch,
+.wealth-agent-console {
+  margin-top:28px;
+  padding:clamp(22px,3vw,34px);
+  border:1px solid rgba(24,95,165,.2);
+  border-radius:16px;
+  background:linear-gradient(145deg,#f7fbff 0%,#eef5fb 100%);
+  box-shadow:0 18px 48px rgba(23,58,88,.08);
+}
+
+.wealth-agent-launch-head,
+.wealth-agent-console-head {
+  display:flex;
+  gap:16px;
+  align-items:center;
+}
+
+.wealth-agent-mark {
+  display:grid;
+  width:52px;
+  height:52px;
+  flex:0 0 52px;
+  place-items:center;
+  border-radius:14px;
+  color:#082845;
+  background:#d4af37;
+  font:800 1.25rem/1 "Noto Serif SC","Songti SC",serif;
+  box-shadow:0 10px 24px rgba(143,106,8,.18);
+}
+
+.wealth-agent-kicker {
+  margin:0 0 5px;
+  color:#185fa5;
+  font-size:.7rem;
+  font-weight:800;
+  letter-spacing:.16em;
+}
+
+.wealth-agent-launch h4,
+.wealth-agent-console h4 { margin:0; color:#173a58; font-size:1.08rem; }
+
+.wealth-agent-availability {
+  margin-left:auto;
+  padding:5px 10px;
+  border-radius:999px;
+  color:#24614f;
+  background:#def3eb;
+  font-size:.7rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.wealth-agent-availability.is-checking { color:#5e6670; background:#e8edf1; }
+.wealth-agent-availability.is-offline { color:#8b3a30; background:#fbe7e4; }
+.wealth-agent-launch-copy { margin:20px 0 0; color:#506b81; font-size:.84rem; line-height:1.75; }
+
+.wealth-agent-handoff {
+  display:flex;
+  margin:18px 0;
+  gap:11px;
+  align-items:center;
+  color:#315b7e;
+  font-size:.76rem;
+  font-weight:700;
+}
+
+.wealth-agent-handoff span { padding:7px 11px; border:1px solid #c7d9e8; border-radius:999px; background:#fff; }
+.wealth-agent-handoff b { color:#d4af37; }
+
+.wealth-agent-consent {
+  display:grid;
+  padding:14px 16px;
+  grid-template-columns:auto 1fr;
+  gap:10px;
+  align-items:start;
+  border:1px solid #d7e3ec;
+  border-radius:10px;
+  color:#4f6678;
+  background:rgba(255,255,255,.74);
+  font-size:.76rem;
+  line-height:1.62;
+  cursor:pointer;
+}
+
+.wealth-agent-consent input { width:17px; height:17px; margin-top:2px; accent-color:#185fa5; }
+.wealth-agent-launch-actions { display:flex; margin-top:16px; gap:14px; align-items:center; }
+.wealth-agent-launch-actions small { color:#718495; font-size:.7rem; }
+.wealth-agent-start[disabled] { opacity:.48; cursor:not-allowed; }
+
+.wealth-agent-console { padding:0; overflow:hidden; background:#fff; }
+.wealth-agent-console-head { padding:22px 24px; color:#dce8f2; background:linear-gradient(135deg,#0a2946,#123e62); }
+.wealth-agent-console-head h4 { color:#fff; }
+.wealth-agent-console-head p:last-child { margin:5px 0 0; color:#9fb5c8; font-size:.75rem; }
+.wealth-agent-console-head .wealth-agent-kicker { color:#d4af37; }
+.wealth-agent-live-status { margin-left:auto; color:#cdebdc; font-size:.72rem; font-weight:700; white-space:nowrap; }
+
+.wealth-agent-messages {
+  display:flex;
+  min-height:300px;
+  max-height:520px;
+  padding:24px;
+  flex-direction:column;
+  gap:14px;
+  overflow:auto;
+  background:linear-gradient(#f8fbfd,#f4f8fb);
+}
+
+.wealth-agent-message { max-width:min(82%,760px); }
+.wealth-agent-message > span { display:block; margin:0 0 5px 4px; color:#7890a3; font-size:.65rem; font-weight:700; }
+.wealth-agent-message p { margin:0; padding:13px 15px; border-radius:4px 14px 14px 14px; color:#38566e; background:#fff; box-shadow:0 7px 20px rgba(24,65,98,.07); font-size:.82rem; line-height:1.75; white-space:pre-wrap; overflow-wrap:anywhere; }
+.wealth-agent-message.is-user { align-self:flex-end; }
+.wealth-agent-message.is-user > span { text-align:right; }
+.wealth-agent-message.is-user p { color:#fff; background:#185fa5; border-radius:14px 4px 14px 14px; }
+.wealth-agent-message.is-system { max-width:100%; align-self:center; }
+.wealth-agent-message.is-system p { padding:7px 12px; color:#6b7e8e; background:#e8f0f6; border-radius:999px; box-shadow:none; font-size:.7rem; }
+.wealth-agent-message.is-error p { color:#8b322b; background:#fbe9e7; }
+
+.wealth-agent-composer { display:grid; padding:16px 18px 8px; grid-template-columns:1fr auto; gap:10px; align-items:end; border-top:1px solid #dfe8ef; }
+.wealth-agent-composer textarea { min-height:76px; max-height:180px; padding:12px 14px; resize:vertical; border:1px solid #cbd9e4; border-radius:10px; color:#203e56; background:#fff; font:inherit; font-size:.82rem; line-height:1.6; }
+.wealth-agent-composer textarea:focus { border-color:#185fa5; outline:3px solid rgba(24,95,165,.12); }
+.wealth-agent-boundary { margin:0; padding:0 18px 12px; color:#8797a4; font-size:.67rem; }
+.wealth-agent-console-actions { display:flex; padding:0 18px 18px; justify-content:space-between; align-items:center; gap:12px; }
+.wealth-agent-end { border:0; color:#8b4e47; background:transparent; font-size:.7rem; text-decoration:underline; cursor:pointer; }
+
+.wealth-agent-diagnostics {
+  margin-top:14px;
+  border:1px solid #d8e2e9;
+  border-radius:12px;
+  color:#36536a;
+  background:#fbfcfd;
+  box-shadow:0 10px 26px rgba(23,58,88,.06);
+}
+
+.wealth-agent-diagnostics summary {
+  padding:13px 16px;
+  cursor:pointer;
+  color:#294c67;
+  font-size:.75rem;
+  font-weight:800;
+}
+
+.wealth-agent-diagnostics summary code {
+  color:#185fa5;
+  font:700 .68rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;
+  overflow-wrap:anywhere;
+}
+
+.wealth-agent-diagnostic-body { padding:0 16px 16px; border-top:1px solid #e5ebef; }
+.wealth-agent-diagnostic-body > p { margin:13px 0 10px; color:#5e7485; font-size:.72rem; line-height:1.6; }
+.wealth-agent-diagnostic-body > small { display:block; margin-top:10px; color:#82929e; font-size:.64rem; line-height:1.55; }
+
+.wealth-agent-diagnostic-timeline {
+  max-height:210px;
+  margin:0;
+  padding:10px 12px 10px 32px;
+  overflow:auto;
+  border-radius:9px;
+  color:#456174;
+  background:#f0f5f8;
+  font:600 .66rem/1.75 ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+.wealth-agent-diagnostic-timeline li.is-error { color:#a33c34; }
+.wealth-agent-diagnostic-timeline li.is-warning { color:#8a6817; }
+.wealth-agent-diagnostic-timeline li.is-success { color:#26715a; }
+.wealth-agent-diagnostic-actions { display:flex; margin-top:12px; gap:12px; align-items:center; }
+.wealth-agent-diagnostic-copy { border:0; color:#185fa5; background:transparent; font-size:.7rem; text-decoration:underline; cursor:pointer; }
+.sr-only { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
+
+@media (max-width:700px) {
+  .wealth-agent-launch-head,.wealth-agent-console-head { align-items:flex-start; flex-wrap:wrap; }
+  .wealth-agent-availability,.wealth-agent-live-status { margin-left:0; }
+  .wealth-agent-handoff { align-items:stretch; flex-direction:column; }
+  .wealth-agent-handoff b { display:none; }
+  .wealth-agent-launch-actions { align-items:stretch; flex-direction:column; }
+  .wealth-agent-launch-actions .btn { width:100%; }
+  .wealth-agent-message { max-width:94%; }
+  .wealth-agent-composer { grid-template-columns:1fr; }
+  .wealth-agent-composer .btn { width:100%; }
+  .wealth-agent-console-actions { align-items:flex-start; flex-direction:column; }
+  .wealth-agent-diagnostic-actions { align-items:stretch; flex-direction:column; }
+  .wealth-agent-diagnostic-actions .btn { width:100%; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .wealth-agent-messages { scroll-behavior:auto; }
+}
