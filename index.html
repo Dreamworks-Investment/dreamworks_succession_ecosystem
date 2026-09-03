@@ -20,7 +20,8 @@
 <link href="css/wealth-agent.css?v=2" rel="stylesheet"/>
 <link href="css/family-trust-system.css?v=2" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
-<link href="css/final-business-pages.css?v=1" rel="stylesheet"/>
+<link href="css/final-business-pages.css?v=2" rel="stylesheet"/>
+<link href="css/academy-experience.css?v=1" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
@@ -2445,9 +2446,91 @@
 </div>
 <footer class="final-cover-bottom">
 <div><strong>传承</strong><span aria-hidden="true"></span><p>上一代愿意传 · 下一代有能力承 · 两代人共同完成长期交接</p></div>
-<button class="final-cover-enter" onclick="academyEnterSystem({ pushHistory: true })" type="button">点击进入传承学院系统 <span aria-hidden="true">→</span></button>
+<div class="academy-cover-actions" aria-label="传承学院功能入口">
+<button class="final-cover-enter academy-entry-secondary" onclick="academyShowAbout({ pushHistory: true })" type="button"><small>01 · 认识学院</small>了解传承学院 <span aria-hidden="true">→</span></button>
+<button class="final-cover-enter" onclick="academyEnterSystem({ pushHistory: true })" type="button"><small>02 · 家族自测</small>点击进入传承学院系统 <span aria-hidden="true">→</span></button>
+<button class="final-cover-enter academy-entry-secondary" onclick="academyShowCases({ pushHistory: true })" type="button"><small>03 · 成长档案</small>查看学员成长案例 <span aria-hidden="true">→</span></button>
+</div>
 </footer>
 <div aria-hidden="true" class="final-cover-folio"><span>MENGONGCHANG</span><span>18 / 20 · 五模块分述 · 传承学院</span></div>
+</div>
+</section>
+</article>
+<article aria-hidden="true" class="academy-about-view" id="academy-about-view">
+<section class="academy-subpage academy-about-page">
+<header class="academy-subpage-header">
+<button class="academy-text-link" onclick="academyShowCover({ pushHistory: true })" type="button">← 返回传承学院</button>
+<div class="academy-subpage-kicker">ABOUT · 传承学院介绍</div>
+<h2>让两代人从“血缘家人”，成为共同守护未来的战略伙伴</h2>
+<p>围绕传承认知、价值投资、家族信托、公益慈善与接班人培养，建立一套从共同学习到长期实践的家族传承体系。</p>
+</header>
+<div class="academy-about-summary" aria-label="传承学院核心价值">
+<article><span>01</span><strong>共同认知</strong><p>打破“富不过三代”魔咒，让两代人建立共同的价值语言。</p></article>
+<article><span>02</span><strong>系统实践</strong><p>从课堂走向真实的投资、治理、信托与家族行动。</p></article>
+<article><span>03</span><strong>长期陪跑</strong><p>毕业不是终点，持续支持家族完成代际协作与落地。</p></article>
+</div>
+<section class="academy-material-section" aria-labelledby="academy-poster-title">
+<div class="academy-material-heading"><div><span>ADMISSIONS POSTER</span><h3 id="academy-poster-title">招生宣传海报</h3></div><a href="assets/academy/admissions-poster.jpg" rel="noopener" target="_blank">查看原图 ↗</a></div>
+<div class="academy-poster-frame"><img alt="梦工场狠值传承学院招生宣传海报" decoding="async" loading="lazy" src="assets/academy/admissions-poster.jpg"/></div>
+</section>
+<section class="academy-material-section" aria-labelledby="academy-brochure-title">
+<div class="academy-material-heading"><div><span>ADMISSIONS BROCHURE · 03 PAGES</span><h3 id="academy-brochure-title">传承学院宣传页</h3></div><a href="assets/academy/admissions-brochure.pdf" rel="noopener" target="_blank">打开完整 PDF ↗</a></div>
+<div class="academy-brochure-grid">
+<figure><img alt="传承学院宣传页第1页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-01.png"/><figcaption>01 · 为什么需要家族传承共同体</figcaption></figure>
+<figure><img alt="传承学院宣传页第2页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-02.png"/><figcaption>02 · 五大核心支撑体系</figcaption></figure>
+<figure><img alt="传承学院宣传页第3页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-03.png"/><figcaption>03 · 长期陪跑与共同成长</figcaption></figure>
+</div>
+</section>
+<footer class="academy-subpage-footer"><button class="academy-outline-button" onclick="academyShowCover({ pushHistory: true })" type="button">← 返回传承学院</button><button class="academy-gold-button" onclick="academyShowCases({ pushHistory: true })" type="button">继续查看学员A成长旅程 →</button></footer>
+</section>
+</article>
+<article aria-hidden="true" class="academy-cases-view" id="academy-cases-view">
+<section class="academy-subpage academy-case-page">
+<header class="academy-subpage-header academy-case-header">
+<button class="academy-text-link" onclick="academyShowCover({ pushHistory: true })" type="button">← 返回传承学院</button>
+<div class="academy-case-heading-row"><div><div class="academy-subpage-kicker">STUDENT JOURNEY · 学员案例库</div><h2>学员A · 从学习营到长期陪跑</h2></div><span class="academy-redaction-badge">已脱敏 · 示例案例</span></div>
+<p>这不是一张课程流程图，而是一位学员从建立个人目标、完成跨学科学习，到毕业后持续实践的真实成长轨迹。</p>
+</header>
+<div class="academy-journey-legend" aria-label="案例图例"><span><i class="is-open"></i>可查看阶段材料</span><span><i class="is-pending"></i>材料整理中</span><span><i class="is-continuing"></i>长期持续</span></div>
+<section class="academy-journey-road" aria-label="学员A成长旅程时间线">
+<div class="academy-road-decoration" aria-hidden="true"><span class="academy-road-line road-line-one"></span><span class="academy-road-turn road-turn-one"></span><span class="academy-road-line road-line-two"></span><span class="academy-road-turn road-turn-two"></span><span class="academy-road-line road-line-three"></span></div>
+<ol class="academy-milestone-list">
+<li class="academy-milestone milestone-one">
+<button onclick="academyOpenMilestone('opening', { pushHistory: true })" type="button"><span class="academy-milestone-flag">START</span><span class="academy-milestone-icon" aria-hidden="true">🏫</span><time datetime="2024-11">2024年11月</time><strong>学习营开学</strong><small>制定个人SMART计划，确认家族学习与实践目标。</small><em>查看阶段材料 →</em></button>
+</li>
+<li class="academy-milestone milestone-two is-pending">
+<div><span class="academy-milestone-flag">02</span><span class="academy-milestone-icon" aria-hidden="true">🧭</span><time datetime="2024-12-18">2024年12月18日</time><strong>人力成长</strong><small>教练技术A与性格分析，帮助学员理解自己与他人。</small><em>资料整理中</em></div>
+</li>
+<li class="academy-milestone milestone-three">
+<button onclick="academyOpenMilestone('inheritance-investment', { pushHistory: true })" type="button"><span class="academy-milestone-flag">03</span><span class="academy-milestone-icon" aria-hidden="true">🏛️</span><time datetime="2025-03">2025年3月</time><strong>传承与投资</strong><small>建立传承第一性原理与长期价值投资的共同认知。</small><em>查看2份材料 →</em></button>
+</li>
+<li class="academy-milestone milestone-four">
+<button onclick="academyOpenMilestone('trust', { pushHistory: true })" type="button"><span class="academy-milestone-flag">04</span><span class="academy-milestone-icon" aria-hidden="true">🛡️</span><time datetime="2025-04">2025年4月</time><strong>信托认知</strong><small>理解家族信托与慈善信托的功能、边界与设立逻辑。</small><em>查看阶段材料 →</em></button>
+</li>
+<li class="academy-milestone milestone-five is-graduation">
+<button onclick="academyOpenMilestone('graduation', { pushHistory: true })" type="button"><span class="academy-milestone-flag">GRADUATION</span><span class="academy-milestone-icon academy-graduation-cap" aria-hidden="true">🎓</span><time datetime="2025-05-01">2025年5月1日</time><strong>学习营毕业</strong><small>以毕业陈述与六个月规划，承接下一阶段实践行动。</small><em>查看2份材料 →</em></button>
+</li>
+<li class="academy-milestone milestone-six is-continuing">
+<div><span class="academy-milestone-flag">∞</span><span class="academy-milestone-icon" aria-hidden="true">✨</span><time>持续进行</time><strong>实践落地 · 长期陪跑</strong><small>道路仍在延伸。围绕家族真实议题持续对话、复盘与行动。</small><em>毕业不是终点</em></div>
+</li>
+</ol>
+<div class="academy-road-horizon" aria-hidden="true"><span></span><b>TO BE CONTINUED</b></div>
+</section>
+<aside class="academy-case-boundary"><strong>案例边界</strong><p>本页仅展示经过脱敏、可用于说明培养路径的阶段材料。毕业后的家族信托落地与私人沟通不对外展示。</p></aside>
+<footer class="academy-subpage-footer"><button class="academy-outline-button" onclick="academyShowCover({ pushHistory: true })" type="button">← 返回传承学院</button><button class="academy-gold-button" onclick="academyEnterSystem({ pushHistory: true })" type="button">进行家族传承健康度测评 →</button></footer>
+</section>
+</article>
+<article aria-hidden="true" class="academy-material-view" id="academy-material-view">
+<section class="academy-subpage academy-preview-page">
+<header class="academy-preview-header">
+<button class="academy-text-link" onclick="academyShowCases({ pushHistory: true })" type="button">← 返回学员A成长旅程</button>
+<div class="academy-subpage-kicker" id="academy-preview-kicker">STUDENT A · MILESTONE</div>
+<h2 id="academy-preview-title">阶段材料</h2>
+<p id="academy-preview-summary"></p>
+</header>
+<div class="academy-preview-layout">
+<aside class="academy-preview-sidebar"><div class="academy-preview-stage"><span id="academy-preview-icon" aria-hidden="true">📄</span><time id="academy-preview-date"></time><strong id="academy-preview-stage"></strong></div><div id="academy-preview-material-list" class="academy-preview-material-list" aria-label="阶段材料列表"></div></aside>
+<section class="academy-document-viewer" aria-live="polite"><header><div><span>DOCUMENT PREVIEW</span><h3 id="academy-document-title">选择一份材料</h3></div><a id="academy-document-open" href="#" rel="noopener noreferrer" target="_blank">在飞书中打开 ↗</a></header><div class="academy-document-notice"><strong>预览说明</strong><span>飞书文档能否在站内显示取决于原文分享与嵌入权限；若下方未加载，请使用右上角按钮打开原文。</span></div><div class="academy-document-frame"><iframe id="academy-document-frame" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-forms allow-popups allow-same-origin allow-scripts" title="学员A阶段文档预览"></iframe><div class="academy-document-placeholder" id="academy-document-placeholder"><span>↗</span><strong>正在准备文档预览</strong><p>也可以直接在飞书中打开原始脱敏材料。</p></div></div></section>
 </div>
 </section>
 </article>
@@ -2957,7 +3040,7 @@
 </footer>
 <!-- ===================== SCRIPTS ===================== -->
 <script src="js/charts.js"></script>
-<script src="js/app.js?v=9"></script>
+<script src="js/app.js?v=10"></script>
 <script src="js/home.js"></script>
 <script src="js/home-journey.js?v=3"></script>
 <script src="js/enterprise.js"></script>
@@ -2982,10 +3065,9 @@
 <script type="module" src="js/value-agent-websdk.js?v=1"></script>
 <script type="module" src="js/service-agent-websdk.js?v=1"></script>
 <script src="js/academy-assessment.js"></script>
-<script src="js/final-business-pages.js?v=1"></script>
+<script src="js/final-business-pages.js?v=2"></script>
 </body>
 </html>
-
 
 
 

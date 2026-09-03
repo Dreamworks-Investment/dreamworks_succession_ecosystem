@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 
@@ -7,6 +7,7 @@ const html = readFileSync(join(root, 'index.html'), 'utf8');
 const app = readFileSync(join(root, 'js/app.js'), 'utf8');
 const controller = readFileSync(join(root, 'js/final-business-pages.js'), 'utf8');
 const css = readFileSync(join(root, 'css/final-business-pages.css'), 'utf8');
+const academyCss = readFileSync(join(root, 'css/academy-experience.css'), 'utf8');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -16,6 +17,24 @@ assert((html.match(/class="nav-link(?: active)?" data-page=/g) || []).length ===
 assert((html.match(/id="page-academy"/g) || []).length === 1, 'Academy page must exist exactly once');
 assert(html.includes('id="academy-cover-view"') && html.includes('id="academy-system-view"'), 'Academy requires cover and system views');
 assert(html.includes('onclick="academyEnterSystem({ pushHistory: true })"'), 'Academy cover CTA must enter the existing system');
+assert(html.includes('id="academy-about-view"') && html.includes('id="academy-cases-view"') && html.includes('id="academy-material-view"'), 'Academy requires about, case journey, and material preview views');
+assert(html.includes('onclick="academyShowAbout({ pushHistory: true })"') && html.includes('onclick="academyShowCases({ pushHistory: true })"'), 'Academy cover must expose the two new MVP entry points');
+assert((html.match(/class="academy-milestone milestone-/g) || []).length === 6, 'Student A journey must contain six milestones including long-term support');
+assert((html.match(/academyOpenMilestone\('/g) || []).length === 4, 'Four milestones with supplied materials must be interactive');
+assert(html.includes('2025年3月') && html.includes('2025年5月1日'), 'Student A journey must use the approved timeline');
+assert(html.includes('资料整理中') && html.includes('实践落地 · 长期陪跑'), 'Pending HR and confidential long-term stages must have explicit non-clickable states');
+assert((controller.match(/https:\/\/www\.feishu\.cn\/docx\//g) || []).length === 6, 'All six supplied Feishu material links must be mapped');
+assert(controller.includes("academySetView('about'") && controller.includes("academySetView('cases'") && controller.includes("academySetView('material'"), 'Academy controller must support each new view');
+assert(app.includes("requested === 'academy-about'") && app.includes("requested === 'academy-cases'") && app.includes("requested.startsWith('academy-material-')"), 'SPA router must support new academy deep links');
+assert(academyCss.includes('.academy-journey-road') && academyCss.includes('@keyframes academy-cap-rise'), 'Academy experience must include the winding journey and graduation motion');
+assert(academyCss.includes('@media (max-width: 780px)') && academyCss.includes('@media (prefers-reduced-motion: reduce)'), 'Academy experience needs responsive and reduced-motion treatments');
+[
+  'admissions-poster.jpg',
+  'admissions-brochure.pdf',
+  'admissions-brochure-01.png',
+  'admissions-brochure-02.png',
+  'admissions-brochure-03.png'
+].forEach((asset) => assert(existsSync(join(root, 'assets/academy', asset)), `Missing academy asset: ${asset}`));
 assert(html.includes('第五业务板块 · 传承学院'), 'Academy must be identified as the fifth business module');
 assert((html.match(/id="page-charity"/g) || []).length === 1, 'Charity page must exist exactly once');
 assert(html.includes('第六业务板块 · 公益慈善'), 'Charity must be identified as the sixth business module');
@@ -33,4 +52,4 @@ assert((html.match(/class="home-life-journey-node journey-node-06"[^>]+data-page
 assert(css.includes('@media (max-width: 780px)') && css.includes('@media (prefers-reduced-motion: reduce)'), 'Final pages need responsive and reduced-motion treatments');
 assert(!html.includes('/Users/harryhsu/Desktop/梦工场狠值传承系统.html'), 'Deployed HTML must not reference the source attachment');
 
-console.log('Final business page checks passed (20 assertions).');
+console.log('Final business page checks passed, including Academy MVP coverage.');

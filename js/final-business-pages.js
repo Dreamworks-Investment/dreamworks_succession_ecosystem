@@ -5,6 +5,65 @@
 (function () {
   'use strict';
 
+  const ACADEMY_MILESTONES = Object.freeze({
+    opening: {
+      icon: '🏫',
+      date: '2024年11月',
+      stage: '学习营开学',
+      summary: '从一份个人SMART计划开始，把家族学习、个人成长与未来实践目标写成可回看的起点。',
+      materials: [
+        {
+          title: '梦工场传承学院个人SMART计划表',
+          url: 'https://www.feishu.cn/docx/Ie8KdYNJCo73WKxuhLecxbhBn0f'
+        }
+      ]
+    },
+    'inheritance-investment': {
+      icon: '🏛️',
+      date: '2025年3月',
+      stage: '传承与投资',
+      summary: '围绕传承第一性原理与长期价值投资建立共同语言，从“知道”走向能够表达、讨论和判断。',
+      materials: [
+        {
+          title: '传承学院问卷',
+          url: 'https://www.feishu.cn/docx/QZpddvpM9oi6MlxxWY0c5d1Xnth'
+        },
+        {
+          title: '传承认知与投资认知问卷',
+          url: 'https://www.feishu.cn/docx/X1qNdRe5IoTmS3xiYLHcVWRynIJ'
+        }
+      ]
+    },
+    trust: {
+      icon: '🛡️',
+      date: '2025年4月',
+      stage: '信托认知',
+      summary: '理解家族信托与慈善信托的功能、边界和基本设立逻辑，为未来的家族实践建立工具认知。',
+      materials: [
+        {
+          title: '家族信托与慈善信托QA',
+          url: 'https://www.feishu.cn/docx/Gdj2d5DEYoJOeOxl4pnc48gWnIg'
+        }
+      ]
+    },
+    graduation: {
+      icon: '🎓',
+      date: '2025年5月1日',
+      stage: '学习营毕业',
+      summary: '用毕业陈述回望学习成果，再以六个月规划承接实践营与长期陪跑。毕业是阶段节点，不是关系终点。',
+      materials: [
+        {
+          title: '关于传承 · 毕业逐字稿',
+          url: 'https://www.feishu.cn/docx/W3DQdPH7mo47fex61kQcG4GYnIg'
+        },
+        {
+          title: '毕业规划',
+          url: 'https://www.feishu.cn/docx/FbAOdcrcMoZ5UxxupFWchscHnCe'
+        }
+      ]
+    }
+  });
+
   const SIX_COMMON_VISION = {
     value: {
       index: '01',
@@ -62,23 +121,95 @@
     }
   };
 
+  function academySelectMaterial(milestone, materialIndex) {
+    const material = milestone && milestone.materials && milestone.materials[materialIndex];
+    if (!material) return;
+
+    const title = document.getElementById('academy-document-title');
+    const open = document.getElementById('academy-document-open');
+    const frame = document.getElementById('academy-document-frame');
+    const placeholder = document.getElementById('academy-document-placeholder');
+    if (title) title.textContent = material.title;
+    if (open) open.href = material.url;
+    if (frame) {
+      frame.title = material.title + '预览';
+      frame.src = material.url;
+    }
+    if (placeholder) placeholder.setAttribute('aria-hidden', 'true');
+
+    document.querySelectorAll('#academy-preview-material-list button').forEach((button, index) => {
+      const isActive = index === materialIndex;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+  }
+
+  function academyRenderMilestone(milestoneKey) {
+    const milestone = ACADEMY_MILESTONES[milestoneKey];
+    if (!milestone) return null;
+
+    const title = document.getElementById('academy-preview-title');
+    const summary = document.getElementById('academy-preview-summary');
+    const icon = document.getElementById('academy-preview-icon');
+    const date = document.getElementById('academy-preview-date');
+    const stage = document.getElementById('academy-preview-stage');
+    const list = document.getElementById('academy-preview-material-list');
+    if (title) title.textContent = milestone.stage + ' · 阶段材料';
+    if (summary) summary.textContent = milestone.summary;
+    if (icon) icon.textContent = milestone.icon;
+    if (date) date.textContent = milestone.date;
+    if (stage) stage.textContent = milestone.stage;
+
+    if (list) {
+      list.replaceChildren();
+      milestone.materials.forEach((material, index) => {
+        const button = document.createElement('button');
+        const fileIcon = document.createElement('span');
+        const label = document.createElement('b');
+        button.type = 'button';
+        button.setAttribute('aria-pressed', String(index === 0));
+        button.classList.toggle('is-active', index === 0);
+        fileIcon.textContent = '文';
+        label.textContent = material.title;
+        button.append(fileIcon, label);
+        button.addEventListener('click', () => academySelectMaterial(milestone, index));
+        list.appendChild(button);
+      });
+    }
+
+    academySelectMaterial(milestone, 0);
+    return milestone;
+  }
+
   function academySetView(view, options) {
     const settings = Object.assign({ pushHistory: false, replaceHistory: false, scroll: true }, options || {});
     const page = document.getElementById('page-academy');
-    const cover = document.getElementById('academy-cover-view');
-    const system = document.getElementById('academy-system-view');
-    if (!page || !cover || !system) return;
+    const views = {
+      cover: document.getElementById('academy-cover-view'),
+      about: document.getElementById('academy-about-view'),
+      cases: document.getElementById('academy-cases-view'),
+      material: document.getElementById('academy-material-view'),
+      system: document.getElementById('academy-system-view')
+    };
+    if (!page || !views.cover || !views.system) return;
 
-    const showSystem = view === 'system';
-    page.classList.toggle('academy-system-active', showSystem);
-    page.classList.toggle('academy-cover-active', !showSystem);
-    cover.setAttribute('aria-hidden', String(showSystem));
-    system.setAttribute('aria-hidden', String(!showSystem));
+    const safeView = views[view] ? view : 'cover';
+    ['cover', 'about', 'cases', 'material', 'system'].forEach((viewName) => {
+      page.classList.toggle('academy-' + viewName + '-active', viewName === safeView);
+      if (views[viewName]) views[viewName].setAttribute('aria-hidden', String(viewName !== safeView));
+    });
 
-    const route = showSystem ? '#academy-system' : '#academy';
-    const state = showSystem
-      ? { page: 'academy', academyView: 'system' }
-      : { page: 'academy', academyView: 'cover' };
+    const milestoneKey = settings.milestoneKey || '';
+    const routeMap = {
+      cover: '#academy',
+      about: '#academy-about',
+      cases: '#academy-cases',
+      system: '#academy-system',
+      material: '#academy-material-' + milestoneKey
+    };
+    const route = routeMap[safeView];
+    const state = { page: 'academy', academyView: safeView };
+    if (safeView === 'material') state.academyMilestone = milestoneKey;
 
     try {
       if (settings.pushHistory) window.history.pushState(state, '', route);
@@ -89,13 +220,28 @@
 
     if (settings.scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
     window.setTimeout(() => {
-      const focusTarget = showSystem
-        ? system.querySelector('h2, button, [tabindex]')
-        : cover.querySelector('h1, button, [tabindex]');
+      const activeView = views[safeView];
+      const focusTarget = activeView && (
+        activeView.querySelector('h1, h2') || activeView.querySelector('button, [tabindex]')
+      );
       if (!focusTarget) return;
       focusTarget.setAttribute('tabindex', '-1');
       focusTarget.focus({ preventScroll: true });
     }, settings.scroll ? 260 : 0);
+
+    if (safeView === 'cases') {
+      const cap = document.querySelector('.academy-graduation-cap');
+      if (cap) {
+        cap.classList.remove('academy-graduation-cap');
+        void cap.offsetWidth;
+        cap.classList.add('academy-graduation-cap');
+      }
+    }
+
+    if (safeView !== 'material') {
+      const frame = document.getElementById('academy-document-frame');
+      if (frame && frame.src && frame.src !== 'about:blank') frame.src = 'about:blank';
+    }
   }
 
   function academyShowCover(options) {
@@ -104,6 +250,28 @@
 
   function academyEnterSystem(options) {
     academySetView('system', options);
+  }
+
+  function academyShowAbout(options) {
+    academySetView('about', options);
+  }
+
+  function academyShowCases(options) {
+    academySetView('cases', options);
+  }
+
+  function academyOpenMilestone(milestoneKey, options) {
+    if (!academyRenderMilestone(milestoneKey)) return;
+    academySetView('material', Object.assign({}, options || {}, { milestoneKey }));
+  }
+
+  function academyRestoreView(state, options) {
+    const view = state && state.academyView ? state.academyView : 'cover';
+    if (view === 'material' && state.academyMilestone) {
+      academyOpenMilestone(state.academyMilestone, Object.assign({}, options || {}, { milestoneKey: state.academyMilestone }));
+      return;
+    }
+    academySetView(view, options);
   }
 
   function renderVisionPreview(key) {
@@ -170,6 +338,10 @@
 
   window.academyShowCover = academyShowCover;
   window.academyEnterSystem = academyEnterSystem;
+  window.academyShowAbout = academyShowAbout;
+  window.academyShowCases = academyShowCases;
+  window.academyOpenMilestone = academyOpenMilestone;
+  window.academyRestoreView = academyRestoreView;
   window.activateSixCommonVision = renderVisionPreview;
 
   document.addEventListener('DOMContentLoaded', setupVisionExperience);
