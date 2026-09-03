@@ -20,9 +20,11 @@ assert(html.includes('onclick="academyEnterSystem({ pushHistory: true })"'), 'Ac
 assert(html.includes('id="academy-about-view"') && html.includes('id="academy-cases-view"') && html.includes('id="academy-material-view"'), 'Academy requires about, case journey, and material preview views');
 assert(html.includes('onclick="academyShowAbout({ pushHistory: true })"') && html.includes('onclick="academyShowCases({ pushHistory: true })"'), 'Academy cover must expose the two new MVP entry points');
 assert((html.match(/class="academy-milestone milestone-/g) || []).length === 6, 'Student A journey must contain six milestones including long-term support');
-assert((html.match(/academyOpenMilestone\('/g) || []).length === 4, 'Four milestones with supplied materials must be interactive');
+assert((html.match(/academyOpenMilestone\('/g) || []).length === 6, 'All six 3D milestones must open their corresponding stage view');
 assert(html.includes('2025年3月') && html.includes('2025年5月1日'), 'Student A journey must use the approved timeline');
-assert(html.includes('资料整理中') && html.includes('实践落地 · 长期陪跑'), 'Pending HR and confidential long-term stages must have explicit non-clickable states');
+assert(html.includes('资料整理中') && html.includes('实践落地 · 长期陪跑'), 'Pending HR and confidential long-term stages must retain explicit disclosure states');
+assert(html.includes('assets/academy/student-a-roadmap-clay.png') && html.includes('3D CAMPUS JOURNEY'), 'Student A journey must include the claymorphic 3D roadmap visual');
+assert(controller.includes("'human-growth'") && controller.includes('continuing:') && controller.includes('academy-preview-empty-state'), 'Stages without public materials must open an honest empty or private state');
 assert((controller.match(/https:\/\/www\.feishu\.cn\/docx\//g) || []).length === 6, 'All six supplied Feishu material links must be mapped');
 assert(controller.includes("academySetView('about'") && controller.includes("academySetView('cases'") && controller.includes("academySetView('material'"), 'Academy controller must support each new view');
 assert(app.includes("requested === 'academy-about'") && app.includes("requested === 'academy-cases'") && app.includes("requested.startsWith('academy-material-')"), 'SPA router must support new academy deep links');
@@ -33,7 +35,8 @@ assert(academyCss.includes('@media (max-width: 780px)') && academyCss.includes('
   'admissions-brochure.pdf',
   'admissions-brochure-01.png',
   'admissions-brochure-02.png',
-  'admissions-brochure-03.png'
+  'admissions-brochure-03.png',
+  'student-a-roadmap-clay.png'
 ].forEach((asset) => assert(existsSync(join(root, 'assets/academy', asset)), `Missing academy asset: ${asset}`));
 assert(html.includes('第五业务板块 · 传承学院'), 'Academy must be identified as the fifth business module');
 assert((html.match(/id="page-charity"/g) || []).length === 1, 'Charity page must exist exactly once');

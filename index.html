@@ -21,7 +21,7 @@
 <link href="css/family-trust-system.css?v=2" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <link href="css/final-business-pages.css?v=2" rel="stylesheet"/>
-<link href="css/academy-experience.css?v=1" rel="stylesheet"/>
+<link href="css/academy-experience.css?v=2" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
@@ -2493,13 +2493,17 @@
 </header>
 <div class="academy-journey-legend" aria-label="案例图例"><span><i class="is-open"></i>可查看阶段材料</span><span><i class="is-pending"></i>材料整理中</span><span><i class="is-continuing"></i>长期持续</span></div>
 <section class="academy-journey-road" aria-label="学员A成长旅程时间线">
-<div class="academy-road-decoration" aria-hidden="true"><span class="academy-road-line road-line-one"></span><span class="academy-road-turn road-turn-one"></span><span class="academy-road-line road-line-two"></span><span class="academy-road-turn road-turn-two"></span><span class="academy-road-line road-line-three"></span></div>
+<div class="academy-road-visual" aria-hidden="true">
+<img alt="" decoding="async" height="1254" loading="lazy" src="assets/academy/student-a-roadmap-clay.png" width="1254"/>
+<span class="academy-road-visual-glow"></span>
+</div>
+<div class="academy-road-instruction"><span>3D CAMPUS JOURNEY</span><strong>点击可查看的立体节点，进入对应阶段材料</strong></div>
 <ol class="academy-milestone-list">
 <li class="academy-milestone milestone-one">
 <button onclick="academyOpenMilestone('opening', { pushHistory: true })" type="button"><span class="academy-milestone-flag">START</span><span class="academy-milestone-icon" aria-hidden="true">🏫</span><time datetime="2024-11">2024年11月</time><strong>学习营开学</strong><small>制定个人SMART计划，确认家族学习与实践目标。</small><em>查看阶段材料 →</em></button>
 </li>
 <li class="academy-milestone milestone-two is-pending">
-<div><span class="academy-milestone-flag">02</span><span class="academy-milestone-icon" aria-hidden="true">🧭</span><time datetime="2024-12-18">2024年12月18日</time><strong>人力成长</strong><small>教练技术A与性格分析，帮助学员理解自己与他人。</small><em>资料整理中</em></div>
+<button onclick="academyOpenMilestone('human-growth', { pushHistory: true })" type="button"><span class="academy-milestone-flag">02</span><span class="academy-milestone-icon" aria-hidden="true">🧭</span><time datetime="2024-12-18">2024年12月18日</time><strong>人力成长</strong><small>教练技术A与性格分析，帮助学员理解自己与他人。</small><em>进入节点 · 资料整理中 →</em></button>
 </li>
 <li class="academy-milestone milestone-three">
 <button onclick="academyOpenMilestone('inheritance-investment', { pushHistory: true })" type="button"><span class="academy-milestone-flag">03</span><span class="academy-milestone-icon" aria-hidden="true">🏛️</span><time datetime="2025-03">2025年3月</time><strong>传承与投资</strong><small>建立传承第一性原理与长期价值投资的共同认知。</small><em>查看2份材料 →</em></button>
@@ -2511,7 +2515,7 @@
 <button onclick="academyOpenMilestone('graduation', { pushHistory: true })" type="button"><span class="academy-milestone-flag">GRADUATION</span><span class="academy-milestone-icon academy-graduation-cap" aria-hidden="true">🎓</span><time datetime="2025-05-01">2025年5月1日</time><strong>学习营毕业</strong><small>以毕业陈述与六个月规划，承接下一阶段实践行动。</small><em>查看2份材料 →</em></button>
 </li>
 <li class="academy-milestone milestone-six is-continuing">
-<div><span class="academy-milestone-flag">∞</span><span class="academy-milestone-icon" aria-hidden="true">✨</span><time>持续进行</time><strong>实践落地 · 长期陪跑</strong><small>道路仍在延伸。围绕家族真实议题持续对话、复盘与行动。</small><em>毕业不是终点</em></div>
+<button onclick="academyOpenMilestone('continuing', { pushHistory: true })" type="button"><span class="academy-milestone-flag">∞</span><span class="academy-milestone-icon" aria-hidden="true">✨</span><time>持续进行</time><strong>实践落地 · 长期陪跑</strong><small>道路仍在延伸。围绕家族真实议题持续对话、复盘与行动。</small><em>毕业不是终点 →</em></button>
 </li>
 </ol>
 <div class="academy-road-horizon" aria-hidden="true"><span></span><b>TO BE CONTINUED</b></div>
@@ -3065,13 +3069,9 @@
 <script type="module" src="js/value-agent-websdk.js?v=1"></script>
 <script type="module" src="js/service-agent-websdk.js?v=1"></script>
 <script src="js/academy-assessment.js"></script>
-<script src="js/final-business-pages.js?v=2"></script>
+<script src="js/final-business-pages.js?v=3"></script>
 </body>
 </html>
-
-
-
-
 
 
 

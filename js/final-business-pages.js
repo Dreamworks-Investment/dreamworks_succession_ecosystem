@@ -18,6 +18,15 @@
         }
       ]
     },
+    'human-growth': {
+      icon: '🧭',
+      date: '2024年12月18日',
+      stage: '人力成长',
+      summary: '通过教练技术A与性格分析，帮助学员理解自己、理解他人，并建立更成熟的家族沟通方式。',
+      emptyTitle: '阶段材料整理中',
+      emptyMessage: '该阶段节点已经开放浏览，相关脱敏材料整理完成后会在这里补充。',
+      materials: []
+    },
     'inheritance-investment': {
       icon: '🏛️',
       date: '2025年3月',
@@ -61,6 +70,15 @@
           url: 'https://www.feishu.cn/docx/FbAOdcrcMoZ5UxxupFWchscHnCe'
         }
       ]
+    },
+    continuing: {
+      icon: '✨',
+      date: '持续进行',
+      stage: '实践落地 · 长期陪跑',
+      summary: '毕业之后，围绕家族真实议题持续对话、复盘与行动。道路继续向前，但私人沟通与落地材料不对外展示。',
+      emptyTitle: '长期陪跑持续进行',
+      emptyMessage: '该阶段涉及家族私人议题与持续服务记录，仅展示培养路径，不公开具体材料。',
+      materials: []
     }
   });
 
@@ -130,12 +148,21 @@
     const frame = document.getElementById('academy-document-frame');
     const placeholder = document.getElementById('academy-document-placeholder');
     if (title) title.textContent = material.title;
-    if (open) open.href = material.url;
+    if (open) {
+      open.hidden = false;
+      open.href = material.url;
+    }
     if (frame) {
       frame.title = material.title + '预览';
       frame.src = material.url;
     }
-    if (placeholder) placeholder.setAttribute('aria-hidden', 'true');
+    if (placeholder) {
+      placeholder.setAttribute('aria-hidden', 'true');
+      const placeholderTitle = placeholder.querySelector('strong');
+      const placeholderCopy = placeholder.querySelector('p');
+      if (placeholderTitle) placeholderTitle.textContent = '正在准备文档预览';
+      if (placeholderCopy) placeholderCopy.textContent = '也可以直接在飞书中打开原始脱敏材料。';
+    }
 
     document.querySelectorAll('#academy-preview-material-list button').forEach((button, index) => {
       const isActive = index === materialIndex;
@@ -175,6 +202,41 @@
         button.addEventListener('click', () => academySelectMaterial(milestone, index));
         list.appendChild(button);
       });
+
+      if (!milestone.materials.length) {
+        const emptyState = document.createElement('div');
+        const emptyIcon = document.createElement('span');
+        const emptyCopy = document.createElement('p');
+        emptyState.className = 'academy-preview-empty-state';
+        emptyIcon.textContent = milestone.icon;
+        emptyCopy.textContent = milestone.emptyMessage;
+        emptyState.append(emptyIcon, emptyCopy);
+        list.appendChild(emptyState);
+      }
+    }
+
+    if (!milestone.materials.length) {
+      const documentTitle = document.getElementById('academy-document-title');
+      const documentOpen = document.getElementById('academy-document-open');
+      const documentFrame = document.getElementById('academy-document-frame');
+      const placeholder = document.getElementById('academy-document-placeholder');
+      if (documentTitle) documentTitle.textContent = milestone.emptyTitle;
+      if (documentOpen) {
+        documentOpen.hidden = true;
+        documentOpen.removeAttribute('href');
+      }
+      if (documentFrame) {
+        documentFrame.title = milestone.emptyTitle;
+        documentFrame.src = 'about:blank';
+      }
+      if (placeholder) {
+        placeholder.setAttribute('aria-hidden', 'false');
+        const placeholderTitle = placeholder.querySelector('strong');
+        const placeholderCopy = placeholder.querySelector('p');
+        if (placeholderTitle) placeholderTitle.textContent = milestone.emptyTitle;
+        if (placeholderCopy) placeholderCopy.textContent = milestone.emptyMessage;
+      }
+      return milestone;
     }
 
     academySelectMaterial(milestone, 0);
