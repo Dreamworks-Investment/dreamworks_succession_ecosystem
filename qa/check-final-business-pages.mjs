@@ -20,6 +20,7 @@ assert(html.includes('onclick="academyEnterSystem({ pushHistory: true })"'), 'Ac
 assert(html.includes('id="academy-about-view"') && html.includes('id="academy-cases-view"') && html.includes('id="academy-material-view"'), 'Academy requires about, case journey, and material preview views');
 assert(html.includes('onclick="academyShowAbout({ pushHistory: true })"') && html.includes('onclick="academyShowCases({ pushHistory: true })"'), 'Academy cover must expose the two new MVP entry points');
 assert((html.match(/class="academy-plate plate-/g) || []).length === 6, 'The 3D journey must be divided into six full plate-shaped interaction regions');
+assert((html.match(/class="academy-plate-art"/g) || []).length === 6, 'Each plate must render through an independent transparent artwork layer');
 assert((html.match(/<clipPath clipPathUnits="objectBoundingBox" id="academy-clip-/g) || []).length === 6, 'Each journey plate must use its own responsive SVG vector mask');
 assert((html.match(/transform="scale\(\.001\)"/g) || []).length === 6, 'The six detailed masks must share the normalized Illustrator-style coordinate system');
 assert(html.includes('id="academy-clip-graduation"><g') && html.includes('id="academy-clip-continuing"><g'), 'Complex lower journey plates must use compound vector contours instead of enclosing surrounding voids');
@@ -37,7 +38,9 @@ assert((controller.match(/assets\/academy\/materials\/[\w-]+\.html/g) || []).len
 assert(controller.includes("academySetView('about'") && controller.includes("academySetView('cases'") && controller.includes("academySetView('material'"), 'Academy controller must support each new view');
 assert(app.includes("requested === 'academy-about'") && app.includes("requested === 'academy-cases'") && app.includes("requested.startsWith('academy-material-')"), 'SPA router must support new academy deep links');
 assert(academyCss.includes('.academy-journey-road') && academyCss.includes('@keyframes academy-cap-rise'), 'Academy experience must include the winding journey and graduation motion');
-assert(academyCss.includes('.academy-plate-map') && academyCss.includes('.academy-plate-clips') && academyCss.includes('clip-path: var(--plate-clip)') && academyCss.includes('translate3d(0, -20px, 0)'), 'Each vector-masked plate must lift independently without scaling the full artwork');
+assert(academyCss.includes('.academy-plate-map') && academyCss.includes('.academy-plate-clips') && academyCss.includes('clip-path: var(--plate-clip)') && academyCss.includes('translate3d(0, -14px, 0)'), 'Each vector-masked plate must lift independently without scaling the full artwork');
+assert(academyCss.includes('student-a-roadmap-foreground-mask.png') && academyCss.includes('mask-mode: alpha'), 'Moving artwork must use the source-registered alpha mask so surrounding beige void never lifts');
+assert(!academyCss.includes('.academy-plate::after'), 'A polygon-shaped highlight layer must not reintroduce blank wedges');
 assert(academyCss.includes('.academy-plate:hover .academy-plate-label') && academyCss.includes('opacity: 0'), 'Plate labels must remain hidden until hover or keyboard focus');
 assert(academyCss.includes('width: 100vw') && academyCss.includes('margin-left: calc(50% - 50vw)'), 'Admissions poster must render full-bleed');
 assert((html.match(/>招生简章<\/h3>/g) || []).length === 2, 'Both admissions headings must use 招生简章');
@@ -49,7 +52,8 @@ assert(academyCss.includes('@media (max-width: 780px)') && academyCss.includes('
   'admissions-brochure-01.png',
   'admissions-brochure-02.png',
   'admissions-brochure-03.png',
-  'student-a-roadmap-clay.png'
+  'student-a-roadmap-clay.png',
+  'student-a-roadmap-foreground-mask.png'
 ].forEach((asset) => assert(existsSync(join(root, 'assets/academy', asset)), `Missing academy asset: ${asset}`));
 [
   'opening-smart-plan.docx',

@@ -374,46 +374,55 @@
   padding: 0;
   border: 0;
   background-color: transparent;
-  background-image: url('../assets/academy/student-a-roadmap-clay.png');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 101.2% 101.2%;
   color: var(--academy-navy);
   font: inherit;
   -webkit-clip-path: var(--plate-clip);
   clip-path: var(--plate-clip);
-  filter: drop-shadow(0 0 0 rgba(16, 45, 71, 0));
   transform: translate3d(0, 0, 0);
-  transition: transform .38s cubic-bezier(.2, .82, .22, 1), filter .38s ease;
+  transition: transform .38s cubic-bezier(.2, .82, .22, 1);
   pointer-events: auto;
   cursor: pointer;
   will-change: transform, filter;
   -webkit-tap-highlight-color: transparent;
 }
 
-.academy-plate.is-pending,
-.academy-plate.is-continuing { cursor: help; }
-
-.academy-plate::after {
-  content: '';
+.academy-plate-art {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  background: linear-gradient(125deg, rgba(255, 255, 255, .22), transparent 38%, rgba(226, 183, 54, .08));
-  transition: opacity .28s ease;
+  display: block;
+  background-image: url('../assets/academy/student-a-roadmap-clay.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 101.2% 101.2%;
+  -webkit-mask-image: url('../assets/academy/student-a-roadmap-foreground-mask.png');
+  mask-image: url('../assets/academy/student-a-roadmap-foreground-mask.png');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 101.2% 101.2%;
+  mask-size: 101.2% 101.2%;
+  mask-mode: alpha;
+  filter: drop-shadow(0 0 0 rgba(16, 45, 71, 0));
+  transition: filter .38s ease, brightness .28s ease;
   pointer-events: none;
 }
+
+.academy-plate.is-pending,
+.academy-plate.is-continuing { cursor: help; }
 
 .academy-plate:hover,
 .academy-plate:focus-visible {
   z-index: 6;
   outline: none;
-  filter: drop-shadow(0 24px 18px rgba(16, 45, 71, .3)) drop-shadow(0 5px 3px rgba(188, 139, 21, .2));
-  transform: translate3d(0, -20px, 0);
+  transform: translate3d(0, -14px, 0);
 }
 
-.academy-plate:hover::after,
-.academy-plate:focus-visible::after { opacity: 1; }
+.academy-plate:hover .academy-plate-art,
+.academy-plate:focus-visible .academy-plate-art {
+  filter: drop-shadow(0 24px 18px rgba(16, 45, 71, .3)) drop-shadow(0 5px 3px rgba(188, 139, 21, .2));
+  brightness: 1.035;
+}
 
 .academy-plate-label {
   width: max-content;
@@ -845,7 +854,7 @@
   .academy-road-visual { width: 100%; position: relative; inset: auto; aspect-ratio: 1; border-radius: 18px; box-shadow: inset 0 0 0 1px rgba(16, 45, 71, .08); }
   .academy-road-visual img { border-radius: inherit; }
   .academy-plate:hover,
-  .academy-plate:focus-visible { transform: translate3d(0, -11px, 0); }
+  .academy-plate:focus-visible { transform: translate3d(0, -9px, 0); }
   .academy-plate-label { min-width: 120px; max-width: 155px; padding: 8px 10px; }
   .academy-plate-label b { font-size: .61rem; }
   .academy-plate-label time,
@@ -885,7 +894,7 @@
   .academy-road-visual img,
   .academy-road-visual-glow { animation: none; }
   .academy-plate,
-  .academy-plate::after,
+  .academy-plate-art,
   .academy-plate-label { transition: none; }
   .academy-milestone button { transition: none; }
 }
