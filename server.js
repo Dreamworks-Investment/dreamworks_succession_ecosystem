@@ -347,8 +347,11 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
         sendJson(res, 401, { ok: false, error: { code: "INVALID_CREDENTIALS", message: "账号或密码不正确。" } });
         return true;
       }
-      res.setHeader("Set-Cookie", authService.grant(req, scope));
-      sendJson(res, 200, { ok: true, scope, ...authService.status({ headers: { cookie: res.getHeader("Set-Cookie")?.split(";")[0] || "" } }) });
+      const grantCookie = authService.grant(req, scope);
+      res.setHeader("Set-Cookie", grantCookie);
+      const issuedCookie = String(grantCookie).split(";")[0];
+      const statusCookie = [req.headers.cookie || "", issuedCookie].filter(Boolean).join("; ");
+      sendJson(res, 200, { ok: true, scope, ...authService.status({ headers: { cookie: statusCookie } }) });
       return true;
     } catch (error) {
       const statusCode = error instanceof WorkBuddyError ? error.statusCode : 500;

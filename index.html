@@ -21,7 +21,7 @@
 <link href="css/family-trust-system.css?v=2" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <link href="css/final-business-pages.css?v=2" rel="stylesheet"/>
-<link href="css/academy-experience.css?v=2" rel="stylesheet"/>
+<link href="css/academy-experience.css?v=3" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
@@ -2268,7 +2268,7 @@
 <nav aria-label="家族信托顾问路径" class="strategy-agent-websdk-breadcrumb"><button onclick="trustShowIntro({ pushHistory: true })" type="button">家族信托</button><span aria-hidden="true">/</span><strong>家族信托设立系统顾问</strong></nav>
 <header class="strategy-agent-websdk-heading"><div><p>FEISHU AILY · 家族信托设立系统顾问</p><h1 id="trust-agent-websdk-title">把传承意愿，转化为<span>可讨论、可归档的设立路径</span></h1><p>围绕家族信托、家族基金与慈善信托的设立流程、资料准备、备忘录访谈及持续管理继续对话。</p></div><div class="strategy-agent-websdk-meta"><span><b aria-hidden="true"></b>飞书官方会话面板</span><span>服务端独立授权</span><span>SDK v0.0.12</span></div></header>
 <div class="strategy-agent-websdk-layout"><aside class="strategy-agent-websdk-guide"><div class="strategy-agent-websdk-mark" aria-hidden="true">信</div><h2>先说清家族目标，再逐步完善安排</h2><p>可以直接询问设立流程、资料清单、费用结构与合规要求，也可以让顾问从新委托人的背景访谈开始。</p><div class="strategy-agent-websdk-prompts"><span>家族信托设立流程是怎样的？</span><span>设立家族信托需要准备哪些资料？</span><span>帮我开始一个新委托人的交互</span></div><div class="strategy-agent-websdk-access-note"><strong>访问说明</strong><p>本站账号验证与飞书账号可用范围是两层独立校验；进入后仍需使用获授权的飞书账号。</p></div><button class="btn btn-secondary" onclick="trustShowIntro({ pushHistory: true })" type="button">← 返回家族信托</button></aside>
-<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>家族信托设立系统顾问</strong><em aria-live="polite" id="trust-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="trust-agent-container"><div class="strategy-agent-websdk-loading" role="status"><span></span><strong>正在载入飞书信托顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="trust-agent-error" role="alert"><strong>信托顾问暂时没有成功载入</strong><p id="trust-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="trust-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="trust-agent-trace">尚未开始</code></summary><div><ol id="trust-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="trust-agent-download" type="button">下载诊断 JSON</button></div></details></section>
+<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>家族信托设立系统顾问</strong><em aria-live="polite" id="trust-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="trust-agent-container"><div class="strategy-agent-websdk-loading" id="trust-agent-loading" role="status"><span></span><strong>正在载入飞书信托顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="trust-agent-error" role="alert"><strong>信托顾问暂时没有成功载入</strong><p id="trust-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="trust-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="trust-agent-trace">尚未开始</code></summary><div><ol id="trust-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="trust-agent-download" type="button">下载诊断 JSON</button></div></details></section>
 </div></div></section>
 </article>
 <!-- TRUST_AILY_PROTECTED_END -->
@@ -2493,9 +2493,17 @@
 </header>
 <div class="academy-journey-legend" aria-label="案例图例"><span><i class="is-open"></i>可查看阶段材料</span><span><i class="is-pending"></i>材料整理中</span><span><i class="is-continuing"></i>长期持续</span></div>
 <section class="academy-journey-road" aria-label="学员A成长旅程时间线">
-<div class="academy-road-visual" aria-hidden="true">
+<div class="academy-road-visual">
 <img alt="" decoding="async" height="1254" loading="lazy" src="assets/academy/student-a-roadmap-clay.png" width="1254"/>
 <span class="academy-road-visual-glow"></span>
+<div class="academy-scene-hotspots" aria-label="3D校园旅程图标节点">
+<button aria-label="学习营开学，2024年11月，点击查看阶段材料" class="academy-scene-hotspot hotspot-opening" data-academy-scene-milestone="opening" style="--scene-x:37%;--scene-y:15%;--scene-size:16%;--sprite-scale:625%;" type="button"><span class="academy-scene-sprite" aria-hidden="true"></span><span class="academy-scene-pulse" aria-hidden="true"></span><span class="academy-scene-label"><b>01 · 学习营开学</b><small>点击学校查看材料</small></span></button>
+<span aria-label="人力成长，2024年12月18日，暂无对应材料" class="academy-scene-hotspot hotspot-human is-pending" style="--scene-x:67%;--scene-y:32%;--scene-size:13%;--sprite-scale:769%;" tabindex="0"><span class="academy-scene-sprite" aria-hidden="true"></span><span class="academy-scene-pulse" aria-hidden="true"></span><span class="academy-scene-label"><b>02 · 人力成长</b><small>暂无对应材料</small></span></span>
+<button aria-label="传承与投资，2025年3月，点击查看阶段材料" class="academy-scene-hotspot hotspot-investment" data-academy-scene-milestone="inheritance-investment" style="--scene-x:31%;--scene-y:51%;--scene-size:16%;--sprite-scale:625%;" type="button"><span class="academy-scene-sprite" aria-hidden="true"></span><span class="academy-scene-pulse" aria-hidden="true"></span><span class="academy-scene-label"><b>03 · 传承与投资</b><small>点击机构查看材料</small></span></button>
+<button aria-label="信托认知，2025年4月，点击查看阶段材料" class="academy-scene-hotspot hotspot-trust" data-academy-scene-milestone="trust" style="--scene-x:70%;--scene-y:58%;--scene-size:15%;--sprite-scale:667%;" type="button"><span class="academy-scene-sprite" aria-hidden="true"></span><span class="academy-scene-pulse" aria-hidden="true"></span><span class="academy-scene-label"><b>04 · 信托认知</b><small>点击盾牌查看材料</small></span></button>
+<button aria-label="学习营毕业，2025年5月1日，点击查看阶段材料" class="academy-scene-hotspot hotspot-graduation" data-academy-scene-milestone="graduation" style="--scene-x:30%;--scene-y:76%;--scene-size:17%;--sprite-scale:588%;" type="button"><span class="academy-scene-sprite" aria-hidden="true"></span><span class="academy-scene-pulse" aria-hidden="true"></span><span class="academy-scene-label"><b>05 · 学习营毕业</b><small>点击学士帽查看材料</small></span></button>
+<span aria-label="实践落地与长期陪跑，持续进行，暂无公开材料" class="academy-scene-hotspot hotspot-continuing is-continuing" style="--scene-x:74%;--scene-y:87%;--scene-size:15%;--sprite-scale:667%;" tabindex="0"><span class="academy-scene-sprite" aria-hidden="true"></span><span class="academy-scene-pulse" aria-hidden="true"></span><span class="academy-scene-label"><b>∞ · 长期陪跑</b><small>持续进行 · 暂无公开材料</small></span></span>
+</div>
 </div>
 <div class="academy-road-instruction"><span>3D CAMPUS JOURNEY</span><strong>点击可查看的立体节点，进入对应阶段材料</strong></div>
 <ol class="academy-milestone-list">
@@ -2773,7 +2781,7 @@
 <nav aria-label="身家诊断顾问路径" class="strategy-agent-websdk-breadcrumb"><button onclick="wealthShowIntro({ pushHistory: true })" type="button">身家诊断</button><span aria-hidden="true">/</span><strong>身家诊断顾问</strong></nav>
 <header class="strategy-agent-websdk-heading"><div><p>FEISHU AILY · 身家诊断顾问</p><h1 id="wealth-agent-websdk-title">从资产盘点开始，厘清<span>真实身家与调整方向</span></h1><p>围绕要求回报率、三情景 DCF、资产集中度、无意识财富损毁与完整报告继续咨询。</p></div><div class="strategy-agent-websdk-meta"><span><b aria-hidden="true"></b>飞书官方会话面板</span><span>服务端独立授权</span><span>SDK v0.0.12</span></div></header>
 <div class="strategy-agent-websdk-layout"><aside class="strategy-agent-websdk-guide"><div class="strategy-agent-websdk-mark" aria-hidden="true">诊</div><h2>先说明对象与目标，再逐步补齐数据</h2><p>您可以从完整诊断开始，也可以单独测算要求回报率、重算某类资产的三情景现值。</p><div class="strategy-agent-websdk-prompts"><span>开始为王总做身家诊断</span><span>帮我测算家庭的要求回报率（三角度取 max）</span><span>把我的资产按悲观/中性/乐观三情景做现值重算</span></div><div class="strategy-agent-websdk-access-note"><strong>访问说明</strong><p>本站账号验证与飞书账号可用范围是两层独立校验；进入后仍需使用获授权的飞书账号。</p></div><button class="btn btn-secondary" onclick="wealthShowIntro({ pushHistory: true })" type="button">← 返回身家诊断</button></aside>
-<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>身家诊断顾问</strong><em aria-live="polite" id="wealth-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="wealth-agent-container"><div class="strategy-agent-websdk-loading" role="status"><span></span><strong>正在载入飞书身家诊断顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="wealth-agent-error" role="alert"><strong>身家诊断顾问暂时没有成功载入</strong><p id="wealth-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="wealth-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="wealth-agent-trace">尚未开始</code></summary><div><ol id="wealth-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="wealth-agent-download" type="button">下载诊断 JSON</button></div></details></section>
+<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>身家诊断顾问</strong><em aria-live="polite" id="wealth-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="wealth-agent-container"><div class="strategy-agent-websdk-loading" id="wealth-agent-loading" role="status"><span></span><strong>正在载入飞书身家诊断顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="wealth-agent-error" role="alert"><strong>身家诊断顾问暂时没有成功载入</strong><p id="wealth-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="wealth-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="wealth-agent-trace">尚未开始</code></summary><div><ol id="wealth-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="wealth-agent-download" type="button">下载诊断 JSON</button></div></details></section>
 </div></div></section>
 </article>
 <!-- WEALTH_AILY_PROTECTED_END -->
@@ -3067,11 +3075,8 @@
 <script type="module" src="js/strategy-agent-websdk.js?v=1"></script>
 <!-- STRATEGY_AGENT_PROTECTED_END -->
 <script type="module" src="js/value-agent-websdk.js?v=1"></script>
-<script type="module" src="js/service-agent-websdk.js?v=1"></script>
+<script type="module" src="js/service-agent-websdk.js?v=2"></script>
 <script src="js/academy-assessment.js"></script>
-<script src="js/final-business-pages.js?v=3"></script>
+<script src="js/final-business-pages.js?v=4"></script>
 </body>
 </html>
-
-
-

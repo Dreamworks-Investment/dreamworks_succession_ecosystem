@@ -15,6 +15,7 @@ for (const scope of ['wealth', 'trust']) {
   assert(html.includes(`data-strategy-auth-form="${scope}"`), `${scope} must have its own authentication cover`);
   assert(html.includes(`id="${scope}-agent-websdk-view"`), `${scope} must have a protected agent view`);
   assert(html.includes(`id="${scope}-agent-container"`), `${scope} must have a Web SDK mount container`);
+  assert(html.includes(`id="${scope}-agent-loading"`), `${scope} must have an individually removable loading cover`);
   assert(client.includes(`/api/strategy-auth/agent-config/${scope}`) || client.includes('`/api/strategy-auth/agent-config/${scope}`'), `${scope} must use the scoped config endpoint`);
 }
 
@@ -22,6 +23,10 @@ assert(html.includes('点击进入 身家诊断顾问'), 'The wealth cover must 
 assert(html.includes('点击进入 家族信托设立系统顾问'), 'The trust cover must include an agent CTA');
 assert(html.includes('WEALTH_AILY_PROTECTED_START') && html.includes('TRUST_AILY_PROTECTED_START'), 'Both agent pages must be server protected');
 assert(client.includes("initAgentChat(elements.root, { channelToken: config.channelToken })"), 'Both agents must use the verified Aily Web SDK');
+assert(client.includes('function hideLoading()'), 'The shared loader must remove its loading cover once the SDK mounts');
+assert(client.includes('new MutationObserver'), 'The shared loader must observe the SDK-created iframe');
+assert(client.includes("addTrace('iframe.created', 'success'"), 'Diagnostics must record iframe creation');
+assert(client.includes("addTrace('iframe.loaded', 'success'"), 'Diagnostics must record iframe load completion');
 assert(client.includes("replace(/wsk_[A-Za-z0-9_-]+/g, 'wsk_[REDACTED]')"), 'Diagnostics must redact any accidental token text');
 assert(client.includes('downloadTrace'), 'Both agents must provide downloadable sanitized diagnostics');
 assert(client.includes('window.wealthAilyOpen') && client.includes('window.trustAilyOpen'), 'Both page routers must be exposed');
@@ -35,7 +40,6 @@ assert(css.includes('.wealth-agent-auth-active') && css.includes('.trust-agent-a
   'TRUST_AGENT_USERNAME', 'TRUST_AGENT_PASSWORD', 'TRUST_AILY_CHANNEL_TOKEN'
 ].forEach((name) => assert(env.includes(`${name}=`), `${name} must be documented`));
 
-assert(![html, client].join('\n').includes('wsk_3YtGfsuuIy3kY3DJ1KPqgA'), 'The supplied wealth token must not be committed to browser code');
-assert(![html, client].join('\n').includes('wsk_11Ox4jTHCcnBx2pawJMfgC'), 'The supplied trust token must not be committed to browser code');
+assert(!/\bwsk_[A-Za-z0-9_-]{16,}\b/.test([html, client].join('\n')), 'No real Aily token may be committed to browser code');
 
 console.log('Protected wealth/trust Aily Web SDK checks passed.');

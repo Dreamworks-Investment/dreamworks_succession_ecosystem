@@ -333,6 +333,14 @@
     return true;
   }
 
+  function setupAcademySceneHotspots() {
+    document.querySelectorAll('[data-academy-scene-milestone]').forEach((hotspot) => {
+      hotspot.addEventListener('click', () => {
+        academyOpenMilestone(hotspot.dataset.academySceneMilestone, { pushHistory: true });
+      });
+    });
+  }
+
   function academyRestoreView(state, options) {
     const view = state && state.academyView ? state.academyView : 'cover';
     if (view === 'material' && state.academyMilestone) {
@@ -413,5 +421,8 @@
   window.academyRestoreView = academyRestoreView;
   window.activateSixCommonVision = renderVisionPreview;
 
-  document.addEventListener('DOMContentLoaded', setupVisionExperience);
+  document.addEventListener('DOMContentLoaded', () => {
+    setupAcademySceneHotspots();
+    setupVisionExperience();
+  });
 })();
