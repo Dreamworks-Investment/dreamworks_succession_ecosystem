@@ -350,6 +350,14 @@
   animation: academy-infinity-breathe 3.8s ease-in-out infinite;
 }
 
+.academy-plate-clips {
+  width: 0;
+  height: 0;
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .academy-plate-map {
   position: absolute;
   inset: 0;
