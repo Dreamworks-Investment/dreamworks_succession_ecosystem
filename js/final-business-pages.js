@@ -333,7 +333,7 @@
     return true;
   }
 
-  function setupAcademySceneHotspots() {
+  function setupAcademyPlateMap() {
     document.querySelectorAll('[data-academy-scene-milestone]').forEach((hotspot) => {
       hotspot.addEventListener('click', () => {
         academyOpenMilestone(hotspot.dataset.academySceneMilestone, { pushHistory: true });
@@ -422,7 +422,7 @@
   window.activateSixCommonVision = renderVisionPreview;
 
   document.addEventListener('DOMContentLoaded', () => {
-    setupAcademySceneHotspots();
+    setupAcademyPlateMap();
     setupVisionExperience();
   });
 })();
