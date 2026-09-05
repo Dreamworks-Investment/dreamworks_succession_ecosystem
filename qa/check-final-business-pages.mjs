@@ -22,8 +22,8 @@ assert(html.includes('onclick="academyShowAbout({ pushHistory: true })"') && htm
 assert((html.match(/class="academy-plate plate-/g) || []).length === 6, 'The 3D journey must be divided into six full plate-shaped interaction regions');
 assert((html.match(/class="academy-plate-art"/g) || []).length === 6, 'Each plate must render through an independent transparent artwork layer');
 assert((html.match(/<clipPath clipPathUnits="objectBoundingBox" id="academy-clip-/g) || []).length === 6, 'Each journey plate must use its own responsive SVG vector mask');
-assert((html.match(/transform="scale\(\.001\)"/g) || []).length === 6, 'The six detailed masks must share the normalized Illustrator-style coordinate system');
-assert(html.includes('id="academy-clip-graduation"><g') && html.includes('id="academy-clip-continuing"><g'), 'Complex lower journey plates must use compound vector contours instead of enclosing surrounding voids');
+assert((html.match(/transform="scale\(0\.00079744816587\)"/g) || []).length === 6, 'Masks must share the original 1254-pixel coordinate system');
+assert(!/<clipPath[^>]*>\s*<g/.test(html), 'SVG clip paths must contain supported shapes directly');
 assert(!html.includes('--plate-clip:polygon('), 'Coarse polygon masks must not remain on the Academy journey');
 assert((html.match(/data-academy-scene-milestone=/g) || []).length === 4, 'Only the four full plates with usable Word materials may open a milestone');
 assert(!html.includes('academy-milestone-list') && !html.includes('academy-road-instruction'), 'The journey must not show permanent side cards or instructional labels over the artwork');
