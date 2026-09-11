@@ -85,20 +85,24 @@ h4 { font-size: 1.1rem; font-weight: 600; }
 }
 
 .nav-brand {
-  display: flex; align-items: center;
+  display: flex; align-items: center; justify-content: center;
   flex: 0 0 auto;
-  width: 214px; height: 48px;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: transform var(--transition), filter var(--transition);
 }
 
-.nav-brand-lockup,
 .nav-brand-logo {
   display: block;
-  width: 214px; height: 42px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(229, 166, 78, .35), 0 4px 14px rgba(0, 0, 0, .24);
 }
 
-.nav-brand-logo {
-  object-fit: contain;
-}
+.nav-brand:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.nav-brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 .nav-links { display: flex; gap: 2px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; min-width: 0; }
 

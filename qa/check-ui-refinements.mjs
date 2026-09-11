@@ -35,9 +35,12 @@ assert(!accessClient.includes('dreamworks:auth-granted') && !confidentialClient.
 assert(homeCss.includes('.home-confidential-blur') && homeCss.includes('.home-confidential-lock'), 'Confidential card must render a blurred lock cover before authentication');
 
 assert(!html.includes('class="nav-brand-icon"'), 'The placeholder character icon must be removed from the global navigation');
-assert(html.includes('assets/brand/dreamworks-official-nav.svg') && html.includes('assets/brand/dreamworks-official-mark.svg'), 'The global navigation must use the official responsive logo assets');
+assert(html.includes('src="assets/brand/dreamworks-official-mark.png"'), 'The global navigation must directly load the checked official PNG logo');
+assert(html.includes('href="https://www.dreamworksinvest.com/website/w/h"'), 'The official logo must link to the company website');
+assert(html.includes('target="_blank"') && html.includes('rel="noopener noreferrer"'), 'The company link must open safely without replacing the application');
 assert(existsSync(join(root, 'assets/brand/dreamworks-official-logo.png')), 'The official source logo must be stored locally');
-assert(existsSync(join(root, 'assets/brand/dreamworks-official-nav.svg')), 'The desktop official logo lockup must be available');
-assert(existsSync(join(root, 'assets/brand/dreamworks-official-mark.svg')), 'The mobile official logo mark must be available');
+assert(existsSync(join(root, 'assets/brand/dreamworks-official-mark.png')), 'The checked official navigation mark must be stored locally');
+assert(!existsSync(join(root, 'assets/brand/dreamworks-official-nav.svg')), 'The browser-blocked nested SVG logo wrapper must be removed');
+assert(!existsSync(join(root, 'assets/brand/dreamworks-official-mark.svg')), 'The browser-blocked nested SVG mark wrapper must be removed');
 
 console.log('Requested UI refinement checks passed.');
