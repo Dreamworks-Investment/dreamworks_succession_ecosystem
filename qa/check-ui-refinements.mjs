@@ -34,4 +34,10 @@ assert(accessClient.includes("dreamworks:auth-return") && accessClient.includes(
 assert(!accessClient.includes('dreamworks:auth-granted') && !confidentialClient.includes('dreamworks:auth-granted'), 'Confidential login must never mutate an already-loaded protected page in place');
 assert(homeCss.includes('.home-confidential-blur') && homeCss.includes('.home-confidential-lock'), 'Confidential card must render a blurred lock cover before authentication');
 
+assert(!html.includes('class="nav-brand-icon"'), 'The placeholder character icon must be removed from the global navigation');
+assert(html.includes('assets/brand/dreamworks-official-nav.svg') && html.includes('assets/brand/dreamworks-official-mark.svg'), 'The global navigation must use the official responsive logo assets');
+assert(existsSync(join(root, 'assets/brand/dreamworks-official-logo.png')), 'The official source logo must be stored locally');
+assert(existsSync(join(root, 'assets/brand/dreamworks-official-nav.svg')), 'The desktop official logo lockup must be available');
+assert(existsSync(join(root, 'assets/brand/dreamworks-official-mark.svg')), 'The mobile official logo mark must be available');
+
 console.log('Requested UI refinement checks passed.');

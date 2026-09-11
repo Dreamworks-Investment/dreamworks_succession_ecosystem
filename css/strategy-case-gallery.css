@@ -332,8 +332,9 @@
 
 @media (max-width:900px) {
   .nav-inner { gap:10px; padding:0 16px; }
-  .nav-brand { flex:0 0 auto; }
-  .nav-brand > span { display:none; }
+  .nav-brand,
+  .nav-brand-lockup,
+  .nav-brand-logo { width:42px; height:42px; }
   .nav-links { flex:1 1 auto; }
   .strategy-case-shell { width:min(100% - 28px,680px); }
   .strategy-hub-hero { min-height:auto; padding:90px 0 64px; }
