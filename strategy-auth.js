@@ -1,6 +1,6 @@
 import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 
-const COOKIE_NAME = "dw_strategy_auth";
+const COOKIE_PREFIX = "dw_auth_";
 const DEFAULT_TTL_SECONDS = 8 * 60 * 60;
 const VALID_SCOPES = new Set(["cases", "agent", "value", "wealth", "trust"]);
 
@@ -83,30 +83,36 @@ export function createStrategyAuthService(options = {}) {
     return Boolean(credential?.username && credential?.password && configured("session"));
   }
 
-  function signature(encodedPayload) {
-    return createHmac("sha256", sessionSecret).update(encodedPayload).digest("base64url");
+  function cookieName(scope) {
+    return `${COOKIE_PREFIX}${scope}`;
   }
 
-  function encode(grants) {
+  function signature(scope, encodedPayload) {
+    return createHmac("sha256", sessionSecret)
+      .update(`scope:${scope}:${encodedPayload}`)
+      .digest("base64url");
+  }
+
+  function encode(scope) {
     const payload = base64url(JSON.stringify({
-      v: 1,
-      grants: [...new Set(grants)].filter(scope => VALID_SCOPES.has(scope)),
+      v: 2,
+      scope,
       exp: Math.floor(now() / 1000) + ttlSeconds
     }));
-    return `${payload}.${signature(payload)}`;
+    return `${payload}.${signature(scope, payload)}`;
   }
 
-  function decode(token) {
-    if (!configured("session") || typeof token !== "string") return null;
+  function decode(scope, token) {
+    if (!VALID_SCOPES.has(scope) || !configured("session") || typeof token !== "string") return null;
     const [payload, candidateSignature, extra] = token.split(".");
     if (!payload || !candidateSignature || extra) return null;
-    if (!safeEqual(signature(payload), candidateSignature)) return null;
+    if (!safeEqual(signature(scope, payload), candidateSignature)) return null;
     try {
       const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-      if (parsed.v !== 1 || !Array.isArray(parsed.grants) || !Number.isFinite(parsed.exp)) return null;
+      if (parsed.v !== 2 || parsed.scope !== scope || !Number.isFinite(parsed.exp)) return null;
       if (parsed.exp <= Math.floor(now() / 1000)) return null;
       return {
-        grants: parsed.grants.filter(scope => VALID_SCOPES.has(scope)),
+        scope,
         expiresAt: new Date(parsed.exp * 1000).toISOString()
       };
     } catch {
@@ -115,8 +121,21 @@ export function createStrategyAuthService(options = {}) {
   }
 
   function session(req) {
-    const token = parseCookies(req.headers?.cookie || "")[COOKIE_NAME];
-    return decode(token) || { grants: [], expiresAt: null };
+    const cookies = parseCookies(req.headers?.cookie || "");
+    const grants = [];
+    const grantExpiresAt = {};
+    for (const scope of VALID_SCOPES) {
+      const decoded = decode(scope, cookies[cookieName(scope)]);
+      if (!decoded) continue;
+      grants.push(scope);
+      grantExpiresAt[scope] = decoded.expiresAt;
+    }
+    const expiries = Object.values(grantExpiresAt).sort();
+    return {
+      grants,
+      expiresAt: expiries[0] || null,
+      grantExpiresAt
+    };
   }
 
   function status(req) {
@@ -137,7 +156,8 @@ export function createStrategyAuthService(options = {}) {
         trust: configured("trust"),
         session: configured("session")
       },
-      expiresAt: current.expiresAt
+      expiresAt: current.expiresAt,
+      grantExpiresAt: current.grantExpiresAt
     };
   }
 
@@ -150,26 +170,26 @@ export function createStrategyAuthService(options = {}) {
     return { ok: validUsername && validPassword, reason: validUsername && validPassword ? null : "invalid_credentials" };
   }
 
-  function cookie(req, grants) {
-    const value = encode(grants);
+  function cookie(req, scope) {
+    const value = encode(scope);
     const secure = isSecureRequest(req) ? "; Secure" : "";
-    return `${COOKIE_NAME}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${ttlSeconds}${secure}`;
+    return `${cookieName(scope)}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${ttlSeconds}${secure}`;
   }
 
-  function clearCookie(req) {
+  function clearCookie(req, scope) {
     const secure = isSecureRequest(req) ? "; Secure" : "";
-    return `${COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure}`;
+    return `${cookieName(scope)}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure}`;
   }
 
   function grant(req, scope) {
-    const current = session(req);
-    return cookie(req, [...current.grants, scope]);
+    return cookie(req, scope);
   }
 
   function revoke(req, scope) {
-    if (!scope || scope === "all") return clearCookie(req);
-    const remaining = session(req).grants.filter(grantScope => grantScope !== scope);
-    return remaining.length ? cookie(req, remaining) : clearCookie(req);
+    if (!scope || scope === "all") {
+      return [...VALID_SCOPES].map(grantScope => clearCookie(req, grantScope));
+    }
+    return clearCookie(req, scope);
   }
 
   function agentConfig(scope = "agent") {
@@ -188,7 +208,7 @@ export function createStrategyAuthService(options = {}) {
   }
 
   return {
-    cookieName: COOKIE_NAME,
+    cookieNames: Object.fromEntries([...VALID_SCOPES].map(scope => [scope, cookieName(scope)])),
     status,
     session,
     authenticate,

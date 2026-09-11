@@ -21,7 +21,7 @@
 <link href="css/family-trust-system.css?v=2" rel="stylesheet"/>
 <link href="css/academy-assessment.css" rel="stylesheet"/>
 <link href="css/final-business-pages.css?v=2" rel="stylesheet"/>
-<link href="css/academy-experience.css?v=2" rel="stylesheet"/>
+<link href="css/academy-experience.css?v=7" rel="stylesheet"/>
 <script src="vendor/chart.umd.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
@@ -2096,7 +2096,6 @@
 <div class="value-investment-story">
 <article><p>评估单个标的，用的是与价值增进完全相同的企业家思维——<strong>一体两用</strong>的品菜面：评估同样三要素（R · G · S），算清内在价值；当市场价格因恐慌或认知偏差远低于内在价值时，机会出现，即“<strong>狠值</strong>”。</p><h3>不买会涨，只买狠值。</h3><p>这一定位反人性，却历经短、中、长多个周期检验。管理规模中，公司、股东、员工自有资金占比约<strong>三分之一</strong>——我们是真的和客户绑在一起。</p></article>
 <div class="value-achievement-list">
-<p><span class="value-achievement-dot">·</span><span class="value-achievement-copy">有审计的 <strong>17 年近 35 倍</strong>回报（年化约 23%）</span></p>
 <p><span class="value-achievement-dot">·</span><span class="value-achievement-copy"><strong>2024 中国同规模组冠军</strong> #1</span></p>
 <p><span class="value-achievement-dot">·</span><span class="value-achievement-copy"><strong>2025 三大奖大满贯</strong>：金牛奖 · 英华奖 · 金阳光奖</span></p>
 <p><span class="value-achievement-dot">·</span><span class="value-achievement-copy">自有资金占比约 <strong>1/3</strong> —— 与客户风险共担</span></p>
@@ -2268,7 +2267,7 @@
 <nav aria-label="家族信托顾问路径" class="strategy-agent-websdk-breadcrumb"><button onclick="trustShowIntro({ pushHistory: true })" type="button">家族信托</button><span aria-hidden="true">/</span><strong>家族信托设立系统顾问</strong></nav>
 <header class="strategy-agent-websdk-heading"><div><p>FEISHU AILY · 家族信托设立系统顾问</p><h1 id="trust-agent-websdk-title">把传承意愿，转化为<span>可讨论、可归档的设立路径</span></h1><p>围绕家族信托、家族基金与慈善信托的设立流程、资料准备、备忘录访谈及持续管理继续对话。</p></div><div class="strategy-agent-websdk-meta"><span><b aria-hidden="true"></b>飞书官方会话面板</span><span>服务端独立授权</span><span>SDK v0.0.12</span></div></header>
 <div class="strategy-agent-websdk-layout"><aside class="strategy-agent-websdk-guide"><div class="strategy-agent-websdk-mark" aria-hidden="true">信</div><h2>先说清家族目标，再逐步完善安排</h2><p>可以直接询问设立流程、资料清单、费用结构与合规要求，也可以让顾问从新委托人的背景访谈开始。</p><div class="strategy-agent-websdk-prompts"><span>家族信托设立流程是怎样的？</span><span>设立家族信托需要准备哪些资料？</span><span>帮我开始一个新委托人的交互</span></div><div class="strategy-agent-websdk-access-note"><strong>访问说明</strong><p>本站账号验证与飞书账号可用范围是两层独立校验；进入后仍需使用获授权的飞书账号。</p></div><button class="btn btn-secondary" onclick="trustShowIntro({ pushHistory: true })" type="button">← 返回家族信托</button></aside>
-<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>家族信托设立系统顾问</strong><em aria-live="polite" id="trust-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="trust-agent-container"><div class="strategy-agent-websdk-loading" role="status"><span></span><strong>正在载入飞书信托顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="trust-agent-error" role="alert"><strong>信托顾问暂时没有成功载入</strong><p id="trust-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="trust-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="trust-agent-trace">尚未开始</code></summary><div><ol id="trust-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="trust-agent-download" type="button">下载诊断 JSON</button></div></details></section>
+<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>家族信托设立系统顾问</strong><em aria-live="polite" id="trust-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="trust-agent-container"><div class="strategy-agent-websdk-loading" id="trust-agent-loading" role="status"><span></span><strong>正在载入飞书信托顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="trust-agent-error" role="alert"><strong>信托顾问暂时没有成功载入</strong><p id="trust-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="trust-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="trust-agent-trace">尚未开始</code></summary><div><ol id="trust-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="trust-agent-download" type="button">下载诊断 JSON</button></div></details></section>
 </div></div></section>
 </article>
 <!-- TRUST_AILY_PROTECTED_END -->
@@ -2469,16 +2468,16 @@
 <article><span>02</span><strong>系统实践</strong><p>从课堂走向真实的投资、治理、信托与家族行动。</p></article>
 <article><span>03</span><strong>长期陪跑</strong><p>毕业不是终点，持续支持家族完成代际协作与落地。</p></article>
 </div>
-<section class="academy-material-section" aria-labelledby="academy-poster-title">
-<div class="academy-material-heading"><div><span>ADMISSIONS POSTER</span><h3 id="academy-poster-title">招生宣传海报</h3></div><a href="assets/academy/admissions-poster.jpg" rel="noopener" target="_blank">查看原图 ↗</a></div>
-<div class="academy-poster-frame"><img alt="梦工场狠值传承学院招生宣传海报" decoding="async" loading="lazy" src="assets/academy/admissions-poster.jpg"/></div>
+<section class="academy-material-section academy-poster-section" aria-labelledby="academy-poster-title">
+<div class="academy-material-heading"><div><span>ADMISSIONS GUIDE</span><h3 id="academy-poster-title">招生简章</h3></div></div>
+<div class="academy-poster-frame"><img alt="梦工场传承学院招生简章" decoding="async" loading="lazy" src="assets/academy/admissions-poster.jpg"/></div>
 </section>
 <section class="academy-material-section" aria-labelledby="academy-brochure-title">
-<div class="academy-material-heading"><div><span>ADMISSIONS BROCHURE · 03 PAGES</span><h3 id="academy-brochure-title">传承学院宣传页</h3></div><a href="assets/academy/admissions-brochure.pdf" rel="noopener" target="_blank">打开完整 PDF ↗</a></div>
+<div class="academy-material-heading"><div><span>ADMISSIONS GUIDE · 03 PAGES</span><h3 id="academy-brochure-title">招生简章</h3></div><a href="assets/academy/admissions-brochure.pdf" rel="noopener" target="_blank">打开完整 PDF ↗</a></div>
 <div class="academy-brochure-grid">
-<figure><img alt="传承学院宣传页第1页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-01.png"/><figcaption>01 · 为什么需要家族传承共同体</figcaption></figure>
-<figure><img alt="传承学院宣传页第2页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-02.png"/><figcaption>02 · 五大核心支撑体系</figcaption></figure>
-<figure><img alt="传承学院宣传页第3页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-03.png"/><figcaption>03 · 长期陪跑与共同成长</figcaption></figure>
+<figure><img alt="传承学院招生简章第1页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-01.png"/><figcaption>01 · 为什么需要家族传承共同体</figcaption></figure>
+<figure><img alt="传承学院招生简章第2页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-02.png"/><figcaption>02 · 五大核心支撑体系</figcaption></figure>
+<figure><img alt="传承学院招生简章第3页" decoding="async" loading="lazy" src="assets/academy/admissions-brochure-03.png"/><figcaption>03 · 长期陪跑与共同成长</figcaption></figure>
 </div>
 </section>
 <footer class="academy-subpage-footer"><button class="academy-outline-button" onclick="academyShowCover({ pushHistory: true })" type="button">← 返回传承学院</button><button class="academy-gold-button" onclick="academyShowCases({ pushHistory: true })" type="button">继续查看学员A成长旅程 →</button></footer>
@@ -2491,34 +2490,29 @@
 <div class="academy-case-heading-row"><div><div class="academy-subpage-kicker">STUDENT JOURNEY · 学员案例库</div><h2>学员A · 从学习营到长期陪跑</h2></div><span class="academy-redaction-badge">已脱敏 · 示例案例</span></div>
 <p>这不是一张课程流程图，而是一位学员从建立个人目标、完成跨学科学习，到毕业后持续实践的真实成长轨迹。</p>
 </header>
-<div class="academy-journey-legend" aria-label="案例图例"><span><i class="is-open"></i>可查看阶段材料</span><span><i class="is-pending"></i>材料整理中</span><span><i class="is-continuing"></i>长期持续</span></div>
 <section class="academy-journey-road" aria-label="学员A成长旅程时间线">
-<div class="academy-road-visual" aria-hidden="true">
+<div class="academy-road-visual">
 <img alt="" decoding="async" height="1254" loading="lazy" src="assets/academy/student-a-roadmap-clay.png" width="1254"/>
 <span class="academy-road-visual-glow"></span>
+<svg aria-hidden="true" class="academy-plate-clips" focusable="false">
+<defs>
+<clipPath clipPathUnits="objectBoundingBox" id="academy-clip-opening"><path d="M35 344 Q42 321 87 305 L89 280 Q98 255 111 262 L112 192 L104 181 L112 172 L126 167 Q118 155 125 145 Q137 134 147 146 Q153 157 143 167 L161 173 L166 190 L166 203 Q217 146 274 160 L274 142 L261 130 L267 121 L282 116 Q272 106 282 94 Q294 87 301 99 Q306 109 295 117 L314 123 L318 142 L318 177 L355 166 L355 102 L390 93 L433 101 L436 77 Q440 58 454 52 L454 14 L461 14 L462 24 Q475 19 487 28 L503 32 Q490 47 463 37 L463 51 Q480 56 482 85 L483 94 L544 100 L594 116 L600 132 L594 151 L594 183 Q601 169 613 174 Q619 150 636 156 Q655 155 659 174 Q676 192 666 211 Q689 211 695 228 L700 273 Q708 305 680 319 Q624 345 488 357 Q435 366 409 376 Q456 393 559 398 L587 416 L573 461 L549 486 Q453 470 375 458 L355 455 L355 421 L349 421 L325 439 L325 448 L213 420 Q133 445 64 419 Q36 408 35 386 Z" transform="scale(0.00079744816587)"/></clipPath>
+<clipPath clipPathUnits="objectBoundingBox" id="academy-clip-human"><path d="M558 399 L616 398 L620 383 Q609 350 621 350 L629 358 Q632 340 642 348 L645 368 Q660 348 666 361 L657 385 L665 397 L678 401 Q650 367 675 329 Q708 283 757 294 L772 300 Q761 275 790 272 Q822 270 828 294 Q835 319 814 331 L821 346 Q820 326 838 322 Q861 318 868 338 Q873 358 856 369 Q878 387 878 415 L888 411 L892 383 Q878 361 885 352 L898 365 Q885 336 901 325 Q913 330 914 352 Q929 339 931 348 Q932 367 908 377 L906 386 Q926 378 929 387 Q925 402 910 403 L908 414 Q945 423 949 450 L956 481 Q962 513 940 531 Q900 558 785 573 Q778 604 744 620 Q681 644 585 658 L563 639 Q559 619 572 604 Q675 581 685 551 Q700 521 648 510 Q589 487 550 490 Z" transform="scale(0.00079744816587)"/></clipPath>
+<clipPath clipPathUnits="objectBoundingBox" id="academy-clip-investment"><path d="M146 654 Q150 636 175 622 Q176 591 186 579 Q183 558 200 551 Q213 554 214 580 L220 551 L213 532 L214 524 L316 465 Q318 452 338 450 L350 449 L350 440 Q338 438 325 450 L325 439 Q340 426 350 426 L350 421 L356 421 L356 456 Q380 458 386 476 L399 483 L478 518 L480 527 L467 536 L470 542 L466 548 L468 594 L518 547 L516 537 L548 525 L550 552 L540 551 L548 567 L553 569 L555 650 Q575 663 570 690 Q607 706 659 715 L675 761 L658 788 Q558 757 471 779 Q355 797 220 754 Q145 732 145 697 Z" transform="scale(0.00079744816587)"/></clipPath>
+<clipPath clipPathUnits="objectBoundingBox" id="academy-clip-trust"><path d="M664 707 L729 720 L742 709 Q724 697 737 687 L751 699 L752 686 Q728 674 734 655 Q746 653 758 676 L760 669 Q745 642 762 627 Q776 632 774 655 L769 681 Q782 660 790 663 Q797 677 776 694 L777 710 Q792 695 800 702 L801 714 L815 727 Q791 678 793 597 L800 590 Q854 587 900 567 Q947 594 1000 604 L1004 613 Q1001 689 982 733 Q1010 748 1017 778 L1025 802 L1024 834 Q1016 877 938 890 L843 908 Q802 917 768 940 L634 991 L619 970 Q617 952 634 940 Q711 909 746 876 Q765 852 739 820 Q700 788 658 788 L675 761 Z" transform="scale(0.00079744816587)"/></clipPath>
+<clipPath clipPathUnits="objectBoundingBox" id="academy-clip-graduation"><path d="M150 970 Q166 940 216 924 L216 906 L294 900 L292 877 L245 850 L245 832 L345 780 L492 811 L489 847 L475 855 L478 925 L466 934 L430 920 Q490 926 542 982 L559 1000 L549 1025 L583 1028 L612 1055 L612 1158 Q530 1130 470 1140 Q330 1156 218 1115 Q157 1090 157 1035 Z" transform="scale(0.00079744816587)"/></clipPath>
+<clipPath clipPathUnits="objectBoundingBox" id="academy-clip-continuing"><path d="M612 1055 Q634 1014 658 1003 Q700 982 751 1001 Q790 1017 811 1048 L868 1025 L876 998 L887 989 Q882 978 894 975 Q906 978 902 990 L918 1003 L916 1013 L916 1041 Q929 1039 943 1048 Q953 1040 962 1047 Q969 1038 981 1046 Q1002 1047 1008 1064 L1028 1051 Q1022 1031 999 1024 Q966 1013 991 998 Q1030 978 1114 971 L1121 939 L1139 939 L1145 962 L1191 971 L1191 985 Q1122 994 1069 1018 Q1050 1028 1066 1043 Q1086 1061 1077 1115 L1077 1140 Q1060 1180 961 1200 Q858 1221 777 1207 Q686 1199 612 1158 Z" transform="scale(0.00079744816587)"/></clipPath>
+</defs>
+</svg>
+<div class="academy-plate-map" aria-label="可探索的六段3D校园旅程">
+<button aria-label="学习营开学，2024年11月，点击查看阶段材料" class="academy-plate plate-opening" data-academy-scene-milestone="opening" style="--plate-clip:url(#academy-clip-opening);--label-x:38%;--label-y:31%;" type="button"><span aria-hidden="true" class="academy-plate-art"></span><span class="academy-plate-label"><b>01 · 学习营开学</b><time>2024年11月</time><small>点击查看阶段材料</small></span></button>
+<button aria-disabled="true" aria-label="人力成长，2024年12月18日，暂无对应材料" class="academy-plate plate-human is-pending" style="--plate-clip:url(#academy-clip-human);--label-x:66%;--label-y:42%;" type="button"><span aria-hidden="true" class="academy-plate-art"></span><span class="academy-plate-label"><b>02 · 人力成长</b><time>2024年12月18日</time><small>暂无对应材料</small></span></button>
+<button aria-label="传承与投资，2025年3月，点击查看阶段材料" class="academy-plate plate-investment" data-academy-scene-milestone="inheritance-investment" style="--plate-clip:url(#academy-clip-investment);--label-x:31%;--label-y:58%;" type="button"><span aria-hidden="true" class="academy-plate-art"></span><span class="academy-plate-label"><b>03 · 传承与投资</b><time>2025年3月</time><small>点击查看阶段材料</small></span></button>
+<button aria-label="信托认知，2025年4月，点击查看阶段材料" class="academy-plate plate-trust" data-academy-scene-milestone="trust" style="--plate-clip:url(#academy-clip-trust);--label-x:70%;--label-y:68%;" type="button"><span aria-hidden="true" class="academy-plate-art"></span><span class="academy-plate-label"><b>04 · 信托认知</b><time>2025年4月</time><small>点击查看阶段材料</small></span></button>
+<button aria-label="学习营毕业，2025年5月1日，点击查看阶段材料" class="academy-plate plate-graduation" data-academy-scene-milestone="graduation" style="--plate-clip:url(#academy-clip-graduation);--label-x:31%;--label-y:87%;" type="button"><span aria-hidden="true" class="academy-plate-art"></span><span class="academy-plate-label"><b>05 · 学习营毕业</b><time>2025年5月1日</time><small>点击查看阶段材料</small></span></button>
+<button aria-disabled="true" aria-label="实践落地与长期陪跑，持续进行，暂无公开材料" class="academy-plate plate-continuing is-continuing" style="--plate-clip:url(#academy-clip-continuing);--label-x:76%;--label-y:93%;" type="button"><span aria-hidden="true" class="academy-plate-art"></span><span class="academy-plate-label"><b>∞ · 长期陪跑</b><time>持续进行</time><small>暂无公开材料</small></span></button>
 </div>
-<div class="academy-road-instruction"><span>3D CAMPUS JOURNEY</span><strong>点击可查看的立体节点，进入对应阶段材料</strong></div>
-<ol class="academy-milestone-list">
-<li class="academy-milestone milestone-one">
-<button onclick="academyOpenMilestone('opening', { pushHistory: true })" type="button"><span class="academy-milestone-flag">START</span><span class="academy-milestone-icon" aria-hidden="true">🏫</span><time datetime="2024-11">2024年11月</time><strong>学习营开学</strong><small>制定个人SMART计划，确认家族学习与实践目标。</small><em>查看阶段材料 →</em></button>
-</li>
-<li class="academy-milestone milestone-two is-pending">
-<button onclick="academyOpenMilestone('human-growth', { pushHistory: true })" type="button"><span class="academy-milestone-flag">02</span><span class="academy-milestone-icon" aria-hidden="true">🧭</span><time datetime="2024-12-18">2024年12月18日</time><strong>人力成长</strong><small>教练技术A与性格分析，帮助学员理解自己与他人。</small><em>进入节点 · 资料整理中 →</em></button>
-</li>
-<li class="academy-milestone milestone-three">
-<button onclick="academyOpenMilestone('inheritance-investment', { pushHistory: true })" type="button"><span class="academy-milestone-flag">03</span><span class="academy-milestone-icon" aria-hidden="true">🏛️</span><time datetime="2025-03">2025年3月</time><strong>传承与投资</strong><small>建立传承第一性原理与长期价值投资的共同认知。</small><em>查看2份材料 →</em></button>
-</li>
-<li class="academy-milestone milestone-four">
-<button onclick="academyOpenMilestone('trust', { pushHistory: true })" type="button"><span class="academy-milestone-flag">04</span><span class="academy-milestone-icon" aria-hidden="true">🛡️</span><time datetime="2025-04">2025年4月</time><strong>信托认知</strong><small>理解家族信托与慈善信托的功能、边界与设立逻辑。</small><em>查看阶段材料 →</em></button>
-</li>
-<li class="academy-milestone milestone-five is-graduation">
-<button onclick="academyOpenMilestone('graduation', { pushHistory: true })" type="button"><span class="academy-milestone-flag">GRADUATION</span><span class="academy-milestone-icon academy-graduation-cap" aria-hidden="true">🎓</span><time datetime="2025-05-01">2025年5月1日</time><strong>学习营毕业</strong><small>以毕业陈述与六个月规划，承接下一阶段实践行动。</small><em>查看2份材料 →</em></button>
-</li>
-<li class="academy-milestone milestone-six is-continuing">
-<button onclick="academyOpenMilestone('continuing', { pushHistory: true })" type="button"><span class="academy-milestone-flag">∞</span><span class="academy-milestone-icon" aria-hidden="true">✨</span><time>持续进行</time><strong>实践落地 · 长期陪跑</strong><small>道路仍在延伸。围绕家族真实议题持续对话、复盘与行动。</small><em>毕业不是终点 →</em></button>
-</li>
-</ol>
-<div class="academy-road-horizon" aria-hidden="true"><span></span><b>TO BE CONTINUED</b></div>
+</div>
 </section>
 <aside class="academy-case-boundary"><strong>案例边界</strong><p>本页仅展示经过脱敏、可用于说明培养路径的阶段材料。毕业后的家族信托落地与私人沟通不对外展示。</p></aside>
 <footer class="academy-subpage-footer"><button class="academy-outline-button" onclick="academyShowCover({ pushHistory: true })" type="button">← 返回传承学院</button><button class="academy-gold-button" onclick="academyEnterSystem({ pushHistory: true })" type="button">进行家族传承健康度测评 →</button></footer>
@@ -2534,7 +2528,7 @@
 </header>
 <div class="academy-preview-layout">
 <aside class="academy-preview-sidebar"><div class="academy-preview-stage"><span id="academy-preview-icon" aria-hidden="true">📄</span><time id="academy-preview-date"></time><strong id="academy-preview-stage"></strong></div><div id="academy-preview-material-list" class="academy-preview-material-list" aria-label="阶段材料列表"></div></aside>
-<section class="academy-document-viewer" aria-live="polite"><header><div><span>DOCUMENT PREVIEW</span><h3 id="academy-document-title">选择一份材料</h3></div><a id="academy-document-open" href="#" rel="noopener noreferrer" target="_blank">在飞书中打开 ↗</a></header><div class="academy-document-notice"><strong>预览说明</strong><span>飞书文档能否在站内显示取决于原文分享与嵌入权限；若下方未加载，请使用右上角按钮打开原文。</span></div><div class="academy-document-frame"><iframe id="academy-document-frame" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-forms allow-popups allow-same-origin allow-scripts" title="学员A阶段文档预览"></iframe><div class="academy-document-placeholder" id="academy-document-placeholder"><span>↗</span><strong>正在准备文档预览</strong><p>也可以直接在飞书中打开原始脱敏材料。</p></div></div></section>
+<section class="academy-document-viewer" aria-live="polite"><header><div><span>DOCUMENT PREVIEW</span><h3 id="academy-document-title">选择一份材料</h3></div><a id="academy-document-open" download href="#">下载 Word ↗</a></header><div class="academy-document-notice"><strong>预览说明</strong><span>下方为 Word 原件生成的站内预览；如需编辑或归档，请下载右上角 Word 文件。</span></div><div class="academy-document-frame"><iframe id="academy-document-frame" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-forms allow-popups allow-same-origin allow-scripts" title="学员A阶段文档预览"></iframe><div class="academy-document-placeholder" id="academy-document-placeholder"><span>↗</span><strong>正在准备文档预览</strong><p>也可以下载 Word 原件留存。</p></div></div></section>
 </div>
 </section>
 </article>
@@ -2773,7 +2767,7 @@
 <nav aria-label="身家诊断顾问路径" class="strategy-agent-websdk-breadcrumb"><button onclick="wealthShowIntro({ pushHistory: true })" type="button">身家诊断</button><span aria-hidden="true">/</span><strong>身家诊断顾问</strong></nav>
 <header class="strategy-agent-websdk-heading"><div><p>FEISHU AILY · 身家诊断顾问</p><h1 id="wealth-agent-websdk-title">从资产盘点开始，厘清<span>真实身家与调整方向</span></h1><p>围绕要求回报率、三情景 DCF、资产集中度、无意识财富损毁与完整报告继续咨询。</p></div><div class="strategy-agent-websdk-meta"><span><b aria-hidden="true"></b>飞书官方会话面板</span><span>服务端独立授权</span><span>SDK v0.0.12</span></div></header>
 <div class="strategy-agent-websdk-layout"><aside class="strategy-agent-websdk-guide"><div class="strategy-agent-websdk-mark" aria-hidden="true">诊</div><h2>先说明对象与目标，再逐步补齐数据</h2><p>您可以从完整诊断开始，也可以单独测算要求回报率、重算某类资产的三情景现值。</p><div class="strategy-agent-websdk-prompts"><span>开始为王总做身家诊断</span><span>帮我测算家庭的要求回报率（三角度取 max）</span><span>把我的资产按悲观/中性/乐观三情景做现值重算</span></div><div class="strategy-agent-websdk-access-note"><strong>访问说明</strong><p>本站账号验证与飞书账号可用范围是两层独立校验；进入后仍需使用获授权的飞书账号。</p></div><button class="btn btn-secondary" onclick="wealthShowIntro({ pushHistory: true })" type="button">← 返回身家诊断</button></aside>
-<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>身家诊断顾问</strong><em aria-live="polite" id="wealth-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="wealth-agent-container"><div class="strategy-agent-websdk-loading" role="status"><span></span><strong>正在载入飞书身家诊断顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="wealth-agent-error" role="alert"><strong>身家诊断顾问暂时没有成功载入</strong><p id="wealth-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="wealth-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="wealth-agent-trace">尚未开始</code></summary><div><ol id="wealth-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="wealth-agent-download" type="button">下载诊断 JSON</button></div></details></section>
+<section class="strategy-agent-websdk-panel"><header><div><span></span><span></span><span></span></div><strong>身家诊断顾问</strong><em aria-live="polite" id="wealth-agent-status">准备连接</em></header><div class="strategy-agent-websdk-container" id="wealth-agent-container"><div class="strategy-agent-websdk-loading" id="wealth-agent-loading" role="status"><span></span><strong>正在载入飞书身家诊断顾问</strong><small>首次打开可能需要完成飞书登录</small></div></div><div class="strategy-agent-websdk-error" hidden id="wealth-agent-error" role="alert"><strong>身家诊断顾问暂时没有成功载入</strong><p id="wealth-agent-error-message">请检查飞书登录状态和域名白名单后重试。</p><button class="btn btn-primary" id="wealth-agent-retry" type="button">重新连接</button></div><details class="strategy-agent-websdk-diagnostics"><summary>连接诊断 · <code id="wealth-agent-trace">尚未开始</code></summary><div><ol id="wealth-agent-timeline"></ol><p>日志不记录账号、密码、Channel Token 或对话内容。</p><button class="strategy-agent-websdk-download" id="wealth-agent-download" type="button">下载诊断 JSON</button></div></details></section>
 </div></div></section>
 </article>
 <!-- WEALTH_AILY_PROTECTED_END -->
@@ -3067,11 +3061,8 @@
 <script type="module" src="js/strategy-agent-websdk.js?v=1"></script>
 <!-- STRATEGY_AGENT_PROTECTED_END -->
 <script type="module" src="js/value-agent-websdk.js?v=1"></script>
-<script type="module" src="js/service-agent-websdk.js?v=1"></script>
+<script type="module" src="js/service-agent-websdk.js?v=2"></script>
 <script src="js/academy-assessment.js"></script>
-<script src="js/final-business-pages.js?v=3"></script>
+<script src="js/final-business-pages.js?v=5"></script>
 </body>
 </html>
-
-
-

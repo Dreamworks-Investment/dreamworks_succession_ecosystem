@@ -8,6 +8,7 @@ const definitions = Object.freeze({
     authId: 'wealth-agent-auth-view',
     viewId: 'wealth-agent-websdk-view',
     rootId: 'wealth-agent-container',
+    loadingId: 'wealth-agent-loading',
     statusId: 'wealth-agent-status',
     errorId: 'wealth-agent-error',
     errorMessageId: 'wealth-agent-error-message',
@@ -31,6 +32,7 @@ const definitions = Object.freeze({
     authId: 'trust-agent-auth-view',
     viewId: 'trust-agent-websdk-view',
     rootId: 'trust-agent-container',
+    loadingId: 'trust-agent-loading',
     statusId: 'trust-agent-status',
     errorId: 'trust-agent-error',
     errorMessageId: 'trust-agent-error-message',
@@ -85,7 +87,12 @@ function createClient(scope, definition) {
   let trace = null;
 
   function loadingMarkup() {
-    return `<div class="strategy-agent-websdk-loading" role="status"><span aria-hidden="true"></span><strong>${definition.loading}</strong><small>首次打开可能需要完成飞书登录</small></div>`;
+    return `<div class="strategy-agent-websdk-loading" id="${definition.loadingId}" role="status"><span aria-hidden="true"></span><strong>${definition.loading}</strong><small>首次打开可能需要完成飞书登录</small></div>`;
+  }
+
+  function hideLoading() {
+    const loading = document.getElementById(definition.loadingId);
+    if (loading) loading.hidden = true;
   }
 
   function renderTrace() {
@@ -174,6 +181,7 @@ function createClient(scope, definition) {
 
   function showError(error) {
     const message = explainError(error);
+    hideLoading();
     setStatus('连接失败', 'error');
     if (elements.errorMessage) elements.errorMessage.textContent = message;
     if (elements.error) elements.error.hidden = false;
@@ -210,6 +218,9 @@ function createClient(scope, definition) {
     if (elements.error) elements.error.hidden = true;
     setStatus('正在验证访问会话');
     mountPromise = (async () => {
+      let observer = null;
+      let iframeLoaded = false;
+      let iframeFailed = false;
       try {
         await loadConfig();
         beginTrace();
@@ -217,6 +228,29 @@ function createClient(scope, definition) {
         const hostMatches = !config.allowedHost || location.hostname === config.allowedHost;
         addTrace('origin.checked', hostMatches ? 'success' : 'warning', { currentHost: location.hostname, matchesConfiguredHost: hostMatches });
         setStatus('正在连接');
+        observer = new MutationObserver(() => {
+          const iframe = elements.root.querySelector('iframe');
+          if (!iframe || iframe.dataset.dreamworksObserved === 'true') return;
+          iframe.dataset.dreamworksObserved = 'true';
+          iframe.setAttribute('title', `${definition.label}飞书会话面板`);
+          hideLoading();
+          addTrace('iframe.created', 'success', { host: (() => {
+            try { return new URL(iframe.src, location.href).hostname; } catch { return 'unknown'; }
+          })() });
+          iframe.addEventListener('load', () => {
+            iframeLoaded = true;
+            hideLoading();
+            setStatus('会话面板已载入', 'ready');
+            addTrace('iframe.loaded', 'success');
+          }, { once: true });
+          iframe.addEventListener('error', () => {
+            iframeFailed = true;
+            const error = new Error('飞书会话面板资源加载失败，请检查网络后重试。');
+            error.code = 'IFRAME_LOAD_ERROR';
+            showError(error);
+          }, { once: true });
+        });
+        observer.observe(elements.root, { childList: true, subtree: true });
         const startedAt = Date.now();
         const instance = await initAgentChat(elements.root, { channelToken: config.channelToken });
         if (currentGeneration !== generation) {
@@ -225,15 +259,23 @@ function createClient(scope, definition) {
         }
         sdk = instance;
         const iframe = elements.root.querySelector('iframe');
-        if (iframe) iframe.setAttribute('title', `${definition.label}飞书会话面板`);
-        setStatus('会话面板已载入', 'ready');
-        addTrace('sdk.init.completed', 'success', { initDurationMs: Date.now() - startedAt, iframePresent: Boolean(iframe) });
+        if (iframe) {
+          iframe.setAttribute('title', `${definition.label}飞书会话面板`);
+          hideLoading();
+        }
+        if (!iframeFailed) setStatus('会话面板已载入', 'ready');
+        addTrace('sdk.init.completed', 'success', {
+          initDurationMs: Date.now() - startedAt,
+          iframePresent: Boolean(iframe),
+          iframeLoadObserved: iframeLoaded
+        });
         return sdk;
       } catch (error) {
         if (!trace) beginTrace();
         showError(error);
         return null;
       } finally {
+        observer?.disconnect();
         if (currentGeneration === generation) mountPromise = null;
       }
     })();

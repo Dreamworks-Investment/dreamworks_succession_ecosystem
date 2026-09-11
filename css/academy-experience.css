@@ -179,14 +179,20 @@
   text-decoration: none;
 }
 
+.academy-poster-section {
+  overflow: visible;
+}
+
 .academy-poster-frame {
-  width: min(560px, 100%);
-  margin: 0 auto;
-  padding: 14px;
-  border: 1px solid rgba(16, 45, 71, .14);
-  border-radius: 22px;
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
   background: #fff;
-  box-shadow: 0 28px 80px rgba(17, 38, 55, .14);
+  box-shadow: none;
 }
 
 .academy-poster-frame img,
@@ -195,6 +201,10 @@
   width: 100%;
   height: auto;
   border-radius: 12px;
+}
+
+.academy-poster-frame img {
+  border-radius: 0;
 }
 
 .academy-brochure-grid {
@@ -323,7 +333,7 @@
   height: 100%;
   display: block;
   object-fit: cover;
-  transform: scale(1.012);
+  transform: scale(1);
   animation: academy-road-settle 1.1s cubic-bezier(.2, .75, .25, 1) both;
 }
 
@@ -338,6 +348,121 @@
   background: radial-gradient(circle, rgba(240, 190, 61, .34), transparent 68%);
   filter: blur(16px);
   animation: academy-infinity-breathe 3.8s ease-in-out infinite;
+}
+
+.academy-plate-clips {
+  width: 0;
+  height: 0;
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.academy-plate-map {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.academy-plate {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  color: var(--academy-navy);
+  font: inherit;
+  transform: translate3d(0, 0, 0);
+  transition: transform .38s cubic-bezier(.2, .82, .22, 1);
+  pointer-events: none;
+  cursor: pointer;
+  will-change: transform, filter;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.academy-plate-art {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-image: url('../assets/academy/student-a-roadmap-clay.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  -webkit-mask-image: url('../assets/academy/student-a-roadmap-foreground-mask.png');
+  mask-image: url('../assets/academy/student-a-roadmap-foreground-mask.png');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  mask-mode: alpha;
+  filter: drop-shadow(0 0 0 rgba(16, 45, 71, 0));
+  transition: filter .38s ease;
+  -webkit-clip-path: var(--plate-clip);
+  clip-path: var(--plate-clip);
+  pointer-events: auto;
+}
+
+.academy-plate.is-pending,
+.academy-plate.is-continuing { cursor: help; }
+
+.academy-plate:hover,
+.academy-plate:focus-visible {
+  z-index: 6;
+  outline: none;
+  transform: translate3d(0, -14px, 0);
+}
+
+.academy-plate:hover .academy-plate-art,
+.academy-plate:focus-visible .academy-plate-art {
+  opacity: 1;
+  filter: drop-shadow(0 24px 18px rgba(16, 45, 71, .3)) drop-shadow(0 5px 3px rgba(188, 139, 21, .2));
+}
+
+.academy-plate-label {
+  width: max-content;
+  min-width: 150px;
+  max-width: 210px;
+  padding: 11px 14px;
+  position: absolute;
+  left: var(--label-x);
+  top: var(--label-y);
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, .92);
+  border-radius: 14px;
+  background: rgba(255, 253, 247, .94);
+  box-shadow: 0 16px 36px rgba(16, 45, 71, .2), inset 0 1px 0 #fff;
+  opacity: 0;
+  text-align: left;
+  transform: translate(-50%, calc(-50% + 14px));
+  transition: opacity .22s ease .04s, transform .3s cubic-bezier(.2, .82, .22, 1) .04s;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.academy-plate-label b,
+.academy-plate-label time,
+.academy-plate-label small { display: block; }
+.academy-plate-label b { color: var(--academy-navy); font-size: .74rem; }
+.academy-plate-label time { margin-top: 4px; color: #887348; font-size: .58rem; font-weight: 800; letter-spacing: .06em; }
+.academy-plate-label small { margin-top: 5px; color: #177a60; font-size: .58rem; font-weight: 800; }
+.academy-plate.is-pending .academy-plate-label small { color: #7a7368; }
+.academy-plate.is-continuing .academy-plate-label { background: rgba(7, 28, 51, .93); }
+.academy-plate.is-continuing .academy-plate-label b { color: #fff; }
+.academy-plate.is-continuing .academy-plate-label time,
+.academy-plate.is-continuing .academy-plate-label small { color: #e7c65c; }
+
+.academy-plate:hover .academy-plate-label,
+.academy-plate:focus-visible .academy-plate-label {
+  opacity: 1;
+  transform: translate(-50%, -50%);
 }
 
 .academy-road-instruction {
@@ -426,7 +551,8 @@
   transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
 }
 
-.academy-milestone button::before {
+.academy-milestone button::before,
+.academy-milestone > div::before {
   content: '';
   width: 72px;
   height: 2px;
@@ -439,7 +565,8 @@
   pointer-events: none;
 }
 
-.academy-milestone button::after {
+.academy-milestone button::after,
+.academy-milestone > div::after {
   content: '';
   width: clamp(84px, 8vw, 128px);
   aspect-ratio: 1;
@@ -456,16 +583,22 @@
 }
 
 .milestone-two button::before,
+.milestone-two > div::before,
 .milestone-four button::before,
-.milestone-six button::before {
+.milestone-four > div::before,
+.milestone-six button::before,
+.milestone-six > div::before {
   left: -72px;
   right: auto;
   background: linear-gradient(270deg, rgba(215, 172, 43, .86), rgba(215, 172, 43, .08));
 }
 
 .milestone-two button::after,
+.milestone-two > div::after,
 .milestone-four button::after,
-.milestone-six button::after {
+.milestone-four > div::after,
+.milestone-six button::after,
+.milestone-six > div::after {
   left: clamp(-170px, -11vw, -112px);
   right: auto;
 }
@@ -561,13 +694,15 @@
   font-weight: 800;
 }
 
-.academy-milestone.is-pending > button {
+.academy-milestone.is-pending > button,
+.academy-milestone.is-pending > div {
   opacity: .9;
   background: linear-gradient(145deg, rgba(246, 243, 236, .9), rgba(224, 225, 220, .8));
 }
 .academy-milestone.is-pending .academy-milestone-icon { filter: grayscale(.45); }
 .academy-milestone.is-pending em { color: #817b6f; }
-.academy-milestone.is-continuing > button {
+.academy-milestone.is-continuing > button,
+.academy-milestone.is-continuing > div {
   border-color: rgba(232, 199, 91, .34);
   background: linear-gradient(145deg, rgba(7, 28, 51, .96), rgba(13, 54, 72, .92));
   color: #fff;
@@ -688,7 +823,7 @@
 
 @keyframes academy-road-settle {
   0% { opacity: 0; transform: translateY(20px) scale(1.035); }
-  100% { opacity: 1; transform: translateY(0) scale(1.012); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes academy-infinity-breathe {
@@ -719,6 +854,12 @@
   .academy-journey-road { min-height: 0; padding: 16px; aspect-ratio: auto; border-radius: 24px; }
   .academy-road-visual { width: 100%; position: relative; inset: auto; aspect-ratio: 1; border-radius: 18px; box-shadow: inset 0 0 0 1px rgba(16, 45, 71, .08); }
   .academy-road-visual img { border-radius: inherit; }
+  .academy-plate:hover,
+  .academy-plate:focus-visible { transform: translate3d(0, -9px, 0); }
+  .academy-plate-label { min-width: 120px; max-width: 155px; padding: 8px 10px; }
+  .academy-plate-label b { font-size: .61rem; }
+  .academy-plate-label time,
+  .academy-plate-label small { font-size: .5rem; }
   .academy-road-instruction { max-width: none; margin: 12px 2px 18px; position: relative; inset: auto; border-color: rgba(16, 45, 71, .1); background: rgba(255, 255, 255, .7); box-shadow: none; }
   .academy-road-horizon { display: none; }
   .academy-milestone-list { height: auto; min-height: 0; position: relative; inset: auto; display: grid; gap: 20px; pointer-events: auto; }
@@ -727,7 +868,9 @@
   .academy-milestone button,
   .academy-milestone > div { min-height: 0; padding: 18px 20px; }
   .academy-milestone button::before,
-  .academy-milestone button::after { display: none; }
+  .academy-milestone > div::before,
+  .academy-milestone button::after,
+  .academy-milestone > div::after { display: none; }
   .academy-milestone-icon { width: 44px; height: 44px; }
   .academy-milestone strong { font-size: 1.08rem; }
   .academy-milestone small { font-size: .73rem; }
@@ -751,5 +894,8 @@
   .academy-graduation-cap { animation: none; }
   .academy-road-visual img,
   .academy-road-visual-glow { animation: none; }
+  .academy-plate,
+  .academy-plate-art,
+  .academy-plate-label { transition: none; }
   .academy-milestone button { transition: none; }
 }

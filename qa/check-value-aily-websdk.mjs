@@ -41,7 +41,7 @@ assert(!client.includes('customParams:'), 'The MVP must not inject unverified id
 assert(app.includes("requested === 'value-agent'"), 'The application router must support direct research-agent URLs');
 assert(app.includes("event.state.valueView === 'agent'"), 'Browser Back/Forward must restore the research-agent view');
 assert(app.includes('window.valueAgentDestroy'), 'Leaving the value-investing tab must destroy its SDK iframe');
-assert(html.includes('js/app.js?v=9'), 'The modified router must use a current browser-cache revision');
+assert(/js\/app\.js\?v=(?:[9]|[1-9]\d+)/.test(html), 'The modified router must use browser-cache revision 9 or later');
 assert(css.includes('#page-value.value-agent-active .value-intro-document { display: none; }'), 'The agent route must replace rather than overlap the introduction slides');
 assert(css.includes('@media (max-width: 820px)') && css.includes('@media (prefers-reduced-motion: reduce)'), 'The agent view needs mobile and reduced-motion treatments');
 

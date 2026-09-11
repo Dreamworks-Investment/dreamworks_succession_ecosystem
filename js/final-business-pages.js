@@ -14,7 +14,8 @@
       materials: [
         {
           title: '梦工场传承学院个人SMART计划表',
-          url: 'https://www.feishu.cn/docx/Ie8KdYNJCo73WKxuhLecxbhBn0f'
+          previewUrl: 'assets/academy/materials/opening-smart-plan.html',
+          downloadUrl: 'assets/academy/materials/opening-smart-plan.docx'
         }
       ]
     },
@@ -35,11 +36,8 @@
       materials: [
         {
           title: '传承学院问卷',
-          url: 'https://www.feishu.cn/docx/QZpddvpM9oi6MlxxWY0c5d1Xnth'
-        },
-        {
-          title: '传承认知与投资认知问卷',
-          url: 'https://www.feishu.cn/docx/X1qNdRe5IoTmS3xiYLHcVWRynIJ'
+          previewUrl: 'assets/academy/materials/inheritance-questionnaire.html',
+          downloadUrl: 'assets/academy/materials/inheritance-questionnaire.docx'
         }
       ]
     },
@@ -51,7 +49,8 @@
       materials: [
         {
           title: '家族信托与慈善信托QA',
-          url: 'https://www.feishu.cn/docx/Gdj2d5DEYoJOeOxl4pnc48gWnIg'
+          previewUrl: 'assets/academy/materials/trust-charity-qa.html',
+          downloadUrl: 'assets/academy/materials/trust-charity-qa.docx'
         }
       ]
     },
@@ -63,11 +62,13 @@
       materials: [
         {
           title: '关于传承 · 毕业逐字稿',
-          url: 'https://www.feishu.cn/docx/W3DQdPH7mo47fex61kQcG4GYnIg'
+          previewUrl: 'assets/academy/materials/graduation-speech.html',
+          downloadUrl: 'assets/academy/materials/graduation-speech.docx'
         },
         {
           title: '毕业规划',
-          url: 'https://www.feishu.cn/docx/FbAOdcrcMoZ5UxxupFWchscHnCe'
+          previewUrl: 'assets/academy/materials/graduation-plan.html',
+          downloadUrl: 'assets/academy/materials/graduation-plan.docx'
         }
       ]
     },
@@ -150,18 +151,20 @@
     if (title) title.textContent = material.title;
     if (open) {
       open.hidden = false;
-      open.href = material.url;
+      open.href = material.downloadUrl;
+      open.setAttribute('download', '');
+      open.textContent = '下载 Word ↗';
     }
     if (frame) {
       frame.title = material.title + '预览';
-      frame.src = material.url;
+      frame.src = material.previewUrl;
     }
     if (placeholder) {
       placeholder.setAttribute('aria-hidden', 'true');
       const placeholderTitle = placeholder.querySelector('strong');
       const placeholderCopy = placeholder.querySelector('p');
       if (placeholderTitle) placeholderTitle.textContent = '正在准备文档预览';
-      if (placeholderCopy) placeholderCopy.textContent = '也可以直接在飞书中打开原始脱敏材料。';
+      if (placeholderCopy) placeholderCopy.textContent = '也可以下载 Word 原件留存。';
     }
 
     document.querySelectorAll('#academy-preview-material-list button').forEach((button, index) => {
@@ -224,6 +227,7 @@
       if (documentOpen) {
         documentOpen.hidden = true;
         documentOpen.removeAttribute('href');
+        documentOpen.removeAttribute('download');
       }
       if (documentFrame) {
         documentFrame.title = milestone.emptyTitle;
@@ -323,14 +327,25 @@
   }
 
   function academyOpenMilestone(milestoneKey, options) {
-    if (!academyRenderMilestone(milestoneKey)) return;
+    const milestone = ACADEMY_MILESTONES[milestoneKey];
+    if (!milestone || !milestone.materials.length || !academyRenderMilestone(milestoneKey)) return false;
     academySetView('material', Object.assign({}, options || {}, { milestoneKey }));
+    return true;
+  }
+
+  function setupAcademyPlateMap() {
+    document.querySelectorAll('[data-academy-scene-milestone]').forEach((hotspot) => {
+      hotspot.addEventListener('click', () => {
+        academyOpenMilestone(hotspot.dataset.academySceneMilestone, { pushHistory: true });
+      });
+    });
   }
 
   function academyRestoreView(state, options) {
     const view = state && state.academyView ? state.academyView : 'cover';
     if (view === 'material' && state.academyMilestone) {
-      academyOpenMilestone(state.academyMilestone, Object.assign({}, options || {}, { milestoneKey: state.academyMilestone }));
+      const restored = academyOpenMilestone(state.academyMilestone, Object.assign({}, options || {}, { milestoneKey: state.academyMilestone }));
+      if (!restored) academySetView('cases', Object.assign({}, options || {}, { replaceHistory: true }));
       return;
     }
     academySetView(view, options);
@@ -406,5 +421,8 @@
   window.academyRestoreView = academyRestoreView;
   window.activateSixCommonVision = renderVisionPreview;
 
-  document.addEventListener('DOMContentLoaded', setupVisionExperience);
+  document.addEventListener('DOMContentLoaded', () => {
+    setupAcademyPlateMap();
+    setupVisionExperience();
+  });
 })();

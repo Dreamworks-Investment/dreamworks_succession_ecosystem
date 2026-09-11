@@ -94,9 +94,14 @@ try {
   });
   assert.equal(casesLogin.status, 200);
   const casesCookie = cookieFrom(casesLogin);
-  assert(casesCookie.startsWith('dw_strategy_auth='), 'Successful login must issue the signed HttpOnly session cookie');
+  assert(casesCookie.startsWith('dw_auth_cases='), 'Case login must issue its own scope-bound HttpOnly cookie');
   assert.match(casesLogin.headers.get('set-cookie') || '', /HttpOnly/);
   assert.match(casesLogin.headers.get('set-cookie') || '', /SameSite=Strict/);
+  const transplantedCasesToken = casesCookie.slice(casesCookie.indexOf('=') + 1);
+  const transplantedCasesStatus = await (await request('/api/strategy-auth/status', {
+    headers: { Cookie: `dw_auth_agent=${transplantedCasesToken}` }
+  })).json();
+  assert.deepEqual(transplantedCasesStatus.grants, { cases: false, agent: false, value: false, wealth: false, trust: false }, 'A signed cookie value must not be reusable under another scope name');
 
   const casesIndexResponse = await request('/#strategy-library', { headers: { Cookie: casesCookie } });
   const casesIndex = await casesIndexResponse.text();
@@ -121,7 +126,11 @@ try {
     body: JSON.stringify({ scope: 'agent', username: env.STRATEGY_AGENT_USERNAME, password: env.STRATEGY_AGENT_PASSWORD })
   });
   assert.equal(agentLogin.status, 200);
-  const combinedCookie = cookieFrom(agentLogin);
+  const agentCookie = cookieFrom(agentLogin);
+  assert(agentCookie.startsWith('dw_auth_agent='), 'Positioning-agent login must issue a separate scope-bound cookie');
+  const agentOnlyStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: agentCookie } })).json();
+  assert.deepEqual(agentOnlyStatus.grants, { cases: false, agent: true, value: false, wealth: false, trust: false }, 'One scope cookie must never inherit another scope');
+  const combinedCookie = `${casesCookie}; ${agentCookie}`;
   const combinedIndex = await (await request('/#strategy-agent', { headers: { Cookie: combinedCookie } })).text();
   assert(combinedIndex.includes('十个合作项目，一套通用翻阅方式'), 'Adding agent access must preserve the existing case grant');
   assert(combinedIndex.includes('id="strategy-agent-websdk-view"'), 'Agent grant must reveal the protected agent page');
@@ -133,7 +142,7 @@ try {
   const agentConfig = await agentConfigResponse.json();
   assert.equal(agentConfig.config.channelToken, env.STRATEGY_AILY_CHANNEL_TOKEN);
 
-  let allAgentCookie = combinedCookie;
+  const allAgentCookies = [casesCookie, agentCookie];
   const businessAgents = [
     { scope: 'value', username: env.VALUE_AGENT_USERNAME, password: env.VALUE_AGENT_PASSWORD, token: env.VALUE_AILY_CHANNEL_TOKEN, view: 'value-agent-websdk-view' },
     { scope: 'wealth', username: env.WEALTH_AGENT_USERNAME, password: env.WEALTH_AGENT_PASSWORD, token: env.WEALTH_AILY_CHANNEL_TOKEN, view: 'wealth-agent-websdk-view' },
@@ -144,21 +153,31 @@ try {
     assert.equal(unauthorisedConfig.status, 401, `${agent.scope} config must require its own grant`);
     const login = await request('/api/strategy-auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Cookie: allAgentCookie },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ scope: agent.scope, username: agent.username, password: agent.password })
     });
     assert.equal(login.status, 200, `${agent.scope} login must succeed`);
-    allAgentCookie = cookieFrom(login);
-    const protectedIndex = await (await request(`/#${agent.scope}-agent`, { headers: { Cookie: allAgentCookie } })).text();
+    const scopeCookie = cookieFrom(login);
+    assert(scopeCookie.startsWith(`dw_auth_${agent.scope}=`), `${agent.scope} must receive only its own cookie`);
+    const isolatedStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: scopeCookie } })).json();
+    const expectedGrants = { cases: false, agent: false, value: false, wealth: false, trust: false };
+    expectedGrants[agent.scope] = true;
+    assert.deepEqual(isolatedStatus.grants, expectedGrants, `${agent.scope} login must not unlock any other area`);
+    const protectedIndex = await (await request(`/#${agent.scope}-agent`, { headers: { Cookie: scopeCookie } })).text();
     assert(protectedIndex.includes(`id="${agent.view}"`), `${agent.scope} grant must reveal its protected agent view`);
     assert(!protectedIndex.includes(`data-strategy-auth-form="${agent.scope}"`), `${agent.scope} blocker must be removed after login`);
     assert(!protectedIndex.includes(agent.token), `${agent.scope} token must never be in HTML`);
-    const configResponse = await request(`/api/strategy-auth/agent-config/${agent.scope}`, { headers: { Cookie: allAgentCookie } });
+    for (const other of businessAgents.filter(candidate => candidate.scope !== agent.scope)) {
+      const otherConfig = await request(`/api/strategy-auth/agent-config/${other.scope}`, { headers: { Cookie: scopeCookie } });
+      assert.equal(otherConfig.status, 401, `${agent.scope} cookie must not unlock ${other.scope}`);
+    }
+    const configResponse = await request(`/api/strategy-auth/agent-config/${agent.scope}`, { headers: { Cookie: scopeCookie } });
     assert.equal(configResponse.status, 200);
     assert.equal((await configResponse.json()).config.channelToken, agent.token);
+    allAgentCookies.push(scopeCookie);
   }
 
-  const statusResponse = await request('/api/strategy-auth/status', { headers: { Cookie: allAgentCookie } });
+  const statusResponse = await request('/api/strategy-auth/status', { headers: { Cookie: allAgentCookies.join('; ') } });
   const statusText = await statusResponse.text();
   assert(!statusText.includes(env.STRATEGY_CASES_USERNAME));
   assert(!statusText.includes(env.STRATEGY_CASES_PASSWORD));
