@@ -26,6 +26,7 @@ const env = {
 
 const authService = createStrategyAuthService({ env });
 assert.equal(authService.authenticate('cases', env.STRATEGY_CASES_USERNAME, env.STRATEGY_CASES_PASSWORD).ok, true);
+assert.equal(authService.authenticate('chat', env.STRATEGY_CASES_USERNAME, env.STRATEGY_CASES_PASSWORD).ok, true);
 assert.equal(authService.authenticate('agent', env.STRATEGY_CASES_USERNAME, env.STRATEGY_CASES_PASSWORD).ok, false);
 assert.equal(authService.authenticate('cases', env.STRATEGY_AGENT_USERNAME, env.STRATEGY_AGENT_PASSWORD).ok, false);
 assert.equal(authService.authenticate('value', env.VALUE_AGENT_USERNAME, env.VALUE_AGENT_PASSWORD).ok, true);
@@ -54,6 +55,7 @@ try {
   assert.match(publicIndexResponse.headers.get('vary') || '', /Cookie/);
   assert(publicIndex.includes('定位是中心，<span>价值才是核心</span>'), 'Public strategy hub must remain available');
   assert(publicIndex.includes('data-strategy-auth-form="cases"'), 'Public HTML must include the case-library gate');
+  assert(publicIndex.includes('data-strategy-auth-form="chat"'), 'Public HTML must include the confidential-media gate');
   assert(publicIndex.includes('data-strategy-auth-form="agent"'), 'Public HTML must include the positioning-agent gate');
   assert(publicIndex.includes('data-strategy-auth-form="value"'), 'Public HTML must include the research-agent gate');
   assert(publicIndex.includes('data-strategy-auth-form="wealth"'), 'Public HTML must include the wealth-agent gate');
@@ -74,6 +76,8 @@ try {
 
   const publicAsset = await request('/assets/strategy/scene-home.png');
   assert.equal(publicAsset.status, 404, 'Strategy assets must not be directly retrievable before case authentication');
+  const publicConfidentialAsset = await request('/assets/confidential/strategy-wechat-case.jpeg');
+  assert.equal(publicConfidentialAsset.status, 404, 'Confidential media must not be directly retrievable before its own authentication');
   const publicCaseScript = await request('/js/strategy-cases-data.js');
   assert.equal(publicCaseScript.status, 404, 'Case data must not be directly retrievable before authentication');
   const publicDocument = await request('/docs/strategy/chapter2-final/RESEARCH_SOURCE_INDEX.md');
@@ -101,7 +105,7 @@ try {
   const transplantedCasesStatus = await (await request('/api/strategy-auth/status', {
     headers: { Cookie: `dw_auth_agent=${transplantedCasesToken}` }
   })).json();
-  assert.deepEqual(transplantedCasesStatus.grants, { cases: false, agent: false, value: false, wealth: false, trust: false }, 'A signed cookie value must not be reusable under another scope name');
+  assert.deepEqual(transplantedCasesStatus.grants, { cases: false, chat: false, agent: false, value: false, wealth: false, trust: false }, 'A signed cookie value must not be reusable under another scope name');
 
   const casesIndexResponse = await request('/#strategy-library', { headers: { Cookie: casesCookie } });
   const casesIndex = await casesIndexResponse.text();
@@ -117,6 +121,8 @@ try {
   assert.equal(protectedAsset.status, 200);
   assert.match(protectedAsset.headers.get('cache-control') || '', /private, no-store/);
   assert.match(protectedAsset.headers.get('vary') || '', /Cookie/);
+  const casesCannotReadConfidentialMedia = await request('/assets/confidential/strategy-wechat-case.jpeg', { headers: { Cookie: casesCookie } });
+  assert.equal(casesCannotReadConfidentialMedia.status, 404, 'Case-library login must not automatically unlock the confidential chat image');
   const casesCannotReadAgentConfig = await request('/api/strategy-auth/agent-config', { headers: { Cookie: casesCookie } });
   assert.equal(casesCannotReadAgentConfig.status, 401, 'Case access must not imply agent access');
 
@@ -129,7 +135,7 @@ try {
   const agentCookie = cookieFrom(agentLogin);
   assert(agentCookie.startsWith('dw_auth_agent='), 'Positioning-agent login must issue a separate scope-bound cookie');
   const agentOnlyStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: agentCookie } })).json();
-  assert.deepEqual(agentOnlyStatus.grants, { cases: false, agent: true, value: false, wealth: false, trust: false }, 'One scope cookie must never inherit another scope');
+  assert.deepEqual(agentOnlyStatus.grants, { cases: false, chat: false, agent: true, value: false, wealth: false, trust: false }, 'One scope cookie must never inherit another scope');
   const combinedCookie = `${casesCookie}; ${agentCookie}`;
   const combinedIndex = await (await request('/#strategy-agent', { headers: { Cookie: combinedCookie } })).text();
   assert(combinedIndex.includes('十个合作项目，一套通用翻阅方式'), 'Adding agent access must preserve the existing case grant');
@@ -142,7 +148,23 @@ try {
   const agentConfig = await agentConfigResponse.json();
   assert.equal(agentConfig.config.channelToken, env.STRATEGY_AILY_CHANNEL_TOKEN);
 
-  const allAgentCookies = [casesCookie, agentCookie];
+  const chatLogin = await request('/api/strategy-auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ scope: 'chat', username: env.STRATEGY_CASES_USERNAME, password: env.STRATEGY_CASES_PASSWORD })
+  });
+  assert.equal(chatLogin.status, 200);
+  const chatCookie = cookieFrom(chatLogin);
+  assert(chatCookie.startsWith('dw_auth_chat='), 'Confidential-media login must issue a separate scope-bound cookie');
+  const chatOnlyStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: chatCookie } })).json();
+  assert.deepEqual(chatOnlyStatus.grants, { cases: false, chat: true, agent: false, value: false, wealth: false, trust: false }, 'Confidential-media login must not unlock the case library or any agent');
+  const confidentialAsset = await request('/assets/confidential/strategy-wechat-case.jpeg', { headers: { Cookie: chatCookie } });
+  assert.equal(confidentialAsset.status, 200);
+  assert.match(confidentialAsset.headers.get('cache-control') || '', /private, no-store/);
+  const chatCannotReadCases = await request('/assets/strategy/scene-home.png', { headers: { Cookie: chatCookie } });
+  assert.equal(chatCannotReadCases.status, 404, 'Confidential-media login must not unlock case-library assets');
+
+  const allAgentCookies = [casesCookie, chatCookie, agentCookie];
   const businessAgents = [
     { scope: 'value', username: env.VALUE_AGENT_USERNAME, password: env.VALUE_AGENT_PASSWORD, token: env.VALUE_AILY_CHANNEL_TOKEN, view: 'value-agent-websdk-view' },
     { scope: 'wealth', username: env.WEALTH_AGENT_USERNAME, password: env.WEALTH_AGENT_PASSWORD, token: env.WEALTH_AILY_CHANNEL_TOKEN, view: 'wealth-agent-websdk-view' },
@@ -160,7 +182,7 @@ try {
     const scopeCookie = cookieFrom(login);
     assert(scopeCookie.startsWith(`dw_auth_${agent.scope}=`), `${agent.scope} must receive only its own cookie`);
     const isolatedStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: scopeCookie } })).json();
-    const expectedGrants = { cases: false, agent: false, value: false, wealth: false, trust: false };
+    const expectedGrants = { cases: false, chat: false, agent: false, value: false, wealth: false, trust: false };
     expectedGrants[agent.scope] = true;
     assert.deepEqual(isolatedStatus.grants, expectedGrants, `${agent.scope} login must not unlock any other area`);
     const protectedIndex = await (await request(`/#${agent.scope}-agent`, { headers: { Cookie: scopeCookie } })).text();
@@ -187,7 +209,7 @@ try {
   assert(!statusText.includes(env.WEALTH_AILY_CHANNEL_TOKEN));
   assert(!statusText.includes(env.TRUST_AILY_CHANNEL_TOKEN));
   const status = JSON.parse(statusText);
-  assert.deepEqual(status.grants, { cases: true, agent: true, value: true, wealth: true, trust: true });
+  assert.deepEqual(status.grants, { cases: true, chat: true, agent: true, value: true, wealth: true, trust: true });
 } finally {
   await new Promise(resolve => {
     server.close(resolve);

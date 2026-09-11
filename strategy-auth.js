@@ -2,7 +2,7 @@ import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 
 const COOKIE_PREFIX = "dw_auth_";
 const DEFAULT_TTL_SECONDS = 8 * 60 * 60;
-const VALID_SCOPES = new Set(["cases", "agent", "value", "wealth", "trust"]);
+const VALID_SCOPES = new Set(["cases", "chat", "agent", "value", "wealth", "trust"]);
 
 function clean(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -56,6 +56,13 @@ export function createStrategyAuthService(options = {}) {
   const sessionSecret = clean(env.STRATEGY_AUTH_SESSION_SECRET);
   const credentials = {
     cases: {
+      username: clean(env.STRATEGY_CASES_USERNAME),
+      password: String(env.STRATEGY_CASES_PASSWORD || "")
+    },
+    // The confidential home-page artifact uses the case-library credential
+    // pair, but receives its own signed cookie so one login never unlocks the
+    // other area implicitly.
+    chat: {
       username: clean(env.STRATEGY_CASES_USERNAME),
       password: String(env.STRATEGY_CASES_PASSWORD || "")
     },
@@ -143,6 +150,7 @@ export function createStrategyAuthService(options = {}) {
     return {
       grants: {
         cases: current.grants.includes("cases"),
+        chat: current.grants.includes("chat"),
         agent: current.grants.includes("agent"),
         value: current.grants.includes("value"),
         wealth: current.grants.includes("wealth"),
@@ -150,6 +158,7 @@ export function createStrategyAuthService(options = {}) {
       },
       configured: {
         cases: configured("cases"),
+        chat: configured("chat"),
         agent: configured("agent"),
         value: configured("value"),
         wealth: configured("wealth"),

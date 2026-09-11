@@ -6,8 +6,8 @@
   'use strict';
 
   var auth = window.DREAMWORKS_STRATEGY_AUTH || {
-    grants: { cases: false, agent: false, value: false, wealth: false, trust: false },
-    configured: { cases: false, agent: false, value: false, wealth: false, trust: false, session: false }
+    grants: { cases: false, chat: false, agent: false, value: false, wealth: false, trust: false },
+    configured: { cases: false, chat: false, agent: false, value: false, wealth: false, trust: false, session: false }
   };
   var grants = auth.grants || {};
   var protectedRouter = {
@@ -176,6 +176,11 @@
       if (message) {
         message.classList.add('is-success');
         message.textContent = '验证通过，正在进入…';
+      }
+      if (scope === 'chat') {
+        grants.chat = true;
+        window.dispatchEvent(new CustomEvent('dreamworks:auth-granted', { detail: { scope: scope } }));
+        return;
       }
       window.location.reload();
     } catch (error) {

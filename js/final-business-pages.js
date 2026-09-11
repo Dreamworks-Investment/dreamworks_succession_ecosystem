@@ -413,6 +413,34 @@
     renderVisionPreview('value');
   }
 
+  function setupCharityArtifactDashboard() {
+    const dialog = document.getElementById('charity-artifact-dialog');
+    const image = document.getElementById('charity-artifact-dialog-image');
+    const title = document.getElementById('charity-artifact-dialog-title');
+    const cards = Array.from(document.querySelectorAll('[data-charity-artifact-src]'));
+    if (!dialog || !image || !title || !cards.length) return;
+
+    cards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const source = card.dataset.charityArtifactSrc;
+        const artifactTitle = card.dataset.charityArtifactTitle || '公益信用状';
+        if (!source) return;
+        image.src = source;
+        image.alt = artifactTitle;
+        title.textContent = artifactTitle;
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+        else dialog.setAttribute('open', '');
+      });
+    });
+
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+      image.removeAttribute('src');
+    });
+  }
+
   window.academyShowCover = academyShowCover;
   window.academyEnterSystem = academyEnterSystem;
   window.academyShowAbout = academyShowAbout;
@@ -424,5 +452,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     setupAcademyPlateMap();
     setupVisionExperience();
+    setupCharityArtifactDashboard();
   });
 })();

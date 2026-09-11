@@ -174,11 +174,24 @@
 .strategy-hub-proof span:not(:last-child)::after { content:""; position:absolute; right:-15px; top:50%; width:3px; height:3px; border-radius:50%; background:#d5ad68; }
 
 .strategy-value-model { position:relative; min-height:500px; isolation:isolate; }
-.strategy-value-cube { position:absolute; left:50%; top:46%; width:220px; height:220px; transform:translate(-50%,-50%) rotate(-3deg); }
-.cube-face { position:absolute; display:block; border:1px solid rgba(239,205,143,.62); }
-.cube-front { inset:55px 42px 12px 10px; background:linear-gradient(145deg,rgba(69,136,175,.48),rgba(15,52,82,.24)); box-shadow:0 28px 80px rgba(0,0,0,.32); }
-.cube-top { left:48px; top:3px; width:168px; height:106px; transform:skewY(-28deg); background:linear-gradient(135deg,rgba(222,184,112,.34),rgba(51,111,151,.2)); }
-.cube-side { right:-26px; top:56px; width:68px; height:153px; transform:skewY(-28deg); background:linear-gradient(180deg,rgba(42,99,137,.44),rgba(6,30,51,.35)); }
+.strategy-cube-diagram { position:absolute; inset:0; pointer-events:none; }
+.strategy-cube-axis-lines { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.cube-axis-line { fill:none; stroke:rgba(225,189,119,.48); stroke-width:1.35; stroke-dasharray:5 7; vector-effect:non-scaling-stroke; }
+.cube-axis-line-r { stroke:#80b7da; }
+.cube-axis-line-g { stroke:#dfba74; }
+.cube-axis-line-s { stroke:#b9d2df; }
+.strategy-cube-axis-lines marker path { fill:#dfba74; }
+.cube-axis-origin { fill:#f1ca80; filter:drop-shadow(0 0 8px rgba(223,186,116,.72)); }
+.strategy-cube-scene { position:absolute; left:50%; top:49%; width:178px; height:178px; perspective:900px; transform:translate(-50%,-50%); }
+.strategy-value-cube { position:relative; width:100%; height:100%; transform-style:preserve-3d; transform:rotateX(-23deg) rotateY(36deg) rotateZ(-2deg); transition:transform .55s ease; }
+.strategy-value-model:hover .strategy-value-cube { transform:rotateX(-20deg) rotateY(43deg) rotateZ(-2deg) translateY(-4px); }
+.cube-face { position:absolute; inset:0; display:block; border:1px solid rgba(239,205,143,.72); backface-visibility:visible; box-shadow:inset 0 0 30px rgba(223,186,116,.08); }
+.cube-front { transform:translateZ(89px); background:linear-gradient(145deg,rgba(52,128,174,.48),rgba(9,42,69,.48)); }
+.cube-back { transform:rotateY(180deg) translateZ(89px); background:rgba(8,34,57,.42); }
+.cube-right { transform:rotateY(90deg) translateZ(89px); background:linear-gradient(160deg,rgba(223,186,116,.29),rgba(19,65,96,.45)); }
+.cube-left { transform:rotateY(-90deg) translateZ(89px); background:rgba(26,89,126,.3); }
+.cube-top { transform:rotateX(90deg) translateZ(89px); background:linear-gradient(145deg,rgba(239,205,143,.48),rgba(71,128,161,.3)); }
+.cube-bottom { transform:rotateX(-90deg) translateZ(89px); background:rgba(7,28,47,.42); }
 .strategy-value-axis { position:absolute; display:grid; gap:2px; min-width:150px; padding:14px 16px; border-left:2px solid #d5ad68; background:rgba(7,23,42,.7); backdrop-filter:blur(8px); }
 .strategy-value-axis strong { color:#e1bd77; font-family:Georgia,serif; font-size:1.65rem; }
 .strategy-value-axis span { color:#fff; font-weight:700; }
@@ -352,7 +365,13 @@
   .strategy-hub-actions { flex-direction:column; align-items:stretch; }
   .strategy-hub-actions .btn { justify-content:center; }
   .strategy-value-model { min-height:470px; transform:scale(.9); transform-origin:center; }
-  .strategy-value-cube { width:180px; height:180px; }
+  .strategy-cube-scene { width:142px; height:142px; }
+  .cube-front { transform:translateZ(71px); }
+  .cube-back { transform:rotateY(180deg) translateZ(71px); }
+  .cube-right { transform:rotateY(90deg) translateZ(71px); }
+  .cube-left { transform:rotateY(-90deg) translateZ(71px); }
+  .cube-top { transform:rotateX(90deg) translateZ(71px); }
+  .cube-bottom { transform:rotateX(-90deg) translateZ(71px); }
   .strategy-value-axis { min-width:132px; }
   .axis-r { top:26px; }
   .axis-s { top:104px; }

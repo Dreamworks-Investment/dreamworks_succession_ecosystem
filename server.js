@@ -12,12 +12,13 @@ const DEFAULT_HOST = "0.0.0.0";
 const MAX_JSON_BODY_BYTES = 220 * 1024;
 const REQUEST_BUCKETS = new Map();
 const DEFAULT_DIAGNOSTICS = createDiagnosticStore();
-const STRATEGY_PROTECTED_PATHS = [
-  "/assets/strategy/",
-  "/docs/strategy/",
-  "/js/strategy-cases-data.js",
-  "/js/strategy-cases.js",
-  "/js/strategy.js"
+const PROTECTED_PATH_SCOPES = [
+  { prefix: "/assets/strategy/", scope: "cases" },
+  { prefix: "/docs/strategy/", scope: "cases" },
+  { prefix: "/js/strategy-cases-data.js", scope: "cases" },
+  { prefix: "/js/strategy-cases.js", scope: "cases" },
+  { prefix: "/js/strategy.js", scope: "cases" },
+  { prefix: "/assets/confidential/", scope: "chat" }
 ];
 const STRATEGY_BLOCKS = {
   cases: ["STRATEGY_CASES_PROTECTED_START", "STRATEGY_CASES_PROTECTED_END"],
@@ -130,8 +131,9 @@ function renderIndex(authStatus) {
   );
 }
 
-function isStrategyProtectedPath(pathname) {
-  return STRATEGY_PROTECTED_PATHS.some(prefix => pathname === prefix || pathname.startsWith(prefix));
+function protectedScopeForPath(pathname) {
+  const entry = PROTECTED_PATH_SCOPES.find(({ prefix }) => pathname === prefix || pathname.startsWith(prefix));
+  return entry ? entry.scope : "";
 }
 
 function readJsonBody(req) {
@@ -332,7 +334,7 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
   if (pathname === "/api/strategy-auth/login" && req.method === "POST") {
     try {
       const body = await readJsonBody(req);
-      const scope = ["cases", "agent", "value", "wealth", "trust"].includes(body.scope) ? body.scope : "";
+      const scope = ["cases", "chat", "agent", "value", "wealth", "trust"].includes(body.scope) ? body.scope : "";
       assertWithinRateLimit(req, `strategy-auth:${scope || "invalid"}`, 8, 15 * 60 * 1000);
       if (!scope) {
         sendJson(res, 400, { ok: false, error: { code: "INVALID_SCOPE", message: "访问区域无效。" } });
@@ -365,7 +367,7 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
   if (pathname === "/api/strategy-auth/logout" && req.method === "POST") {
     try {
       const body = await readJsonBody(req);
-      const scope = ["cases", "agent", "value", "wealth", "trust"].includes(body.scope) ? body.scope : "all";
+      const scope = ["cases", "chat", "agent", "value", "wealth", "trust"].includes(body.scope) ? body.scope : "all";
       res.setHeader("Set-Cookie", authService.revoke(req, scope));
       sendJson(res, 200, { ok: true, scope });
       return true;
@@ -421,7 +423,8 @@ export function createDreamworksServer(options = {}) {
       res.end("Bad Request");
       return;
     }
-    if (isStrategyProtectedPath(pathname) && !authStatus.grants.cases) {
+    const protectedScope = protectedScopeForPath(pathname);
+    if (protectedScope && !authStatus.grants[protectedScope]) {
       res.writeHead(404, {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "private, no-store",
@@ -438,7 +441,7 @@ export function createDreamworksServer(options = {}) {
       sendHtml(req, res, renderIndex(authStatus));
       return;
     }
-    if (sendFile(req, res, filePath, isStrategyProtectedPath(pathname) ? {
+    if (sendFile(req, res, filePath, protectedScope ? {
       "Cache-Control": "private, no-store",
       Vary: "Cookie",
       "X-Content-Type-Options": "nosniff"
