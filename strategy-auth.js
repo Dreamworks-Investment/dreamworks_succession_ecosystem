@@ -129,19 +129,30 @@ export function createStrategyAuthService(options = {}) {
 
   function session(req) {
     const cookies = parseCookies(req.headers?.cookie || "");
-    const grants = [];
-    const grantExpiresAt = {};
+    const decodedGrants = [];
+    const decodedGrantExpiresAt = {};
     for (const scope of VALID_SCOPES) {
       const decoded = decode(scope, cookies[cookieName(scope)]);
       if (!decoded) continue;
-      grants.push(scope);
-      grantExpiresAt[scope] = decoded.expiresAt;
+      decodedGrants.push(scope);
+      decodedGrantExpiresAt[scope] = decoded.expiresAt;
     }
+    // A browser is allowed to hold exactly one protected business grant at a
+    // time. Treat legacy/stale multi-cookie states as unauthenticated so an
+    // old SDK instance or copied cookie set cannot merge departmental access.
+    const conflict = decodedGrants.length > 1;
+    const grants = conflict ? [] : decodedGrants;
+    const grantExpiresAt = conflict ? {} : decodedGrantExpiresAt;
     const expiries = Object.values(grantExpiresAt).sort();
     return {
       grants,
       expiresAt: expiries[0] || null,
-      grantExpiresAt
+      grantExpiresAt,
+      isolation: {
+        mode: "exclusive",
+        conflict,
+        rejectedGrantCount: conflict ? decodedGrants.length : 0
+      }
     };
   }
 
@@ -166,7 +177,8 @@ export function createStrategyAuthService(options = {}) {
         session: configured("session")
       },
       expiresAt: current.expiresAt,
-      grantExpiresAt: current.grantExpiresAt
+      grantExpiresAt: current.grantExpiresAt,
+      isolation: current.isolation
     };
   }
 
@@ -192,6 +204,16 @@ export function createStrategyAuthService(options = {}) {
 
   function grant(req, scope) {
     return cookie(req, scope);
+  }
+
+  function grantExclusive(req, scope) {
+    if (!VALID_SCOPES.has(scope)) return [];
+    return [
+      cookie(req, scope),
+      ...[...VALID_SCOPES]
+        .filter(grantScope => grantScope !== scope)
+        .map(grantScope => clearCookie(req, grantScope))
+    ];
   }
 
   function revoke(req, scope) {
@@ -222,6 +244,7 @@ export function createStrategyAuthService(options = {}) {
     session,
     authenticate,
     grant,
+    grantExclusive,
     revoke,
     configured,
     agentConfig

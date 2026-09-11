@@ -30,7 +30,8 @@ assert(!existsSync(join(root, 'assets/home/roadshow-original/client-1998-case-in
 assert(existsSync(join(root, 'assets/confidential/strategy-wechat-case.jpeg')), 'Confidential chat must be stored under the protected asset directory');
 assert(html.includes('data-strategy-auth-form="chat"'), 'Confidential chat card must require its own login form');
 assert(confidentialClient.includes('auth.grants.chat') && confidentialClient.includes('image.src = source'), 'Confidential image must only be requested after the chat grant is present');
-assert(accessClient.includes("scope === 'chat'") && accessClient.includes("dreamworks:auth-granted"), 'Confidential login must unlock in place without navigating away from the home evidence grid');
+assert(accessClient.includes("dreamworks:auth-return") && accessClient.includes('window.location.reload()'), 'Confidential login must reload across the security boundary and preserve its return position');
+assert(!accessClient.includes('dreamworks:auth-granted') && !confidentialClient.includes('dreamworks:auth-granted'), 'Confidential login must never mutate an already-loaded protected page in place');
 assert(homeCss.includes('.home-confidential-blur') && homeCss.includes('.home-confidential-lock'), 'Confidential card must render a blurred lock cover before authentication');
 
 console.log('Requested UI refinement checks passed.');

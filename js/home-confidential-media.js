@@ -45,13 +45,23 @@
 
     if (auth.grants && auth.grants.chat) {
       unlockMedia();
+      try {
+        const stored = JSON.parse(window.sessionStorage.getItem('dreamworks:auth-return') || 'null');
+        if (stored && stored.scope === 'chat') {
+          window.sessionStorage.removeItem('dreamworks:auth-return');
+          window.requestAnimationFrame(() => {
+            media.scrollIntoView({
+              behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+              block: 'center'
+            });
+          });
+        }
+      } catch (error) {
+        window.sessionStorage.removeItem('dreamworks:auth-return');
+      }
     } else {
       open.addEventListener('click', openModal);
     }
-
-    window.addEventListener('dreamworks:auth-granted', (event) => {
-      if (event.detail && event.detail.scope === 'chat') unlockMedia();
-    });
 
     closeButtons.forEach((button) => button.addEventListener('click', closeModal));
     document.addEventListener('keydown', (event) => {

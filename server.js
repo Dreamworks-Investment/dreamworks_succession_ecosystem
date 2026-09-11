@@ -23,6 +23,7 @@ const PROTECTED_PATH_SCOPES = [
 const STRATEGY_BLOCKS = {
   cases: ["STRATEGY_CASES_PROTECTED_START", "STRATEGY_CASES_PROTECTED_END"],
   agent: ["STRATEGY_AGENT_PROTECTED_START", "STRATEGY_AGENT_PROTECTED_END"],
+  agentGate: ["STRATEGY_AGENT_GATE_START", "STRATEGY_AGENT_GATE_END"],
   casesGate: ["STRATEGY_CASES_GATE_START", "STRATEGY_CASES_GATE_END"],
   valueAgent: ["VALUE_AGENT_PROTECTED_START", "VALUE_AGENT_PROTECTED_END"],
   valueAgentGate: ["VALUE_AGENT_GATE_START", "VALUE_AGENT_GATE_END"],
@@ -114,6 +115,7 @@ function renderIndex(authStatus) {
   let html = readFileSync(join(ROOT, "index.html"), "utf8");
   html = removeOrUnwrapProtectedBlocks(html, "cases", authStatus.grants.cases);
   html = removeOrUnwrapProtectedBlocks(html, "agent", authStatus.grants.agent);
+  html = removeOrUnwrapProtectedBlocks(html, "agentGate", !authStatus.grants.agent);
   html = removeOrUnwrapProtectedBlocks(html, "casesGate", !authStatus.grants.cases);
   html = removeOrUnwrapProtectedBlocks(html, "valueAgent", authStatus.grants.value);
   html = removeOrUnwrapProtectedBlocks(html, "valueAgentGate", !authStatus.grants.value);
@@ -349,10 +351,13 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
         sendJson(res, 401, { ok: false, error: { code: "INVALID_CREDENTIALS", message: "账号或密码不正确。" } });
         return true;
       }
-      const grantCookie = authService.grant(req, scope);
-      res.setHeader("Set-Cookie", grantCookie);
-      const issuedCookie = String(grantCookie).split(";")[0];
-      const statusCookie = [req.headers.cookie || "", issuedCookie].filter(Boolean).join("; ");
+      // Compartment switch: issue this grant and revoke every other protected
+      // scope in the same response. Never merge the incoming browser grants
+      // into the login response status.
+      const grantCookies = authService.grantExclusive(req, scope);
+      res.setHeader("Set-Cookie", grantCookies);
+      const issuedCookie = String(grantCookies[0] || "").split(";")[0];
+      const statusCookie = issuedCookie;
       sendJson(res, 200, { ok: true, scope, ...authService.status({ headers: { cookie: statusCookie } }) });
       return true;
     } catch (error) {

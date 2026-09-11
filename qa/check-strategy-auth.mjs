@@ -1,4 +1,5 @@
 import { strict as assert } from 'node:assert';
+import { readFileSync } from 'node:fs';
 import { createDreamworksServer } from '../server.js';
 import { createStrategyAuthService } from '../strategy-auth.js';
 
@@ -46,6 +47,23 @@ const address = server.address();
 const base = `http://127.0.0.1:${address.port}`;
 const request = (path, options = {}) => fetch(base + path, options);
 const cookieFrom = response => String(response.headers.get('set-cookie') || '').split(';')[0];
+const setCookiesFrom = response => {
+  if (typeof response.headers.getSetCookie === 'function') return response.headers.getSetCookie();
+  return String(response.headers.get('set-cookie') || '').split(/,(?=\s*dw_auth_)/i);
+};
+
+const emptyGrants = () => ({ cases: false, chat: false, agent: false, value: false, wealth: false, trust: false });
+const expectedGrantsFor = scope => ({ ...emptyGrants(), [scope]: true });
+
+function assertExclusiveSetCookies(response, activeScope) {
+  const cookies = setCookiesFrom(response);
+  assert.equal(cookies.length, 6, `${activeScope} login must update all six compartment cookies`);
+  assert(cookies.some(value => value.startsWith(`dw_auth_${activeScope}=`) && !/Max-Age=0(?:;|$)/.test(value)), `${activeScope} login must issue its active cookie`);
+  for (const scope of ['cases', 'chat', 'agent', 'value', 'wealth', 'trust']) {
+    if (scope === activeScope) continue;
+    assert(cookies.some(value => value.startsWith(`dw_auth_${scope}=;`) && value.includes('Max-Age=0')), `${activeScope} login must revoke ${scope}`);
+  }
+}
 
 try {
   const publicIndexResponse = await request('/');
@@ -97,6 +115,7 @@ try {
     body: JSON.stringify({ scope: 'cases', username: env.STRATEGY_CASES_USERNAME, password: env.STRATEGY_CASES_PASSWORD })
   });
   assert.equal(casesLogin.status, 200);
+  assertExclusiveSetCookies(casesLogin, 'cases');
   const casesCookie = cookieFrom(casesLogin);
   assert(casesCookie.startsWith('dw_auth_cases='), 'Case login must issue its own scope-bound HttpOnly cookie');
   assert.match(casesLogin.headers.get('set-cookie') || '', /HttpOnly/);
@@ -132,18 +151,26 @@ try {
     body: JSON.stringify({ scope: 'agent', username: env.STRATEGY_AGENT_USERNAME, password: env.STRATEGY_AGENT_PASSWORD })
   });
   assert.equal(agentLogin.status, 200);
+  assertExclusiveSetCookies(agentLogin, 'agent');
   const agentCookie = cookieFrom(agentLogin);
   assert(agentCookie.startsWith('dw_auth_agent='), 'Positioning-agent login must issue a separate scope-bound cookie');
   const agentOnlyStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: agentCookie } })).json();
   assert.deepEqual(agentOnlyStatus.grants, { cases: false, chat: false, agent: true, value: false, wealth: false, trust: false }, 'One scope cookie must never inherit another scope');
   const combinedCookie = `${casesCookie}; ${agentCookie}`;
   const combinedIndex = await (await request('/#strategy-agent', { headers: { Cookie: combinedCookie } })).text();
-  assert(combinedIndex.includes('十个合作项目，一套通用翻阅方式'), 'Adding agent access must preserve the existing case grant');
-  assert(combinedIndex.includes('id="strategy-agent-websdk-view"'), 'Agent grant must reveal the protected agent page');
-  assert(combinedIndex.includes('js/strategy-agent-websdk.js?v=1'), 'Agent grant must load its SDK client');
+  assert(!combinedIndex.includes('十个合作项目，一套通用翻阅方式'), 'Conflicting old grants must not reveal the case library');
+  assert(!combinedIndex.includes('id="strategy-agent-websdk-view"'), 'Conflicting old grants must not reveal the protected agent page');
+  assert(combinedIndex.includes('data-strategy-auth-form="cases"'), 'A conflict must restore the case blocker');
+  assert(combinedIndex.includes('data-strategy-auth-form="agent"'), 'A conflict must restore the agent blocker');
   assert(!combinedIndex.includes(env.STRATEGY_AILY_CHANNEL_TOKEN), 'Even authenticated HTML must not inline the Aily token');
 
-  const agentConfigResponse = await request('/api/strategy-auth/agent-config', { headers: { Cookie: combinedCookie } });
+  const conflictingStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: combinedCookie } })).json();
+  assert.deepEqual(conflictingStatus.grants, emptyGrants(), 'Multiple valid legacy cookies must fail closed');
+  assert.deepEqual(conflictingStatus.isolation, { mode: 'exclusive', conflict: true, rejectedGrantCount: 2 });
+  const conflictingAgentConfig = await request('/api/strategy-auth/agent-config', { headers: { Cookie: combinedCookie } });
+  assert.equal(conflictingAgentConfig.status, 401, 'Conflicting old grants must not release a channel token');
+
+  const agentConfigResponse = await request('/api/strategy-auth/agent-config', { headers: { Cookie: agentCookie } });
   assert.equal(agentConfigResponse.status, 200);
   const agentConfig = await agentConfigResponse.json();
   assert.equal(agentConfig.config.channelToken, env.STRATEGY_AILY_CHANNEL_TOKEN);
@@ -154,6 +181,7 @@ try {
     body: JSON.stringify({ scope: 'chat', username: env.STRATEGY_CASES_USERNAME, password: env.STRATEGY_CASES_PASSWORD })
   });
   assert.equal(chatLogin.status, 200);
+  assertExclusiveSetCookies(chatLogin, 'chat');
   const chatCookie = cookieFrom(chatLogin);
   assert(chatCookie.startsWith('dw_auth_chat='), 'Confidential-media login must issue a separate scope-bound cookie');
   const chatOnlyStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: chatCookie } })).json();
@@ -164,7 +192,11 @@ try {
   const chatCannotReadCases = await request('/assets/strategy/scene-home.png', { headers: { Cookie: chatCookie } });
   assert.equal(chatCannotReadCases.status, 404, 'Confidential-media login must not unlock case-library assets');
 
-  const allAgentCookies = [casesCookie, chatCookie, agentCookie];
+  const scopeCookies = new Map([
+    ['cases', casesCookie],
+    ['chat', chatCookie],
+    ['agent', agentCookie]
+  ]);
   const businessAgents = [
     { scope: 'value', username: env.VALUE_AGENT_USERNAME, password: env.VALUE_AGENT_PASSWORD, token: env.VALUE_AILY_CHANNEL_TOKEN, view: 'value-agent-websdk-view' },
     { scope: 'wealth', username: env.WEALTH_AGENT_USERNAME, password: env.WEALTH_AGENT_PASSWORD, token: env.WEALTH_AILY_CHANNEL_TOKEN, view: 'wealth-agent-websdk-view' },
@@ -179,12 +211,11 @@ try {
       body: JSON.stringify({ scope: agent.scope, username: agent.username, password: agent.password })
     });
     assert.equal(login.status, 200, `${agent.scope} login must succeed`);
+    assertExclusiveSetCookies(login, agent.scope);
     const scopeCookie = cookieFrom(login);
     assert(scopeCookie.startsWith(`dw_auth_${agent.scope}=`), `${agent.scope} must receive only its own cookie`);
     const isolatedStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: scopeCookie } })).json();
-    const expectedGrants = { cases: false, chat: false, agent: false, value: false, wealth: false, trust: false };
-    expectedGrants[agent.scope] = true;
-    assert.deepEqual(isolatedStatus.grants, expectedGrants, `${agent.scope} login must not unlock any other area`);
+    assert.deepEqual(isolatedStatus.grants, expectedGrantsFor(agent.scope), `${agent.scope} login must not unlock any other area`);
     const protectedIndex = await (await request(`/#${agent.scope}-agent`, { headers: { Cookie: scopeCookie } })).text();
     assert(protectedIndex.includes(`id="${agent.view}"`), `${agent.scope} grant must reveal its protected agent view`);
     assert(!protectedIndex.includes(`data-strategy-auth-form="${agent.scope}"`), `${agent.scope} blocker must be removed after login`);
@@ -196,10 +227,45 @@ try {
     const configResponse = await request(`/api/strategy-auth/agent-config/${agent.scope}`, { headers: { Cookie: scopeCookie } });
     assert.equal(configResponse.status, 200);
     assert.equal((await configResponse.json()).config.channelToken, agent.token);
-    allAgentCookies.push(scopeCookie);
+    scopeCookies.set(agent.scope, scopeCookie);
   }
 
-  const statusResponse = await request('/api/strategy-auth/status', { headers: { Cookie: allAgentCookies.join('; ') } });
+  const protectedResources = {
+    cases: '/assets/strategy/scene-home.png',
+    chat: '/assets/confidential/strategy-wechat-case.jpeg',
+    agent: '/api/strategy-auth/agent-config',
+    value: '/api/strategy-auth/agent-config/value',
+    wealth: '/api/strategy-auth/agent-config/wealth',
+    trust: '/api/strategy-auth/agent-config/trust'
+  };
+  const protectedUi = {
+    cases: { content: '十个合作项目，一套通用翻阅方式', gate: 'data-strategy-auth-form="cases"' },
+    agent: { content: 'id="strategy-agent-websdk-view"', gate: 'data-strategy-auth-form="agent"' },
+    value: { content: 'id="value-agent-websdk-view"', gate: 'data-strategy-auth-form="value"' },
+    wealth: { content: 'id="wealth-agent-websdk-view"', gate: 'data-strategy-auth-form="wealth"' },
+    trust: { content: 'id="trust-agent-websdk-view"', gate: 'data-strategy-auth-form="trust"' }
+  };
+
+  // Full 6 × 6 access matrix: every cookie may open exactly its own resource,
+  // and must be denied by each of the other five protected resources.
+  for (const [sourceScope, sourceCookie] of scopeCookies) {
+    const isolatedStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: sourceCookie } })).json();
+    assert.deepEqual(isolatedStatus.grants, expectedGrantsFor(sourceScope), `${sourceScope} status must expose exactly one grant`);
+    assert.deepEqual(isolatedStatus.isolation, { mode: 'exclusive', conflict: false, rejectedGrantCount: 0 });
+    for (const [targetScope, resource] of Object.entries(protectedResources)) {
+      const response = await request(resource, { headers: { Cookie: sourceCookie } });
+      const expectedStatus = sourceScope === targetScope ? 200 : (targetScope === 'cases' || targetScope === 'chat' ? 404 : 401);
+      assert.equal(response.status, expectedStatus, `${sourceScope} cookie must ${sourceScope === targetScope ? 'open' : 'not open'} ${targetScope}`);
+    }
+    const isolatedIndex = await (await request('/', { headers: { Cookie: sourceCookie } })).text();
+    for (const [targetScope, markers] of Object.entries(protectedUi)) {
+      assert.equal(isolatedIndex.includes(markers.content), sourceScope === targetScope, `${sourceScope} HTML must ${sourceScope === targetScope ? 'include' : 'exclude'} ${targetScope} protected UI`);
+      assert.equal(isolatedIndex.includes(markers.gate), sourceScope !== targetScope, `${sourceScope} HTML must ${sourceScope !== targetScope ? 'retain' : 'remove'} ${targetScope} gate`);
+    }
+  }
+
+  const allCookies = [...scopeCookies.values()].join('; ');
+  const statusResponse = await request('/api/strategy-auth/status', { headers: { Cookie: allCookies } });
   const statusText = await statusResponse.text();
   assert(!statusText.includes(env.STRATEGY_CASES_USERNAME));
   assert(!statusText.includes(env.STRATEGY_CASES_PASSWORD));
@@ -209,7 +275,21 @@ try {
   assert(!statusText.includes(env.WEALTH_AILY_CHANNEL_TOKEN));
   assert(!statusText.includes(env.TRUST_AILY_CHANNEL_TOKEN));
   const status = JSON.parse(statusText);
-  assert.deepEqual(status.grants, { cases: true, chat: true, agent: true, value: true, wealth: true, trust: true });
+  assert.deepEqual(status.grants, emptyGrants(), 'A six-cookie legacy state must fail closed rather than merge grants');
+  assert.equal(status.isolation.mode, 'exclusive');
+  assert.equal(status.isolation.conflict, true);
+  assert.equal(status.isolation.rejectedGrantCount, 6);
+
+  for (const resource of Object.values(protectedResources)) {
+    const response = await request(resource, { headers: { Cookie: allCookies } });
+    assert([401, 404].includes(response.status), `Conflicting cookies must deny ${resource}`);
+  }
+
+  const accessScript = readFileSync(new URL('../js/strategy-access.js', import.meta.url), 'utf8');
+  const confidentialScript = readFileSync(new URL('../js/home-confidential-media.js', import.meta.url), 'utf8');
+  assert(accessScript.includes('window.location.reload()'), 'Every successful login must cross a full-page lifecycle boundary');
+  assert(!accessScript.includes('dreamworks:auth-granted'), 'Chat login must not mutate the live page into an authenticated state');
+  assert(!confidentialScript.includes('dreamworks:auth-granted'), 'Confidential media must only unlock from server-rendered auth state');
 } finally {
   await new Promise(resolve => {
     server.close(resolve);

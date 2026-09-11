@@ -177,11 +177,16 @@
         message.classList.add('is-success');
         message.textContent = '验证通过，正在进入…';
       }
-      if (scope === 'chat') {
-        grants.chat = true;
-        window.dispatchEvent(new CustomEvent('dreamworks:auth-granted', { detail: { scope: scope } }));
-        return;
-      }
+      // Every successful grant is a full compartment switch. Reloading is a
+      // security boundary: it removes protected DOM, cached channel tokens and
+      // mounted SDK instances belonging to the previously active scope.
+      try {
+        window.sessionStorage.setItem('dreamworks:auth-return', JSON.stringify({
+          scope: scope,
+          hash: window.location.hash,
+          scrollY: window.scrollY
+        }));
+      } catch (error) {}
       window.location.reload();
     } catch (error) {
       if (message) message.textContent = error && error.message ? error.message : '验证服务暂时不可用，请稍后重试。';
