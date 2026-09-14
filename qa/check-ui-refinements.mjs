@@ -11,6 +11,7 @@ const charityCss = read('css/final-business-pages.css');
 const homeCss = read('css/home-roadshow-curated.css');
 const confidentialClient = read('js/home-confidential-media.js');
 const accessClient = read('js/strategy-access.js');
+const strategyCasesData = read('js/strategy-cases-data.js');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -36,12 +37,17 @@ assert(homeCss.includes('.home-confidential-blur') && homeCss.includes('.home-co
 
 assert(!html.includes('class="nav-brand-icon"'), 'The placeholder character icon must be removed from the global navigation');
 assert(html.includes('src="assets/brand/dreamworks-official-logo.png"'), 'The global navigation must use the first uploaded full official logo');
-assert(html.includes('class="nav-brand-copy"') && html.includes('公司官网 · 了解我们'), 'The company link must include visible explanatory text beside the full logo');
+assert(!html.includes('class="nav-brand-copy"') && !html.includes('公司官网 · 了解我们'), 'The global navigation must not repeat text already included in the full official logo');
 assert(html.includes('href="http://www.dreamworksinvest.com/stationWebsite/w/h"'), 'The official logo must link to the company website');
 assert(html.includes('target="_blank"') && html.includes('rel="noopener noreferrer"'), 'The company link must open safely without replacing the application');
 assert(existsSync(join(root, 'assets/brand/dreamworks-official-logo.png')), 'The official source logo must be stored locally');
 assert(existsSync(join(root, 'assets/brand/dreamworks-official-mark.png')), 'The checked official navigation mark must be stored locally');
 assert(!existsSync(join(root, 'assets/brand/dreamworks-official-nav.svg')), 'The browser-blocked nested SVG logo wrapper must be removed');
 assert(!existsSync(join(root, 'assets/brand/dreamworks-official-mark.svg')), 'The browser-blocked nested SVG mark wrapper must be removed');
+
+assert((strategyCasesData.match(/\bslug:\s*'/g) || []).length === 8, 'The protected strategy library must contain exactly eight approved cases');
+assert(!strategyCasesData.includes('水羊股份') && !strategyCasesData.includes('老百姓大药房'), 'Unapproved cases must be removed from the protected strategy catalogue');
+assert(html.includes('案例库 · 01 / 08') && html.includes('八个合作项目，一套通用翻阅方式'), 'The strategy library heading must reflect the approved eight-case catalogue');
+assert(strategyCss.includes('grid-template-columns:repeat(8,1fr)'), 'The desktop case navigation must use eight equal columns');
 
 console.log('Requested UI refinement checks passed.');

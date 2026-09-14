@@ -62,39 +62,6 @@ window.STRATEGY_CASES = [
     ]
   },
   {
-    slug: 'syoung', name: '水羊股份', english: 'S’YOUNG GROUP', ticker: '300740.SZ',
-    type: '战略诊断 × 价值增进', status: '研究归档', tone: 'rose',
-    headline: '把品牌组合、组织能力与长期价值放进同一套诊断框架',
-    summary: '资料覆盖两轮战略体检、红蓝军、定位研究、增长建议与企业价值诊断。',
-    question: '多品牌美妆平台如何在规模、品牌心智、组织效率与长期价值之间建立一致战略？',
-    method: ['两轮战略体检', '品牌与价值诊断', '红蓝军对决', '发展路径分析'],
-    outcome: '形成完整研究链路；对外页面仅展示方法与材料结构，不发布内部最终判断。',
-    materialsTotal: 10,
-    attachments: [
-      { title: '战略诊断报告（合并版）', type: 'MD', role: '综合报告', summary: '整合定位、竞争、增长与组织相关判断。' },
-      { title: '战略定位与发展路径分析报告', type: 'MD', role: '发展路径', summary: '连接定位选择、品牌结构和发展节奏。' },
-      { title: '水羊股份价值诊断（清单完整版）', type: 'MD', role: '价值诊断', summary: '按价值增进框架梳理关键经营问题。' },
-      { title: '红蓝军辩论（两轮）', type: 'MD', role: '反方检验', summary: '从相反立场检验战略假设及潜在风险。' },
-      { title: '战略增长建议', type: 'MD', role: '增长建议', summary: '将战略方向拆解为增长机会和行动线索。' }
-    ]
-  },
-  {
-    slug: 'lbx', name: '老百姓大药房', english: 'LBX PHARMACY', ticker: '603883.SH',
-    type: '战略体检 × 增长建议', status: '研究归档', tone: 'green',
-    headline: '从“药品零售终端”向“健康服务入口”寻找增长空间',
-    summary: '以基础资料、战略体检、红蓝军与增长建议四份材料构成轻量但完整的定位研究链。',
-    question: '当连锁药房的商品和渠道趋同，如何把专业服务转化为可感知、可验证的新价值？',
-    method: ['基础资料梳理', '定位战略体检', '红蓝军辩论', '战略增长建议'],
-    outcome: '提出“健康服务入口”等方向，并强调服务产品化与付费验证。',
-    materialsTotal: 4,
-    attachments: [
-      { title: '定位战略体检', type: 'MD', role: '战略体检', summary: '识别零售终端同质化与健康服务机会。' },
-      { title: '战略增长建议', type: 'MD', role: '增长路径', summary: '围绕服务入口与运营验证形成行动建议。' },
-      { title: '红蓝军辩论', type: 'MD', role: '反方检验', summary: '检验服务意愿、付费可能性与组织能力。' },
-      { title: '基础资料备忘录', type: 'MD', role: '研究底稿', summary: '汇总企业、行业与竞争背景。' }
-    ]
-  },
-  {
     slug: 'unilumin', name: '洲明科技', english: 'UNILUMIN', ticker: '300232.SZ',
     type: '战略破局 × 价值研究', status: '研究归档', tone: 'cyan',
     headline: '从价格战中跳出来，把部件能力升级为系统价值',

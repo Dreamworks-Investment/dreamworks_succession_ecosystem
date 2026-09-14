@@ -78,7 +78,7 @@ try {
   assert(publicIndex.includes('data-strategy-auth-form="value"'), 'Public HTML must include the research-agent gate');
   assert(publicIndex.includes('data-strategy-auth-form="wealth"'), 'Public HTML must include the wealth-agent gate');
   assert(publicIndex.includes('data-strategy-auth-form="trust"'), 'Public HTML must include the trust-agent gate');
-  assert(!publicIndex.includes('十个合作项目，一套通用翻阅方式'), 'Public HTML must not contain the protected case library');
+  assert(!publicIndex.includes('八个合作项目，一套通用翻阅方式'), 'Public HTML must not contain the protected case library');
   assert(!publicIndex.includes('id="strategy-agent-websdk-view"'), 'Public HTML must not contain the protected agent view');
   assert(!publicIndex.includes('id="value-agent-websdk-view"'), 'Public HTML must not contain the protected research-agent view');
   assert(!publicIndex.includes('id="wealth-agent-websdk-view"'), 'Public HTML must not contain the protected wealth-agent view');
@@ -128,7 +128,7 @@ try {
 
   const casesIndexResponse = await request('/#strategy-library', { headers: { Cookie: casesCookie } });
   const casesIndex = await casesIndexResponse.text();
-  assert(casesIndex.includes('十个合作项目，一套通用翻阅方式'), 'Case grant must reveal the case library');
+  assert(casesIndex.includes('八个合作项目，一套通用翻阅方式'), 'Case grant must reveal the case library');
   assert(!casesIndex.includes('data-strategy-auth-form="cases"'), 'Case grant must remove the blocker instead of rendering it beside the library');
   assert(!casesIndex.includes('id="strategy-cases-access"'), 'The authenticated case-library HTML must not contain the blocker stage');
   assert(casesIndex.includes('js/strategy-cases-data.js'), 'Case grant must load the protected case router');
@@ -158,7 +158,7 @@ try {
   assert.deepEqual(agentOnlyStatus.grants, { cases: false, chat: false, agent: true, value: false, wealth: false, trust: false }, 'One scope cookie must never inherit another scope');
   const combinedCookie = `${casesCookie}; ${agentCookie}`;
   const combinedIndex = await (await request('/#strategy-agent', { headers: { Cookie: combinedCookie } })).text();
-  assert(!combinedIndex.includes('十个合作项目，一套通用翻阅方式'), 'Conflicting old grants must not reveal the case library');
+  assert(!combinedIndex.includes('八个合作项目，一套通用翻阅方式'), 'Conflicting old grants must not reveal the case library');
   assert(!combinedIndex.includes('id="strategy-agent-websdk-view"'), 'Conflicting old grants must not reveal the protected agent page');
   assert(combinedIndex.includes('data-strategy-auth-form="cases"'), 'A conflict must restore the case blocker');
   assert(combinedIndex.includes('data-strategy-auth-form="agent"'), 'A conflict must restore the agent blocker');
@@ -239,7 +239,7 @@ try {
     trust: '/api/strategy-auth/agent-config/trust'
   };
   const protectedUi = {
-    cases: { content: '十个合作项目，一套通用翻阅方式', gate: 'data-strategy-auth-form="cases"' },
+    cases: { content: '八个合作项目，一套通用翻阅方式', gate: 'data-strategy-auth-form="cases"' },
     agent: { content: 'id="strategy-agent-websdk-view"', gate: 'data-strategy-auth-form="agent"' },
     value: { content: 'id="value-agent-websdk-view"', gate: 'data-strategy-auth-form="value"' },
     wealth: { content: 'id="wealth-agent-websdk-view"', gate: 'data-strategy-auth-form="wealth"' },
