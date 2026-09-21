@@ -1,0 +1,60 @@
+/* Shared protected Aily agent views for wealth diagnosis and family trust. */
+.portal-agent-auth-view,
+.portal-agent-websdk-view { display: none; }
+
+#page-wealth.wealth-agent-auth-active #wealth-agent-auth-view,
+#page-wealth.wealth-agent-active #wealth-agent-websdk-view,
+#page-trust.trust-agent-auth-active #trust-agent-auth-view,
+#page-trust.trust-agent-active #trust-agent-websdk-view { display: block; }
+
+#page-wealth.wealth-agent-auth-active .wealth-system-intro,
+#page-wealth.wealth-agent-auth-active .wealth-diagnosis-wizard,
+#page-wealth.wealth-agent-active .wealth-system-intro,
+#page-wealth.wealth-agent-active .wealth-diagnosis-wizard,
+#page-trust.trust-agent-auth-active .trust-system-intro,
+#page-trust.trust-agent-auth-active .trust-system-wizard,
+#page-trust.trust-agent-active .trust-system-intro,
+#page-trust.trust-agent-active .trust-system-wizard { display: none; }
+
+.portal-cover-actions,
+.wealth-system-bottom > .portal-cover-actions,
+.trust-cover-bottom > .portal-cover-actions {
+  display: grid;
+  min-width: min(100%, 410px);
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.portal-cover-actions .wealth-system-enter,
+.portal-cover-actions .trust-cover-enter {
+  width: 100%;
+  min-width: 0;
+}
+
+.portal-agent-enter {
+  color: #071b31;
+  background: #d4af37;
+  box-shadow: 0 12px 28px rgba(212, 175, 55, .14);
+}
+
+.portal-agent-websdk-view {
+  background:
+    radial-gradient(880px 520px at 10% 12%, rgba(22, 134, 239, .14), transparent 66%),
+    radial-gradient(720px 480px at 92% 8%, rgba(212, 175, 55, .12), transparent 62%),
+    linear-gradient(180deg, #071b31, #0b2a48 62%, #071a2d);
+}
+
+@media (max-width: 1180px) {
+  .portal-cover-actions,
+  .wealth-system-bottom > .portal-cover-actions,
+  .trust-cover-bottom > .portal-cover-actions { width: min(100%, 480px); justify-self: center; }
+}
+
+@media (max-width: 820px) {
+  .portal-agent-websdk-view .strategy-agent-websdk-layout { display: block; }
+  .portal-agent-websdk-view .strategy-agent-websdk-guide { padding: 26px 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-agent-enter { transition: none; }
+}

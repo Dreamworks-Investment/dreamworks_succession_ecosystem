@@ -1,0 +1,8 @@
+梦工场设计系统 Claude V3
+===========================
+
+1. “狠值投资”入口改为在新标签页打开独立后端应用。
+2. 弹窗被拦截时自动回退为当前窗口打开。
+3. 明确由后端自身的 /auth/login 和前端 authFetch 管理 Bearer Token。
+4. 主站不再尝试存储、拼接或转发 Bearer Token。
+5. 新增 BACKEND_INTEGRATION_NOTES.md，说明线上根路径仍返回 Missing bearer token 时的部署修复方向。

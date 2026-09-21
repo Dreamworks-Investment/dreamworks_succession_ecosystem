@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#f4f1e9" />
+  <meta name="description" content="从接待前厅到办公空间，以真实影像和路线空间图，循迹探索梦工场。独立虚拟参观测试版。" />
+  <title>梦工场 · 空间之旅 / Office Journey</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
+</head>
+<body>
+  <a class="skip-link" href="#viewer">跳转到参观画面</a>
+  <header class="masthead">
+    <a class="brand" href="#stop=1&view=0&mode=photo" aria-label="梦工场，回到参观起点">
+      <svg class="brand-symbol" viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="currentColor"/><path d="M20 3v7m17 10h-7M20 37v-7M3 20h7M13 27l4-10 10-4-4 10-10 4Z" stroke="currentColor"/><circle cx="20" cy="20" r="2" fill="currentColor"/></svg>
+      <span class="brand-name">梦工场<span>OFFICE JOURNEY</span></span>
+    </a>
+    <nav class="mode-tabs" aria-label="参观模式">
+      <button type="button" data-mode="photo" class="mode-tab active" aria-pressed="true"><span class="tab-symbol" aria-hidden="true">◉</span> 实景漫游</button>
+      <button type="button" data-mode="overview" class="mode-tab" aria-pressed="false"><span class="tab-symbol" aria-hidden="true">◇</span> 3D 空间图</button>
+      <button type="button" data-mode="walk" class="mode-tab" aria-pressed="false"><span class="tab-symbol" aria-hidden="true">↗</span> 3D 路线体验</button>
+    </nav>
+    <div class="header-actions"><a class="return-link" href="/">返回主站</a><button class="tour-logout hidden" id="tour-logout" type="button">退出参访</button><span class="beta-label"><i></i> PRIVATE BETA</span><button class="icon-button info-button" id="open-info" type="button" aria-label="关于本次参观">i</button></div>
+  </header>
+
+  <main class="journey-layout">
+    <aside class="route-panel" aria-label="参观路线">
+      <div class="route-intro"><p class="eyebrow">THE OFFICE, IN PERSPECTIVE</p><h1>循迹，<br/>进入梦工场。</h1><p class="intro-copy">每一处空间，都是故事的开始。<br/>选择连接，走进房间，再回到走廊。</p></div>
+      <div class="route-heading"><h2>空间索引 <span id="stop-count">14</span></h2><button type="button" id="reverse-direction" title="切换行进方向" aria-label="切换为逆时针行进">↻ <span>顺时针</span></button></div>
+      <nav class="route-list" id="route-list" aria-label="选择参观站点"><p class="route-loading">正在整理空间…</p></nav>
+      <div class="route-summary"><span class="mini-loop" aria-hidden="true">↻</span><span>一条动线，连接每一处空间<small>自由前行，也可以回到刚才。</small></span></div>
+    </aside>
+
+    <section class="tour-column" aria-label="虚拟参观">
+      <div class="tour-topline"><p><span class="live-dot"></span> 远方，也可以身临其境</p><button type="button" class="text-button" id="restart">从起点开始 <span aria-hidden="true">↺</span></button></div>
+      <div id="viewer" class="viewer-card" tabindex="-1" aria-label="当前空间参观画面">
+        <div class="photo-stage" id="photo-stage">
+          <div class="photo-backdrop" id="photo-backdrop"></div>
+          <img id="room-image" class="room-image" alt="" draggable="false" />
+        </div>
+        <div class="scene-stage hidden" id="scene-stage" aria-label="3D 路线空间图"></div>
+        <div class="viewer-vignette" aria-hidden="true"></div>
+        <div class="viewer-top"><span class="image-type" id="image-type"><span aria-hidden="true">▣</span> 实景照片</span><span class="photo-index" id="photo-index">— / —</span></div>
+        <div class="viewer-tools"><button class="viewer-tool fit-toggle" type="button" id="fit-photo" aria-label="显示完整照片" aria-pressed="false" title="完整照片 / 沉浸填充">▣</button><button class="viewer-tool" type="button" id="zoom-in" aria-label="放大照片">+</button><button class="viewer-tool" type="button" id="zoom-out" aria-label="缩小照片">−</button><button class="viewer-tool" type="button" id="reset-view" aria-label="重置画面">↺</button><button class="viewer-tool" type="button" id="fullscreen" aria-label="全屏参观">⛶</button></div>
+        <div class="walk-room-controls hidden" id="walk-room-controls"><button class="walk-room-button" type="button" id="enter-room">进入空间 <span aria-hidden="true">↗</span></button></div>
+        <div class="navigation-dock hidden" id="navigation-dock" aria-label="当前节点的可通行连接">
+          <div class="node-heading"><span id="node-location">走廊观察点</span><div class="look-controls"><button type="button" data-look="0.4" aria-label="向左环顾">↶</button><button type="button" data-look="-0.4" aria-label="向右环顾">↷</button></div></div>
+          <div class="node-exits">
+            <button type="button" data-move="back"><span aria-hidden="true">↓</span><span>后退<small></small></span></button>
+            <button type="button" data-move="forward"><span aria-hidden="true">↑</span><span>前进<small></small></span></button>
+            <button type="button" data-move="enter"><span aria-hidden="true">↗</span><span>进入房间<small></small></span></button>
+            <button type="button" data-move="exit"><span aria-hidden="true">↙</span><span>返回走廊<small></small></span></button>
+          </div>
+        </div>
+        <div class="viewer-message hidden" id="viewer-message" role="status"><span class="message-symbol" aria-hidden="true">◇</span><h3 id="message-title">正在载入空间</h3><p id="message-description">稍等片刻，即将抵达。</p><button type="button" class="message-retry hidden" id="retry-image">重新载入</button></div>
+        <div class="viewer-caption"><div><p class="eyebrow" id="section-english">WELCOME TO DREAMWORKS</p><h2 id="section-title">从这里，开始参观</h2><p id="section-description">正在载入真实空间影像…</p></div><span class="section-number"><strong id="section-number">01</strong><span>/ <span id="section-total">14</span></span></span></div>
+        <span class="interaction-hint" id="interaction-hint">切换视角，探索这个空间</span>
+      </div>
+
+      <p class="layout-pending hidden" id="layout-pending">示意排布，非真实平面图 · 步行视频尚待读取，转角与门口位置未校准。</p>
+
+      <div class="view-strip"><div class="view-strip-label"><span id="views-title">空间视角</span><small id="views-note">PHOTO PERSPECTIVES</small></div><div class="thumbnails" id="thumbnails" role="group" aria-label="当前空间照片视角"></div><button type="button" class="detail-button" id="open-room-info" aria-label="查看空间详情">空间札记 <span>↗</span></button></div>
+
+      <div class="journey-controls"><button type="button" id="previous-stop" class="stop-control previous"><span class="arrow" aria-hidden="true">←</span><span><small>上一个空间</small><strong id="previous-title">—</strong></span></button><div class="journey-progress"><span id="progress-label">01 / 14</span><div class="progress-track"><span id="progress-bar"></span></div><small id="direction-label">顺时针探索</small></div><button type="button" id="next-stop" class="stop-control next"><span><small>下一个空间</small><strong id="next-title">—</strong></span><span class="arrow" aria-hidden="true">→</span></button></div>
+      <div class="footnote"><p><span aria-hidden="true">◇</span> 实景记录 · 路线重建 · 独立测试版</p><button type="button" class="text-button" id="open-accuracy">关于影像与空间准确性 <span aria-hidden="true">↗</span></button></div>
+    </section>
+  </main>
+  <div class="screen-reader-only" id="announcer" aria-live="polite" aria-atomic="true"></div>
+  <dialog id="info-dialog" class="info-dialog" aria-labelledby="dialog-title"><button type="button" class="dialog-close icon-button" id="close-info" aria-label="关闭详情">×</button><p class="eyebrow">A NOTE ON THIS JOURNEY</p><h2 id="dialog-title">空间札记</h2><div id="dialog-content"></div><button type="button" class="dialog-done" id="dialog-done">继续参观 <span aria-hidden="true">→</span></button></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
