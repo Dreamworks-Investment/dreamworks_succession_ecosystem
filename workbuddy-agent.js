@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { createDiagnosticStore } from "./wealth-agent-diagnostics.js";
+import { createMarketFileChannel } from "./market-file-channel.js";
 
 const DEFAULT_AGENT_ID = "agent_01M1AB3GRFAR44G0ED9RQ51WY9";
 const DEFAULT_AGENT_NAME = "身家诊断专家";
@@ -516,7 +517,8 @@ class AcpConnection {
   }
 }
 
-function buildMockReply(prompt, turn) {
+function buildMockReply(prompt, turn, profile, context) {
+  if (profile === "market") return buildMarketMockReply(prompt, turn, context);
   if (turn === 1 || prompt.includes("诊断数据摘要")) {
     return [
       "已接收本次五步身家诊断摘要。我会把它作为顾问初筛材料，而不是重新让您填写一遍。\n\n",
@@ -528,6 +530,38 @@ function buildMockReply(prompt, turn) {
     "我已经记录这项补充。下一步会把它放回现金流时间轴，复核要求回报率与流动性安全边界，",
     "再按“先保支付能力、再修复低效资产、最后讨论长期传承结构”的顺序形成顾问复核清单。"
   ];
+}
+
+// 市场专员的演示回复：只讲市场研究口径，绝不混入身家诊断话术。
+// 本地演示时用来验证「提问 → 回答 → 导出报告」整条链路。
+function buildMarketMockReply(prompt, turn, context) {
+  const reportType = context && context.reportType === "unlisted"
+    ? "非上市公司报告润览"
+    : "上市公司报告润览";
+  const question = String(prompt || "")
+    .replace(/\[已上传附件：[^\]]*\]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60);
+
+  if (turn <= 1) {
+    return [
+      "当前是本地演示模式，尚未接入真实 WorkBuddy 专家。下面给出的是用于验证导出流程的示例结构，接入后由专家按所选口径输出完整底稿。\n\n",
+      question ? `已记录你的需求：${question}\n\n` : "",
+      `一、标的与赛道概览（${reportType}）\n示例：主营业务、所处环节、下游需求与竞争格局。\n\n`,
+      "二、商业模式与收入结构\n示例：产品与客户构成、区域分布、定价方式与议价能力。\n\n",
+      "三、财务质量与关键指标\n示例：收入增速、毛利率、经营现金流与应收账款周转。\n\n",
+      "四、估值与同业对比\n示例：可比公司区间、当前折溢价与隐含假设。\n\n",
+      "五、核心风险与证据缺口\n示例：客户集中度、政策变动、尚未取得的原始材料。\n\n",
+      "六、下一步深研任务清单\n示例：调取近三年年报、访谈渠道方、核对产能与在手订单。\n\n",
+      "如需真实输出，请把 WORKBUDDY_MOCK 设为 false 并配置市场专员专家的 Manifest ID。"
+    ].join("");
+  }
+  return [
+    question ? `已记录这条补充：${question}\n\n` : "已记录这条补充。\n\n",
+    "下一步会按「先校验证据、再给结论」的顺序更新底稿：先把新增信息落到对应章节，再重算关键指标，",
+    "最后把仍未闭合的信息缺口单列成待办，避免用推测填满结论。"
+  ].join("");
 }
 
 export function createWealthAgentService({
@@ -553,12 +587,20 @@ export function createWealthAgentService({
     agentId: env.WORKBUDDY_AGENT_ID || DEFAULT_AGENT_ID,
     agentName: env.WORKBUDDY_AGENT_NAME || DEFAULT_AGENT_NAME,
     mock: parseBoolean(env.WORKBUDDY_MOCK),
+    // 本地演示时的模拟回复口径：wealth = 身家诊断，market = 市场专员
+    mockProfile: (env.WORKBUDDY_MOCK_PROFILE || "wealth").trim().toLowerCase(),
     acpMode: env.WORKBUDDY_ACP_MODE || "default",
     runtimeTimeoutMs: safeNumber(env.WORKBUDDY_RUNTIME_TIMEOUT_MS, 50_000),
     rpcTimeoutMs: safeNumber(env.WORKBUDDY_RPC_TIMEOUT_MS, 60_000),
     noTextGraceMs: safeNumber(env.WORKBUDDY_NO_TEXT_GRACE_MS, 1_200),
-    sessionTtlMs: safeNumber(env.WORKBUDDY_SESSION_TTL_MS, SESSION_TTL_MS)
+    sessionTtlMs: safeNumber(env.WORKBUDDY_SESSION_TTL_MS, SESSION_TTL_MS),
+    // 市场专员会把底稿正文/base64 注入 prompt，默认放宽到 4MB；身家诊断仍保持 20KB。
+    maxPromptBytes: safeNumber(
+      env.WORKBUDDY_MAX_PROMPT_BYTES,
+      String(env.WORKBUDDY_MOCK_PROFILE || "wealth").trim().toLowerCase() === "market" ? 4 * 1024 * 1024 : MAX_PROMPT_BYTES
+    )
   };
+  const fileChannel = createMarketFileChannel({ env });
   const sessions = new Map();
   let oauthToken = null;
 
@@ -623,7 +665,7 @@ export function createWealthAgentService({
     }
     if (!config.mock && !config.apiKey) {
       throw new WorkBuddyError(
-        "身家诊断专家 Runtime 缺少必需的 WORKBUDDY_API_KEY。",
+        `${config.agentName} Runtime 缺少必需的 WORKBUDDY_API_KEY。`,
         503,
         "RUNTIME_SECRET_NOT_CONFIGURED"
       );
@@ -868,7 +910,7 @@ export function createWealthAgentService({
     try {
       assertConfigured();
       if (!context || typeof context !== "object" || Array.isArray(context)) {
-        throw new WorkBuddyError("缺少可供专家分析的诊断摘要。", 400, "INVALID_CONTEXT");
+        throw new WorkBuddyError("缺少可供专家分析的会话上下文。", 400, "INVALID_CONTEXT");
       }
       const contextBytes = byteLength(context);
       trace.event("diagnosis.context.validated", "success", {
@@ -877,7 +919,7 @@ export function createWealthAgentService({
         namesRemoved: context.privacy?.namesRemoved ?? context.namesRemoved ?? null
       });
       if (contextBytes > MAX_CONTEXT_BYTES) {
-        throw new WorkBuddyError("诊断摘要过大，请精简后重试。", 413, "CONTEXT_TOO_LARGE", {
+        throw new WorkBuddyError("会话上下文过大，请精简后重试。", 413, "CONTEXT_TOO_LARGE", {
           byteLength: contextBytes,
           limitBytes: MAX_CONTEXT_BYTES
         });
@@ -886,6 +928,7 @@ export function createWealthAgentService({
       const record = config.mock
         ? { publicId, mock: true, turn: 0, createdAt: Date.now(), lastUsedAt: Date.now(), context }
         : { publicId, ...(await createLiveSession(trace)), createdAt: Date.now(), lastUsedAt: Date.now(), context };
+      record.files = [];
       sessions.set(publicId, record);
       trace.event("session.registered", "success", {
         publicSessionIdPresent: true,
@@ -894,6 +937,27 @@ export function createWealthAgentService({
       });
       if (ownsTrace) trace.finish("success");
       return { sessionId: publicId, agentName: config.agentName, mode: config.mock ? "mock" : "live" };
+    } catch (error) {
+      if (ownsTrace) trace.fail(error);
+      throw error;
+    }
+  }
+
+  // 上传端点把文件清单交给会话记录；prompt 时再组装成专家可读的文本。
+  async function attachFiles(publicId, manifest, suppliedTrace) {
+    const trace = suppliedTrace || diagnostics.start("wealth-agent.session.attach-files", {
+      ...diagnosticMetadata(),
+      publicSessionIdPresent: Boolean(publicId)
+    });
+    const ownsTrace = !suppliedTrace;
+    try {
+      const record = sessions.get(publicId);
+      if (!record) throw new WorkBuddyError("专家会话已过期，请重新进入。", 404, "SESSION_NOT_FOUND");
+      record.files = Array.isArray(manifest?.files) ? manifest.files : [];
+      record.lastUsedAt = Date.now();
+      trace.event("session.files.attached", "success", { fileCount: record.files.length });
+      if (ownsTrace) trace.finish("success");
+      return { ok: true, fileCount: record.files.length };
     } catch (error) {
       if (ownsTrace) trace.fail(error);
       throw error;
@@ -912,15 +976,24 @@ export function createWealthAgentService({
       if (typeof text !== "string" || !text.trim()) {
         throw new WorkBuddyError("请输入要咨询的问题。", 400, "EMPTY_PROMPT");
       }
-      const promptBytes = byteLength(text);
-      if (promptBytes > MAX_PROMPT_BYTES) {
-        throw new WorkBuddyError("本次输入过长，请精简后重试。", 413, "PROMPT_TOO_LARGE", {
+      // 演示模式保持对话干净；真实专家必须收到 workspace 清单与文件内容。
+      const outgoing = record.mock
+        ? text.trim()
+        : await fileChannel.buildPromptEnvelope(text.trim(), {
+          sessionId: publicId,
+          workspace: "/workspace",
+          files: record.files || []
+        });
+      const promptBytes = byteLength(outgoing);
+      if (promptBytes > config.maxPromptBytes) {
+        throw new WorkBuddyError("本次输入与附件内容过大，请精简问题或分批上传底稿。", 413, "PROMPT_TOO_LARGE", {
           byteLength: promptBytes,
-          limitBytes: MAX_PROMPT_BYTES
+          limitBytes: config.maxPromptBytes
         });
       }
       trace.event("prompt.validated", "success", {
         byteLength: promptBytes,
+        fileCount: (record.files || []).length,
         mock: Boolean(record.mock),
         runtimeIdPresent: Boolean(record.runtimeId)
       });
@@ -928,8 +1001,8 @@ export function createWealthAgentService({
       let result;
       if (record.mock) {
         record.turn += 1;
-        const chunks = buildMockReply(text, record.turn);
-        emit({ type: "status", text: "身家诊断专家正在分析…" });
+        const chunks = buildMockReply(text, record.turn, config.mockProfile, record.context);
+        emit({ type: "status", text: `${config.agentName}正在分析…` });
         for (const chunk of chunks) {
           await new Promise(resolve => setTimeout(resolve, 12));
           emit({ type: "text", text: chunk });
@@ -937,7 +1010,7 @@ export function createWealthAgentService({
         trace.event("mock.prompt.completed", "success", { turn: record.turn, textChunks: chunks.length });
         result = { stopReason: "end_turn" };
       } else {
-        result = await record.acp.prompt(record.acpSessionId, text.trim(), emit, trace);
+        result = await record.acp.prompt(record.acpSessionId, outgoing, emit, trace);
       }
       if (ownsTrace) trace.finish("success", { stopReason: result.stopReason || "end_turn" });
       return result;
@@ -992,7 +1065,7 @@ export function createWealthAgentService({
   const cleanupTimer = setInterval(() => void cleanupExpired(), 5 * 60 * 1000);
   cleanupTimer.unref?.();
 
-  return { status, createSession, prompt, closeSession, cleanupExpired, WorkBuddyError };
+  return { status, createSession, attachFiles, prompt, closeSession, cleanupExpired, WorkBuddyError };
 }
 
 export { WorkBuddyError };

@@ -204,6 +204,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Some view controllers are loaded as `type="module"` scripts, which execute
+  // AFTER DOMContentLoaded. Calling them too early silently fails and can leave
+  // the page with no active view (a blank body). Wait briefly for the global to
+  // appear, with a bounded retry, before giving up.
+  function whenReady(getter, invoke, attempts = 40) {
+    let tries = 0;
+    const tick = () => {
+      const fn = typeof getter === 'function' ? getter() : null;
+      if (typeof fn === 'function') {
+        invoke(fn);
+        return;
+      }
+      if (tries++ < attempts) window.setTimeout(tick, 25);
+    };
+    tick();
+  }
+  const ready = (name, invoke) => whenReady(() => window[name], invoke);
+
   // Restore direct links such as #strategy / #wealth and initialise History state.
   const requested = INITIAL_ROUTE_HASH || window.location.hash.replace(/^#/, '');
   const internalPages = ['home', 'strategy', 'value', 'wealth', 'trust', 'academy', 'charity', 'vision'];
@@ -217,72 +235,44 @@ document.addEventListener('DOMContentLoaded', () => {
         '#' + requested
       );
     } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof strategyOpenSkyworthDepth === 'function') {
-        strategyOpenSkyworthDepth(strategyChapter, { replaceHistory: true, scroll: false });
-      }
-    }, 0);
+    ready('strategyOpenSkyworthDepth', fn => fn(strategyChapter, { replaceHistory: true, scroll: false }));
   } else if (requested === 'strategy-library') {
     navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
     try { window.history.replaceState({ page: 'strategy', strategyView: 'hub' }, '', '#strategy-library'); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof strategyShowHub === 'function') {
-        strategyShowHub({ replaceHistory: true, scroll: false });
-      }
-    }, 0);
+    ready('strategyShowHub', fn => fn({ replaceHistory: true, scroll: false }));
   } else if (requested === 'strategy-agent') {
     navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
     try { window.history.replaceState({ page: 'strategy', strategyView: 'agent' }, '', '#strategy-agent'); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof strategyOpenAgent === 'function') {
-        strategyOpenAgent({ replaceHistory: true, scroll: false });
-      }
-    }, 0);
+    ready('strategyOpenAgent', fn => fn({ replaceHistory: true, scroll: false }));
   } else if (requested === 'value-agent') {
     navigateTo('value', { skipHistory: true, scroll: false, preserveValueView: true });
     try { window.history.replaceState({ page: 'value', valueView: 'agent' }, '', '#value-agent'); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof window.valueOpenAgent === 'function') {
-        window.valueOpenAgent({ replaceHistory: true, scroll: false });
-      }
-    }, 0);
+    ready('valueOpenAgent', fn => fn({ replaceHistory: true, scroll: false }));
+  } else if (requested === 'market-agent') {
+    navigateTo('value', { skipHistory: true, scroll: false, preserveValueView: true });
+    try { window.history.replaceState({ page: 'value', valueView: 'market-agent' }, '', '#market-agent'); } catch (error) {}
+    ready('marketOpenAgent', fn => fn({ replaceHistory: true, scroll: false }));
   } else if (requested.startsWith('strategy-case-')) {
     const strategyCase = requested.replace('strategy-case-', '');
     navigateTo('strategy', { skipHistory: true, scroll: false, preserveStrategyView: true });
     try { window.history.replaceState({ page: 'strategy', strategyCase }, '', '#' + requested); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof strategyOpenCase === 'function') {
-        strategyOpenCase(strategyCase, { replaceHistory: true, scroll: false });
-      }
-    }, 0);
+    ready('strategyOpenCase', fn => fn(strategyCase, { replaceHistory: true, scroll: false }));
   } else if (requested === 'wealth-system') {
     navigateTo('wealth', { skipHistory: true, scroll: false, preserveWealthView: true });
     try { window.history.replaceState({ page: 'wealth', wealthView: 'wizard' }, '', '#wealth-system'); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof window.wealthEnterSystem === 'function') {
-        window.wealthEnterSystem({ pushHistory: false, scroll: false });
-      }
-    }, 0);
+    ready('wealthEnterSystem', fn => fn({ pushHistory: false, scroll: false }));
   } else if (requested === 'wealth-agent') {
     navigateTo('wealth', { skipHistory: true, scroll: false, preserveWealthView: true });
     try { window.history.replaceState({ page: 'wealth', wealthView: 'agent' }, '', '#wealth-agent'); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof window.wealthAilyOpen === 'function') window.wealthAilyOpen({ replaceHistory: true, scroll: false });
-    }, 0);
+    ready('wealthAilyOpen', fn => fn({ replaceHistory: true, scroll: false }));
   } else if (requested === 'trust-system') {
     navigateTo('trust', { skipHistory: true, scroll: false, preserveTrustView: true });
     try { window.history.replaceState({ page: 'trust', trustView: 'wizard' }, '', '#trust-system'); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof window.trustEnterSystem === 'function') {
-        window.trustEnterSystem({ pushHistory: false, scroll: false });
-      }
-    }, 0);
+    ready('trustEnterSystem', fn => fn({ pushHistory: false, scroll: false }));
   } else if (requested === 'trust-agent') {
     navigateTo('trust', { skipHistory: true, scroll: false, preserveTrustView: true });
     try { window.history.replaceState({ page: 'trust', trustView: 'agent' }, '', '#trust-agent'); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof window.trustAilyOpen === 'function') window.trustAilyOpen({ replaceHistory: true, scroll: false });
-    }, 0);
+    ready('trustAilyOpen', fn => fn({ replaceHistory: true, scroll: false }));
   } else if (
     requested === 'academy-system' ||
     requested === 'academy-about' ||
@@ -303,11 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (academyMilestone) academyState.academyMilestone = academyMilestone;
     navigateTo('academy', { skipHistory: true, scroll: false, preserveAcademyView: true });
     try { window.history.replaceState(academyState, '', '#' + requested); } catch (error) {}
-    window.setTimeout(() => {
-      if (typeof window.academyRestoreView === 'function') {
-        window.academyRestoreView(academyState, { pushHistory: false, scroll: false });
-      }
-    }, 0);
+    ready('academyRestoreView', fn => fn(academyState, { pushHistory: false, scroll: false }));
   } else if (internalPages.includes(requested)) {
     navigateTo(requested, { skipHistory: true });
     try { window.history.replaceState({ page: requested }, '', '#' + requested); } catch (error) {}
@@ -323,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = event.state && event.state.page ? event.state.page : 'home';
     const preserveStrategyView = page === 'strategy' && event.state &&
       (event.state.strategyCase || event.state.strategyChapter || event.state.strategyView);
-    const preserveValueView = page === 'value' && event.state && event.state.valueView === 'agent';
+    const preserveValueView = page === 'value' && event.state && (event.state.valueView === 'agent' || event.state.valueView === 'market-agent');
     const preserveWealthView = page === 'wealth' && event.state && ['wizard', 'agent'].includes(event.state.wealthView);
     const preserveTrustView = page === 'trust' && event.state && ['wizard', 'agent'].includes(event.state.trustView);
     const preserveAcademyView = page === 'academy' && event.state &&
@@ -337,38 +323,26 @@ document.addEventListener('DOMContentLoaded', () => {
       preserveAcademyView
     });
     if (preserveValueView) {
-      window.setTimeout(() => {
-        if (typeof window.valueOpenAgent === 'function') {
-          window.valueOpenAgent({ scroll: false });
-        }
-      }, 0);
+      if (event.state.valueView === 'market-agent') {
+        ready('marketOpenAgent', fn => fn({ scroll: false }));
+      } else {
+        ready('valueOpenAgent', fn => fn({ scroll: false }));
+      }
     }
     if (preserveWealthView && event.state.wealthView === 'wizard') {
-      window.setTimeout(() => {
-        if (typeof window.wealthEnterSystem === 'function') {
-          window.wealthEnterSystem({ pushHistory: false, scroll: false });
-        }
-      }, 0);
+      ready('wealthEnterSystem', fn => fn({ pushHistory: false, scroll: false }));
     }
     if (preserveWealthView && event.state.wealthView === 'agent') {
-      window.setTimeout(() => window.wealthAilyOpen?.({ scroll: false }), 0);
+      ready('wealthAilyOpen', fn => fn({ scroll: false }));
     }
     if (preserveTrustView && event.state.trustView === 'wizard') {
-      window.setTimeout(() => {
-        if (typeof window.trustEnterSystem === 'function') {
-          window.trustEnterSystem({ pushHistory: false, scroll: false });
-        }
-      }, 0);
+      ready('trustEnterSystem', fn => fn({ pushHistory: false, scroll: false }));
     }
     if (preserveTrustView && event.state.trustView === 'agent') {
-      window.setTimeout(() => window.trustAilyOpen?.({ scroll: false }), 0);
+      ready('trustAilyOpen', fn => fn({ scroll: false }));
     }
     if (preserveAcademyView) {
-      window.setTimeout(() => {
-        if (typeof window.academyRestoreView === 'function') {
-          window.academyRestoreView(event.state, { pushHistory: false, scroll: false });
-        }
-      }, 0);
+      ready('academyRestoreView', fn => fn(event.state, { pushHistory: false, scroll: false }));
     }
     if (event.state && event.state.anchor === 'home-value-cycle') {
       window.setTimeout(() => {

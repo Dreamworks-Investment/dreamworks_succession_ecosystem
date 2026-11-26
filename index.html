@@ -14,7 +14,7 @@
 <link href="css/strategy-agent-websdk.css?v=1" rel="stylesheet"/>
 <link href="css/strategy-auth.css?v=1" rel="stylesheet"/>
 <link href="css/value-investment-intro.css?v=2" rel="stylesheet"/>
-<link href="css/value-agent-websdk.css?v=1" rel="stylesheet"/>
+<link href="css/value-agent-websdk.css?v=8" rel="stylesheet"/>
 <link href="css/service-agent-websdk.css?v=1" rel="stylesheet"/>
 <link href="css/wealth-diagnosis.css?v=2" rel="stylesheet"/>
 <link href="css/wealth-agent.css?v=2" rel="stylesheet"/>
@@ -409,21 +409,27 @@
 <div class="strategy-value-model" aria-label="企业价值立方体的三条轴分别是回报率、增长率和可持续时间">
 <div class="strategy-cube-diagram" aria-hidden="true">
 <svg class="strategy-cube-axis-lines" viewBox="0 0 500 500">
-<defs><marker id="strategy-cube-arrow" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L7,3 z"></path></marker></defs>
-<line class="cube-axis-line cube-axis-line-r" marker-end="url(#strategy-cube-arrow)" x1="250" x2="80" y1="250" y2="115"></line>
-<line class="cube-axis-line cube-axis-line-g" marker-end="url(#strategy-cube-arrow)" x1="250" x2="430" y1="250" y2="370"></line>
-<line class="cube-axis-line cube-axis-line-s" marker-end="url(#strategy-cube-arrow)" x1="250" x2="250" y1="250" y2="38"></line>
-<circle class="cube-axis-origin" cx="250" cy="250" r="5"></circle>
+<defs>
+<marker id="strategy-cube-arrow" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L7,3 z"></path></marker>
+<linearGradient id="strategy-cube-face-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f2dda6"/><stop offset="100%" stop-color="#cfa558"/></linearGradient>
+<linearGradient id="strategy-cube-face-left" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3f83ad"/><stop offset="100%" stop-color="#1d4f74"/></linearGradient>
+<linearGradient id="strategy-cube-face-right" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#17456a"/><stop offset="100%" stop-color="#0d2c47"/></linearGradient>
+</defs>
+<g class="strategy-cube-axes">
+<line class="cube-axis-line cube-axis-line-r" marker-end="url(#strategy-cube-arrow)" x1="250" x2="64" y1="265" y2="343"></line>
+<line class="cube-axis-line cube-axis-line-g" marker-end="url(#strategy-cube-arrow)" x1="250" x2="436" y1="265" y2="343"></line>
+<line class="cube-axis-line cube-axis-line-s" marker-end="url(#strategy-cube-arrow)" x1="250" x2="250" y1="265" y2="42"></line>
+</g>
+<g class="strategy-cube-solid">
+<polygon class="cube-face-solid cube-face-left" points="130,185 130,315 250,365 250,235"></polygon>
+<polygon class="cube-face-solid cube-face-right" points="370,185 250,235 250,365 370,315"></polygon>
+<polygon class="cube-face-solid cube-face-top" points="250,135 130,185 250,235 370,185"></polygon>
+</g>
 </svg>
-<div class="strategy-cube-scene">
-<div class="strategy-value-cube">
-<span class="cube-face cube-front"></span><span class="cube-face cube-back"></span><span class="cube-face cube-right"></span><span class="cube-face cube-left"></span><span class="cube-face cube-top"></span><span class="cube-face cube-bottom"></span>
 </div>
-</div>
-</div>
+<div class="strategy-value-axis axis-s"><strong>S</strong><span>可持续时间</span><small>心智护城河</small></div>
 <div class="strategy-value-axis axis-r"><strong>R</strong><span>回报率</span><small>定位找对价值鱼塘</small></div>
 <div class="strategy-value-axis axis-g"><strong>G</strong><span>增长率</span><small>运营配称聚焦</small></div>
-<div class="strategy-value-axis axis-s"><strong>S</strong><span>可持续时间</span><small>心智护城河</small></div>
 <div class="strategy-value-caption"><b>企业价值</b><span>R × G × S</span></div>
 </div>
 </div>
@@ -2136,7 +2142,10 @@
 <div><strong>品菜</strong><span aria-hidden="true"></span></div>
 <div class="value-system-actions">
 <a class="value-system-enter" href="https://sd85slpdkcofupk4bn66g.apigateway-cn-guangzhou.volceapi.com/" rel="noopener noreferrer" target="_blank">点击进入 狠值投资系统 <span aria-hidden="true">→</span></a>
+<div class="value-agent-pair">
+<button class="value-system-enter value-agent-enter" onclick="marketEnterFromEntry({ pushHistory: true })" type="button">点击进入 梦工场市场专员 <span aria-hidden="true">→</span></button>
 <button class="value-system-enter value-agent-enter" onclick="valueOpenAgent({ pushHistory: true })" type="button">点击进入 梦工场投研专员 <span aria-hidden="true">→</span></button>
+</div>
 </div>
 <p>评估单个标的之后，家族整体身家怎么看？下一页，身家诊断</p>
 </div>
@@ -2164,6 +2173,153 @@
 </section>
 </article>
 <!-- VALUE_AGENT_GATE_END -->
+<!-- MARKET_AGENT_GATE_START -->
+<article aria-hidden="true" class="portal-agent-auth-view market-agent-auth-view" id="market-agent-auth-view">
+<section class="strategy-auth-stage" aria-labelledby="market-agent-auth-title">
+<div class="strategy-auth-card">
+<p class="strategy-auth-kicker">MENGONGCHANG MARKET AGENT · 专属访问</p>
+<h2 id="market-agent-auth-title">梦工场市场专员</h2>
+<p class="strategy-auth-intro">请输入由梦工场提供的市场专员账号与密码。</p>
+<form class="strategy-auth-form" data-strategy-auth-form="market" novalidate>
+<label for="market-agent-username">请输入账号（必填）</label>
+<input id="market-agent-username" name="username" type="text" autocomplete="username" required/>
+<label for="market-agent-password">请输入密码（必填）</label>
+<div class="strategy-auth-password-row"><input id="market-agent-password" name="password" type="password" autocomplete="current-password" required/><button aria-label="显示密码" class="strategy-auth-password-toggle" data-password-toggle="market-agent-password" type="button">显示</button></div>
+<p class="strategy-auth-message" data-strategy-auth-message="market" role="alert" aria-live="polite"></p>
+<button class="strategy-auth-submit" type="submit">验证并进入市场专员 <span aria-hidden="true">→</span></button>
+</form>
+<div class="strategy-auth-foot"><span>独立权限 · 狠值市场</span><button onclick="marketShowIntro({ pushHistory: true, scrollToEntry: true })" type="button">返回狠值投资</button></div>
+</div>
+</section>
+</article>
+<!-- MARKET_AGENT_GATE_END -->
+<!-- MARKET_AGENT_PROTECTED_START -->
+<article aria-hidden="true" class="market-agent-websdk-view" id="market-agent-websdk-view">
+<nav aria-label="市场专员路径" class="strategy-agent-websdk-breadcrumb market-agent-breadcrumb">
+<button onclick="marketShowIntro({ pushHistory: true, scrollToEntry: true })" type="button">狠值投资</button>
+<span aria-hidden="true">/</span>
+<strong>梦工场市场专员</strong>
+</nav>
+<section aria-labelledby="market-agent-launch-title" class="wealth-agent-launch market-agent-launch" id="market-agent-launch">
+<div class="wealth-agent-launch-head">
+<div aria-hidden="true" class="wealth-agent-mark">市</div>
+<div>
+<h4 id="market-agent-launch-title">梦工场市场专员</h4>
+</div>
+<span aria-live="polite" class="wealth-agent-availability is-checking" id="market-agent-availability">正在检查服务…</span>
+</div>
+<p class="wealth-agent-launch-copy">先选择报告对象，再选择详细版或简版。上传底稿后点击目标格式，即可按对应模式直接生成报告。</p>
+<div class="market-report-options" aria-label="报告对象">
+<button class="market-report-option" data-market-report="listed" disabled type="button">
+<span class="market-report-option-body">
+<strong>上市公司模块</strong>
+</span>
+</button>
+<button class="market-report-option" data-market-report="unlisted" disabled type="button">
+<span class="market-report-option-body">
+<strong>非上市公司模块</strong>
+</span>
+</button>
+</div>
+<div aria-live="polite" class="market-version-step" id="market-agent-version-step" hidden>
+<p class="market-version-step-title" id="market-agent-version-step-title">已选择模块 · 请选择报告版本</p>
+<div aria-label="报告版本" class="market-version-options" role="group">
+<button class="market-version-option" data-market-version="full" disabled type="button">
+<strong>详细版</strong><span>框架完整、过程充分，保留全部章节、数据和推演过程，呈现完整研究脉络。</span>
+</button>
+<button class="market-version-option" data-market-version="brief" disabled type="button">
+<strong>简版</strong><span>框架完整、重点突出，保留核心结论与关键依据，压缩推演过程，阅读更聚焦。</span>
+</button>
+</div>
+</div>
+<div class="market-report-note-row">
+<small id="market-agent-setup-note">服务就绪后，先选模块，再选版本并上传底稿。</small>
+<button class="market-report-return" onclick="marketShowIntro({ pushHistory: true, scrollToEntry: true })" type="button">返回狠值投资</button>
+</div>
+</section>
+<section aria-labelledby="market-agent-console-title" class="wealth-agent-console market-agent-console" hidden id="market-agent-console">
+<header class="wealth-agent-console-head">
+<div>
+<h4 id="market-agent-console-title">市场顾问对话</h4>
+</div>
+<span class="wealth-agent-live-status" id="market-agent-live-status">准备连接</span>
+</header>
+<div aria-live="polite" aria-relevant="additions text" class="wealth-agent-messages" id="market-agent-messages"></div>
+<section aria-labelledby="market-agent-export-title" class="market-agent-export" hidden id="market-agent-export">
+<div class="market-agent-export-head">
+<p class="market-agent-export-kicker">REPORT DELIVERY</p>
+<h5 id="market-agent-export-title">研究结果已生成，选择导出方式</h5>
+<p class="market-agent-export-desc">详细版保留全部章节、数据口径与论证过程，适合内部评审与归档；简版只留结论与关键要点，适合对外发送或快速过会。</p>
+</div>
+<div aria-label="选择报告版本" class="market-agent-export-versions" role="group">
+<button class="market-agent-export-version" data-export-version="full" type="button">
+<span class="market-agent-export-version-name">详细版下载</span>
+<span class="market-agent-export-version-desc">完整底稿 · 全部轮次与论证</span>
+</button>
+<button class="market-agent-export-version" data-export-version="brief" type="button">
+<span class="market-agent-export-version-name">简版下载</span>
+<span class="market-agent-export-version-desc">结论摘要 · 关键要点</span>
+</button>
+</div>
+<div class="market-agent-export-formats" data-export-formats hidden>
+<p class="market-agent-export-formats-label" id="market-agent-export-formats-label">选择文件格式</p>
+<div aria-labelledby="market-agent-export-formats-label" class="market-agent-export-format-row" role="group">
+<button class="market-agent-export-format" data-export-format="md" type="button">下载 .md</button>
+<button class="market-agent-export-format" data-export-format="pdf" type="button">下载 .pdf</button>
+<button class="market-agent-export-format" data-export-format="docx" type="button">下载 .docx</button>
+<button class="market-agent-export-format" data-export-format="html" type="button">下载 .html</button>
+</div>
+<p aria-live="polite" class="market-agent-export-hint" id="market-agent-export-feedback">PDF 会打开浏览器打印面板，在目标打印机里选择「另存为 PDF」即可保存。</p>
+</div>
+</section>
+<div class="market-agent-upload-zone">
+<p class="market-agent-upload-title">报告底稿是分析的主要依据</p>
+<p class="market-agent-upload-hint"><strong>报告底稿（必传）</strong>：支持 PDF、Word、TXT、Markdown、Excel，未上传时无法开始提问。<strong>标的图片（可选）</strong>：1–3 张，仅用于报告封面；未上传时报告照常生成，封面使用文字版式。</p>
+<div class="market-agent-upload-actions">
+<button class="btn btn-secondary btn-sm market-agent-upload-btn is-required" id="market-agent-upload-report" type="button">＋ 上传报告底稿<span class="market-agent-upload-tag">必传</span></button>
+<button class="btn btn-secondary btn-sm market-agent-upload-btn is-optional" id="market-agent-upload-images" type="button">＋ 上传封面图片<span class="market-agent-upload-tag">可选</span></button>
+<input class="market-agent-file-input" id="market-agent-report-input" type="file" accept=".pdf,.doc,.docx,.txt,.md,.rtf,.csv,.xls,.xlsx" hidden/>
+<input class="market-agent-file-input" id="market-agent-images-input" type="file" accept="image/*" multiple hidden/>
+</div>
+<ul class="market-agent-file-list" id="market-agent-file-list" hidden></ul>
+<p aria-live="polite" class="market-agent-upload-status is-warning" id="market-agent-upload-status">尚未上传报告底稿，上传后「发送」才会启用。</p>
+</div>
+<section aria-labelledby="market-agent-generate-title" class="market-agent-generate" id="market-agent-generate">
+<p class="market-agent-generate-kicker">ONE-CLICK DELIVERY</p>
+<h5 id="market-agent-generate-title">选择格式，直接生成报告</h5>
+<p aria-live="polite" class="market-agent-generate-summary" id="market-agent-generate-summary">请先选择报告模式并上传底稿。</p>
+<div aria-label="直接生成报告格式" class="market-agent-generate-formats" role="group">
+<button class="market-agent-generate-format" data-generate-format="docx" disabled type="button">生成 .docx</button>
+<button class="market-agent-generate-format" data-generate-format="pdf" disabled type="button">生成 .pdf</button>
+<button class="market-agent-generate-format" data-generate-format="md" disabled type="button">生成 .md</button>
+<button class="market-agent-generate-format" data-generate-format="html" disabled type="button">生成 .html</button>
+</div>
+<p aria-live="polite" class="market-agent-generate-feedback" id="market-agent-generate-feedback">.docx / .html / .md 生成后自动下载；.pdf 会打开打印面板供你另存。</p>
+</section>
+<form class="wealth-agent-composer" id="market-agent-form">
+<label class="sr-only" for="market-agent-input">向梦工场市场专员提问</label>
+<textarea id="market-agent-input" maxlength="6000" placeholder="补充你的研究需求或想问市场专员的问题…" rows="3"></textarea>
+<button class="btn btn-primary" id="market-agent-send" type="submit">发送</button>
+</form>
+<div class="wealth-agent-console-actions">
+<button class="btn btn-secondary btn-sm" id="market-agent-back" type="button">← 返回入口</button>
+<button class="wealth-agent-end" id="market-agent-end" type="button">结束并清除本次会话</button>
+</div>
+</section>
+<details class="wealth-agent-diagnostics" hidden id="market-agent-diagnostics">
+<summary>技术诊断日志 · Trace <code id="market-agent-diagnostic-trace">尚未生成</code></summary>
+<div class="wealth-agent-diagnostic-body">
+<p id="market-agent-diagnostic-summary">每次连接、Runtime 创建和 ACP 对话都会生成一条脱敏时间线。</p>
+<ol aria-label="最近一次调用时间线" class="wealth-agent-diagnostic-timeline" id="market-agent-diagnostic-timeline"></ol>
+<div class="wealth-agent-diagnostic-actions">
+<button class="btn btn-secondary btn-sm" id="market-agent-diagnostic-download" type="button">下载完整诊断日志 JSON</button>
+<button class="wealth-agent-diagnostic-copy" id="market-agent-diagnostic-copy" type="button">复制 Trace 引用</button>
+</div>
+<small>日志不包含 API Key、OAuth Token、密码或完整对话内容；部署平台可用同一 Trace ID 检索服务端结构化日志。</small>
+</div>
+</details>
+</article>
+<!-- MARKET_AGENT_PROTECTED_END -->
 <!-- VALUE_AGENT_PROTECTED_START -->
 <article aria-hidden="true" class="strategy-agent-websdk-view value-agent-websdk-view" id="value-agent-websdk-view">
 <section aria-labelledby="value-agent-websdk-title" class="strategy-agent-websdk-stage">
@@ -3058,6 +3214,61 @@
 </article>
 </section>
 </main>
+<script>
+/* 启动兜底：某些情况下路由脚本未能及时激活页面（如 module 脚本加载慢或
+   file:// 下被拦截），会导致 main 区全空白。这里在加载完成后做一次检测，
+   若所有 .page 均无可见高度，则强制激活首页，避免用户看到白屏。 */
+(function () {
+  function ensureVisiblePage() {
+    var pages = document.querySelectorAll('.page');
+    var anyVisible = false;
+    pages.forEach(function (p) {
+      if (p.classList.contains('active') && (p.offsetHeight > 40 || p.getBoundingClientRect().height > 40)) {
+        anyVisible = true;
+      }
+    });
+    if (!anyVisible) {
+      // 先尝试恢复 hash 指向的页面对应的视图函数
+      var hash = (window.location.hash || '').replace(/^#/, '');
+      var viewMap = {
+        'value': 'valueShowIntro', 'value-agent': 'valueOpenAgent', 'market-agent': 'marketOpenAgent',
+        'strategy': 'strategyShowIntro', 'strategy-library': 'strategyShowHub', 'strategy-agent': 'strategyOpenAgent',
+        'wealth': 'wealthShowIntro', 'wealth-system': 'wealthEnterSystem', 'wealth-agent': 'wealthAilyOpen',
+        'trust': 'trustShowIntro', 'trust-system': 'trustEnterSystem', 'trust-agent': 'trustAilyOpen',
+        'academy': 'academyShowCover'
+      };
+      var fnName = viewMap[hash];
+      if (fnName && typeof window[fnName] === 'function') {
+        try { window[fnName]({ scroll: false, pushHistory: false }); } catch (e) {}
+      }
+      // 再次检测：若仍无可见页面，强制回首页
+      window.setTimeout(function () {
+        var visible = false;
+        document.querySelectorAll('.page').forEach(function (p) {
+          if (p.classList.contains('active') && (p.offsetHeight > 40 || p.getBoundingClientRect().height > 40)) visible = true;
+        });
+        if (!visible) {
+          var home = document.getElementById('page-home');
+          if (home) {
+            document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active'); });
+            home.classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(function (l) {
+              l.classList.toggle('active', l.dataset.page === 'home');
+            });
+          }
+        }
+      }, 250);
+    }
+  }
+  if (document.readyState === 'complete') {
+    window.setTimeout(ensureVisiblePage, 300);
+  } else {
+    window.addEventListener('load', function () { window.setTimeout(ensureVisiblePage, 300); });
+    // 双保险：即使 load 事件因某资源卡住不触发，也在 2 秒后强制检查一次。
+    window.setTimeout(ensureVisiblePage, 2000);
+  }
+})();
+</script>
 <button aria-label="返回梦工场主页" class="home-back-to-cycle" id="back-to-value-cycle" onclick="goToHomeCycle()" type="button">
 <span aria-hidden="true">←</span> 返回梦工场主页
   </button>
@@ -3070,7 +3281,7 @@
 </footer>
 <!-- ===================== SCRIPTS ===================== -->
 <script src="js/charts.js"></script>
-<script src="js/app.js?v=10"></script>
+<script src="js/app.js?v=11"></script>
 <script src="js/home.js"></script>
 <script src="js/home-journey.js?v=3"></script>
 <script src="js/enterprise.js"></script>
@@ -3088,11 +3299,13 @@
 <script src="js/strategy-cases.js?v=2"></script>
 <script src="js/strategy.js"></script>
 <!-- STRATEGY_CASES_PROTECTED_END -->
-<script src="js/strategy-access.js?v=2"></script>
+<script src="js/strategy-access.js?v=3"></script>
 <!-- STRATEGY_AGENT_PROTECTED_START -->
 <script type="module" src="js/strategy-agent-websdk.js?v=1"></script>
 <!-- STRATEGY_AGENT_PROTECTED_END -->
 <script type="module" src="js/value-agent-websdk.js?v=1"></script>
+<script src="js/report-export.js?v=1"></script>
+<script src="js/market-agent.js?v=13"></script>
 <script type="module" src="js/service-agent-websdk.js?v=2"></script>
 <script src="js/academy-assessment.js"></script>
 <script src="js/final-business-pages.js?v=6"></script>

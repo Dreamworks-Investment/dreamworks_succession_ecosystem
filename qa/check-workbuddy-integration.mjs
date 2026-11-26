@@ -23,7 +23,7 @@ assert(browserClient.includes('namesRemoved: true'), 'Submitted context must be 
 assert(browserClient.includes('downloadDiagnostics'), 'Browser must let the operator download the diagnostic bundle');
 assert(browserClient.includes('assistantContent.textContent += event.text'), 'Agent output must be rendered as text, not HTML');
 assert(!browserClient.includes('assistantContent.innerHTML'), 'Agent output must never be assigned through innerHTML');
-assert(serverSource.includes('/api/wealth-agent/status'), 'Server must expose a safe configuration status route');
+assert(serverSource.includes('pathPrefix = "/api/wealth-agent"') && serverSource.includes('${pathPrefix}/status'), 'Server must expose a safe configuration status route');
 assert(serverSource.includes('isSameOrigin(req)'), 'Mutating AI routes must enforce same-origin requests');
 assert(serverSource.includes('assertWithinRateLimit(req'), 'Public AI routes must have basic abuse protection');
 assert(serverSource.includes('X-Dreamworks-Trace-Id'), 'Every AI response must expose its trace correlation ID');

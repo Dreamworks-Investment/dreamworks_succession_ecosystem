@@ -6,8 +6,38 @@ import { createWealthAgentService, WorkBuddyError } from "./workbuddy-agent.js";
 import { createDiagnosticStore } from "./wealth-agent-diagnostics.js";
 import { createStrategyAuthService } from "./strategy-auth.js";
 import { createOfficeTourAuthService } from "./office-tour-auth.js";
+import { createMarketFileChannel } from "./market-file-channel.js";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
+
+// 本地开发凭据：从项目根目录 .env 加载到 process.env。
+// 部署平台注入的真实环境变量优先，永远不被 .env 覆盖。
+function loadLocalEnv() {
+  const envPath = join(ROOT, ".env");
+  if (!existsSync(envPath)) return;
+  try {
+    const content = readFileSync(envPath, "utf8");
+    for (const rawLine of content.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith("#")) continue;
+      const separator = line.indexOf("=");
+      if (separator < 1) continue;
+      const key = line.slice(0, separator).trim();
+      let value = line.slice(separator + 1).trim();
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      if (!(key in process.env)) process.env[key] = value;
+    }
+  } catch (error) {
+    console.warn("[env] 无法读取 .env：", error && error.message ? error.message : error);
+  }
+}
+loadLocalEnv();
+
 const DEFAULT_PORT = Number(process.env.PORT || 8000);
 const DEFAULT_HOST = "0.0.0.0";
 const MAX_JSON_BODY_BYTES = 220 * 1024;
@@ -32,6 +62,8 @@ const STRATEGY_BLOCKS = {
   wealthAilyGate: ["WEALTH_AILY_GATE_START", "WEALTH_AILY_GATE_END"],
   trustAily: ["TRUST_AILY_PROTECTED_START", "TRUST_AILY_PROTECTED_END"],
   trustAilyGate: ["TRUST_AILY_GATE_START", "TRUST_AILY_GATE_END"],
+  marketAgent: ["MARKET_AGENT_PROTECTED_START", "MARKET_AGENT_PROTECTED_END"],
+  marketAgentGate: ["MARKET_AGENT_GATE_START", "MARKET_AGENT_GATE_END"],
   wealthInternal: ["WEALTH_INTERNAL_REVIEW_START", "WEALTH_INTERNAL_REVIEW_END"]
 };
 
@@ -204,6 +236,8 @@ function renderIndex(authStatus) {
   html = removeOrUnwrapProtectedBlocks(html, "wealthAilyGate", !authStatus.grants.wealth);
   html = removeOrUnwrapProtectedBlocks(html, "trustAily", authStatus.grants.trust);
   html = removeOrUnwrapProtectedBlocks(html, "trustAilyGate", !authStatus.grants.trust);
+  html = removeOrUnwrapProtectedBlocks(html, "marketAgent", authStatus.grants.market);
+  html = removeOrUnwrapProtectedBlocks(html, "marketAgentGate", !authStatus.grants.market);
   // The WorkBuddy expert is an internal review tool. Reuse the internal case-library
   // grant so public visitors never receive its UI or client script.
   html = removeOrUnwrapProtectedBlocks(html, "wealthInternal", authStatus.grants.cases);
@@ -261,8 +295,46 @@ function diagnosticPathname(pathname) {
     .replace(/\/diagnostics\/dw-[a-f0-9-]+/ig, "/diagnostics/:traceId");
 }
 
+// 判断一个地址是否属于「反向代理/网关」网段（含回环与私网）。
+// 云平台（含火山引擎函数服务）会在前面挂一层网关，此时 socket 对端永远是内网地址，
+// 真实访客地址只在 X-Forwarded-For 里。仅当对端是网关时才信任该请求头，
+// 避免公网直连的客户端伪造 XFF 绕过限流。
+function isGatewayAddress(address) {
+  const value = String(address || "").trim().toLowerCase();
+  if (!value) return false;
+  if (value === "::1" || value === "localhost") return true;
+  const normalized = value.startsWith("::ffff:") ? value.slice(7) : value;
+  if (normalized === "127.0.0.1" || normalized.startsWith("127.")) return true;
+  if (normalized === "::1") return true;
+  if (normalized.startsWith("10.")) return true;
+  if (normalized.startsWith("192.168.")) return true;
+  const match = normalized.match(/^172\.(\d{1,3})\./);
+  if (match) {
+    const second = Number(match[1]);
+    if (second >= 16 && second <= 31) return true;
+  }
+  if (normalized.startsWith("fc") || normalized.startsWith("fd") || normalized.startsWith("fe80")) return true;
+  return false;
+}
+
+function clientAddress(req) {
+  const peer = req.socket?.remoteAddress || "";
+  const trustHeader = String(process.env.TRUST_PROXY || "").toLowerCase() === "true" || isGatewayAddress(peer);
+  if (trustHeader) {
+    const forwarded = req.headers["x-forwarded-for"];
+    const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+    if (typeof raw === "string" && raw.trim()) {
+      const first = raw.split(",")[0].trim();
+      if (first) return first;
+    }
+    const realIp = req.headers["x-real-ip"];
+    if (typeof realIp === "string" && realIp.trim()) return realIp.trim();
+  }
+  return peer || "local";
+}
+
 function assertWithinRateLimit(req, scope, limit, windowMs) {
-  const remoteAddress = req.socket?.remoteAddress || "local";
+  const remoteAddress = clientAddress(req);
   const key = `${scope}:${remoteAddress}`;
   const now = Date.now();
   const bucket = REQUEST_BUCKETS.get(key);
@@ -300,14 +372,15 @@ function publicError(error, trace) {
   };
 }
 
-export async function handleWealthAgentApi(req, res, pathname, agentService, diagnostics = DEFAULT_DIAGNOSTICS) {
-  if (!pathname.startsWith("/api/wealth-agent")) return false;
+export async function handleWealthAgentApi(req, res, pathname, agentService, diagnostics = DEFAULT_DIAGNOSTICS, pathPrefix = "/api/wealth-agent", fileChannel = null) {
+  if (!pathname.startsWith(pathPrefix)) return false;
   if (!isSameOrigin(req)) {
     sendJson(res, 403, { ok: false, error: { code: "ORIGIN_REJECTED", message: "仅允许从本站发起专家诊断。" } });
     return true;
   }
 
-  const diagnosticMatch = pathname.match(/^\/api\/wealth-agent\/diagnostics\/(dw-[a-f0-9-]+)$/i);
+  const escapedPrefix = pathPrefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const diagnosticMatch = pathname.match(new RegExp(`^${escapedPrefix}/diagnostics/(dw-[a-f0-9-]+)$`, "i"));
   if (diagnosticMatch && req.method === "GET") {
     const diagnostic = diagnostics.get(diagnosticMatch[1]);
     sendJson(
@@ -330,14 +403,14 @@ export async function handleWealthAgentApi(req, res, pathname, agentService, dia
   });
 
   try {
-    if (pathname === "/api/wealth-agent/status" && req.method === "GET") {
+    if (pathname === `${pathPrefix}/status` && req.method === "GET") {
       trace.event("service.status", "success", agentService.status());
       const diagnostic = trace.finish("success");
       sendJson(res, 200, { ok: true, ...agentService.status(), traceId: trace.traceId, diagnostic }, trace.traceId);
       return true;
     }
-    if (pathname === "/api/wealth-agent/session" && req.method === "POST") {
-      assertWithinRateLimit(req, "create-session", 8, 15 * 60 * 1000);
+    if (pathname === `${pathPrefix}/session` && req.method === "POST") {
+      assertWithinRateLimit(req, `${pathPrefix}:create-session`, 60, 15 * 60 * 1000);
       const body = await readJsonBody(req);
       if (body.consent !== true) throw new WorkBuddyError("请先确认数据处理授权。", 400, "CONSENT_REQUIRED");
       trace.event("http.request.validated", "success", { consent: true });
@@ -347,9 +420,50 @@ export async function handleWealthAgentApi(req, res, pathname, agentService, dia
       return true;
     }
 
-    const promptMatch = pathname.match(/^\/api\/wealth-agent\/session\/([a-f0-9-]+)\/prompt$/i);
+    // 市场专员文件通道：底稿与封面图先落到本次会话 workspace，
+    // 再由 workbuddy-agent.js 在 prompt 时注入文件清单、正文或 base64。
+    if (pathname === `${pathPrefix}/upload`) {
+      if (!fileChannel) {
+        sendJson(res, 404, { ok: false, error: { code: "API_NOT_FOUND", message: "接口不存在。" } });
+        return true;
+      }
+      try {
+        if (req.method === "POST") {
+          assertWithinRateLimit(req, `${pathPrefix}:upload`, 30, 15 * 60 * 1000);
+          const parts = await fileChannel.readMultipart(req, fileChannel.multipartBoundary(req.headers["content-type"]));
+          const sessionId = String(parts.find(part => !part.filename && part.fieldName === "sessionId")?.data.toString("utf8") || "").trim();
+          if (!sessionId) throw new WorkBuddyError("缺少会话标识，请重新进入市场专员。", 400, "SESSION_ID_REQUIRED");
+          const manifest = await fileChannel.saveFiles(sessionId, parts);
+          const publicFiles = fileChannel.publicManifest(manifest);
+          await agentService.attachFiles(sessionId, publicFiles, trace);
+          trace.event("http.upload.completed", "success", { fileCount: publicFiles.files.length });
+          const diagnostic = trace.finish("success");
+          sendJson(res, 201, { ok: true, ...publicFiles, traceId: trace.traceId, diagnostic }, trace.traceId);
+          return true;
+        }
+        if (req.method === "GET") {
+          const sessionId = String(new URL(req.url || "/", "http://localhost").searchParams.get("sessionId") || "").trim();
+          if (!sessionId) throw new WorkBuddyError("缺少会话标识，请重新进入市场专员。", 400, "SESSION_ID_REQUIRED");
+          const manifest = await fileChannel.readManifest(sessionId);
+          const publicFiles = fileChannel.publicManifest(manifest);
+          sendJson(res, 200, { ok: true, ...publicFiles });
+          return true;
+        }
+        throw new WorkBuddyError("接口不存在。", 404, "API_NOT_FOUND");
+      } catch (error) {
+        const wrapped = error instanceof WorkBuddyError
+          ? error
+          : new WorkBuddyError(error.message || "上传失败，请重试。", error.statusCode || 400, error.code || "UPLOAD_FAILED");
+        trace.fail(wrapped);
+        const { statusCode, payload } = publicError(wrapped, trace);
+        sendJson(res, statusCode, payload, trace.traceId);
+        return true;
+      }
+    }
+
+    const promptMatch = pathname.match(new RegExp(`^${escapedPrefix}/session/([a-f0-9-]+)/prompt$`, "i"));
     if (promptMatch && req.method === "POST") {
-      assertWithinRateLimit(req, "prompt", 40, 10 * 60 * 1000);
+      assertWithinRateLimit(req, `${pathPrefix}:prompt`, 40, 10 * 60 * 1000);
       const body = await readJsonBody(req);
       res.writeHead(200, {
         "Content-Type": "application/x-ndjson; charset=utf-8",
@@ -381,9 +495,10 @@ export async function handleWealthAgentApi(req, res, pathname, agentService, dia
       return true;
     }
 
-    const closeMatch = pathname.match(/^\/api\/wealth-agent\/session\/([a-f0-9-]+)\/close$/i);
+    const closeMatch = pathname.match(new RegExp(`^${escapedPrefix}/session/([a-f0-9-]+)/close$`, "i"));
     if (closeMatch && req.method === "POST") {
       await agentService.closeSession(closeMatch[1], trace);
+      if (fileChannel) await fileChannel.deleteFiles(closeMatch[1]);
       const diagnostic = trace.finish("success");
       sendJson(res, 200, { ok: true, traceId: trace.traceId, diagnostic }, trace.traceId);
       return true;
@@ -417,8 +532,8 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
   if (pathname === "/api/strategy-auth/login" && req.method === "POST") {
     try {
       const body = await readJsonBody(req);
-      const scope = ["cases", "chat", "agent", "value", "wealth", "trust"].includes(body.scope) ? body.scope : "";
-      assertWithinRateLimit(req, `strategy-auth:${scope || "invalid"}`, 8, 15 * 60 * 1000);
+      const scope = ["cases", "chat", "agent", "value", "wealth", "trust", "market"].includes(body.scope) ? body.scope : "";
+      assertWithinRateLimit(req, `strategy-auth:${scope || "invalid"}`, 30, 15 * 60 * 1000);
       if (!scope) {
         sendJson(res, 400, { ok: false, error: { code: "INVALID_SCOPE", message: "访问区域无效。" } });
         return true;
@@ -453,7 +568,7 @@ export async function handleStrategyAuthApi(req, res, pathname, authService) {
   if (pathname === "/api/strategy-auth/logout" && req.method === "POST") {
     try {
       const body = await readJsonBody(req);
-      const scope = ["cases", "chat", "agent", "value", "wealth", "trust"].includes(body.scope) ? body.scope : "all";
+      const scope = ["cases", "chat", "agent", "value", "wealth", "trust", "market"].includes(body.scope) ? body.scope : "all";
       res.setHeader("Set-Cookie", authService.revoke(req, scope));
       sendJson(res, 200, { ok: true, scope });
       return true;
@@ -544,6 +659,19 @@ export async function handleOfficeTourAuthApi(req, res, pathname, authService) {
 export function createDreamworksServer(options = {}) {
   const diagnostics = options.diagnostics || DEFAULT_DIAGNOSTICS;
   const agentService = options.agentService || createWealthAgentService({ diagnostics });
+  // 市场专员 WorkBuddy 服务：复用同一套 Runtime 凭据，但使用独立的专家身份。
+  // 未单独配置时回退到通用 WorkBuddy 凭据，保证部署只需一套环境变量也能工作。
+  const marketAgentService = options.marketAgentService || createWealthAgentService({
+    diagnostics,
+    env: {
+      ...process.env,
+      WORKBUDDY_AGENT_ID: process.env.MARKET_WORKBUDDY_AGENT_ID || process.env.WORKBUDDY_AGENT_ID,
+      WORKBUDDY_AGENT_NAME: process.env.MARKET_WORKBUDDY_AGENT_NAME || process.env.WORKBUDDY_AGENT_NAME || "梦工场市场专员",
+      // 本地演示时用市场研究口径的模拟回复，避免出现身家诊断话术
+      WORKBUDDY_MOCK_PROFILE: process.env.MARKET_WORKBUDDY_MOCK_PROFILE || "market"
+    }
+  });
+  const marketFileChannel = options.marketFileChannel || createMarketFileChannel({ env: process.env });
   const strategyAuthService = options.strategyAuthService || createStrategyAuthService();
   const officeTourAuthService = options.officeTourAuthService || createOfficeTourAuthService();
   return http.createServer(async (req, res) => {
@@ -553,7 +681,12 @@ export function createDreamworksServer(options = {}) {
       sendJson(res, 404, { ok: false, error: { code: "NOT_FOUND", message: "接口不存在。" } });
       return;
     }
+    if (pathname.startsWith("/api/market-agent") && !authStatus.grants.market) {
+      sendJson(res, 404, { ok: false, error: { code: "NOT_FOUND", message: "接口不存在。" } });
+      return;
+    }
     if (await handleWealthAgentApi(req, res, pathname, agentService, diagnostics)) return;
+    if (await handleWealthAgentApi(req, res, pathname, marketAgentService, diagnostics, "/api/market-agent", marketFileChannel)) return;
     if (await handleStrategyAuthApi(req, res, pathname, strategyAuthService)) return;
     if (await handleOfficeTourAuthApi(req, res, pathname, officeTourAuthService)) return;
 

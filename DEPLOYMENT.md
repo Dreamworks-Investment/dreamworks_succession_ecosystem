@@ -77,6 +77,18 @@
 
 部署检查：分别用无痕窗口打开 `#value-agent`、`#wealth-agent`、`#trust-agent`，确认各自只接受对应账号密码；登录后检查会话面板能载入，且页面源代码与 `GET /api/strategy-auth/status` 均不包含任何真实凭据或 Token。
 
+## 梦工场市场专员（WorkBuddy）
+
+狠值投资页的「梦工场市场专员」使用独立的 `market` 认证 scope，登录后站内载入 WorkBuddy 会话面板。它与飞书智体隔离，不使用 Channel Token。请在部署平台增加：
+
+- `MARKET_AGENT_USERNAME`、`MARKET_AGENT_PASSWORD`：市场专员登录账号密码（独立权限，与其他专员互不相通）。
+- `MARKET_WORKBUDDY_AGENT_ID`（可选）：市场专员 WorkBuddy 专家 Manifest ID；未设置时回退到 `WORKBUDDY_AGENT_ID`。
+- `MARKET_WORKBUDDY_AGENT_NAME`（可选）：市场专员专家名称，默认「梦工场市场专员」。
+
+WorkBuddy Runtime 凭据（`WORKBUDDY_CLIENT_ID`、`WORKBUDDY_CLIENT_SECRET`、`WORKBUDDY_API_KEY` 等）与身家诊断专家共用同一套，无需重复配置。市场专员 API 走 `/api/market-agent/*`，只有持有 `market` 授权 Cookie 的浏览器可访问；对应前端与会话面板受服务端保护块保护，未登录用户不会收到相关 HTML。
+
+部署检查：无痕窗口打开 `#market-agent`，未登录时应只看到认证封面；用市场专员账号登录后刷新，认证封面移除、会话面板出现，`GET /api/market-agent/status` 返回配置状态，`GET /api/strategy-auth/status` 不含任何凭据。
+
 ## 企业线上参访子应用
 
 `office-tour/` 已作为主站的独立子应用挂载在 `/office-tour/`，主导航中的“企业参访”会进入该地址。必须使用带结尾斜杠的 URL；服务端会将 `/office-tour` 永久重定向到 `/office-tour/`，确保相对资源路径正确。

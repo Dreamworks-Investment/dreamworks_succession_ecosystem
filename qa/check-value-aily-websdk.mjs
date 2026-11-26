@@ -20,7 +20,7 @@ assert(html.includes('data-strategy-auth-form="value"'), 'The research assistant
 assert(html.includes('VALUE_AGENT_PROTECTED_START'), 'The research assistant HTML must be server protected');
 assert(html.includes('href="https://sd85slpdkcofupk4bn66g.apigateway-cn-guangzhou.volceapi.com/"'), 'The existing value-investing system CTA must remain available');
 assert(html.includes('type="module" src="js/value-agent-websdk.js?v=1"'), 'The research-agent client must load as an ES module');
-assert(html.includes('css/value-agent-websdk.css?v=1'), 'The research-agent view must load responsive styles');
+assert(/css\/value-agent-websdk\.css\?v=\d+/.test(html), 'The research-agent view must load responsive styles');
 assert(html.includes('/dreamworks-full-report-xu-prefin-v2'), 'The page must explain the general research skill');
 assert(html.includes('/dreamworks-innovative-drug-report-xu-prefin-v2'), 'The page must explain the innovative-drug research skill');
 

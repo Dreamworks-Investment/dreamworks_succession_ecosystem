@@ -1,7 +1,11 @@
+# 服务端凭据（严禁提交）
 .env
 .env.*
 !.env.example
+
+# 依赖与日志
 node_modules/
-.workbuddy/
 *.log
-.DS_Store
+
+# 发布包产物
+dist/

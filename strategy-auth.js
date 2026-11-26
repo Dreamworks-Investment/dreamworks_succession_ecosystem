@@ -2,7 +2,7 @@ import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 
 const COOKIE_PREFIX = "dw_auth_";
 const DEFAULT_TTL_SECONDS = 8 * 60 * 60;
-const VALID_SCOPES = new Set(["cases", "chat", "agent", "value", "wealth", "trust"]);
+const VALID_SCOPES = new Set(["cases", "chat", "agent", "value", "wealth", "trust", "market"]);
 
 function clean(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -81,6 +81,10 @@ export function createStrategyAuthService(options = {}) {
     trust: {
       username: clean(env.TRUST_AGENT_USERNAME),
       password: String(env.TRUST_AGENT_PASSWORD || "")
+    },
+    market: {
+      username: clean(env.MARKET_AGENT_USERNAME),
+      password: String(env.MARKET_AGENT_PASSWORD || "")
     }
   };
 
@@ -165,7 +169,8 @@ export function createStrategyAuthService(options = {}) {
         agent: current.grants.includes("agent"),
         value: current.grants.includes("value"),
         wealth: current.grants.includes("wealth"),
-        trust: current.grants.includes("trust")
+        trust: current.grants.includes("trust"),
+        market: current.grants.includes("market")
       },
       configured: {
         cases: configured("cases"),
@@ -174,6 +179,7 @@ export function createStrategyAuthService(options = {}) {
         value: configured("value"),
         wealth: configured("wealth"),
         trust: configured("trust"),
+        market: configured("market"),
         session: configured("session")
       },
       expiresAt: current.expiresAt,

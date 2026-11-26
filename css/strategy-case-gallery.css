@@ -182,24 +182,20 @@
 .cube-axis-line-s { stroke:#b9d2df; }
 .strategy-cube-axis-lines marker path { fill:#dfba74; }
 .cube-axis-origin { fill:#f1ca80; filter:drop-shadow(0 0 8px rgba(223,186,116,.72)); }
-.strategy-cube-scene { position:absolute; left:50%; top:49%; width:178px; height:178px; perspective:900px; transform:translate(-50%,-50%); }
-.strategy-value-cube { position:relative; width:100%; height:100%; transform-style:preserve-3d; transform:rotateX(-23deg) rotateY(36deg) rotateZ(-2deg); transition:transform .55s ease; }
-.strategy-value-model:hover .strategy-value-cube { transform:rotateX(-20deg) rotateY(43deg) rotateZ(-2deg) translateY(-4px); }
-.cube-face { position:absolute; inset:0; display:block; border:1px solid rgba(239,205,143,.72); backface-visibility:visible; box-shadow:inset 0 0 30px rgba(223,186,116,.08); }
-.cube-front { transform:translateZ(89px); background:linear-gradient(145deg,rgba(52,128,174,.48),rgba(9,42,69,.48)); }
-.cube-back { transform:rotateY(180deg) translateZ(89px); background:rgba(8,34,57,.42); }
-.cube-right { transform:rotateY(90deg) translateZ(89px); background:linear-gradient(160deg,rgba(223,186,116,.29),rgba(19,65,96,.45)); }
-.cube-left { transform:rotateY(-90deg) translateZ(89px); background:rgba(26,89,126,.3); }
-.cube-top { transform:rotateX(90deg) translateZ(89px); background:linear-gradient(145deg,rgba(239,205,143,.48),rgba(71,128,161,.3)); }
-.cube-bottom { transform:rotateX(-90deg) translateZ(89px); background:rgba(7,28,47,.42); }
-.strategy-value-axis { position:absolute; display:grid; gap:2px; min-width:150px; padding:14px 16px; border-left:2px solid #d5ad68; background:rgba(7,23,42,.7); backdrop-filter:blur(8px); }
+.strategy-cube-solid { transform-box:fill-box; transform-origin:center; transition:transform .55s ease,filter .55s ease; }
+.strategy-value-model:hover .strategy-cube-solid { transform:translateY(-6px); filter:brightness(1.1); }
+.cube-face-solid { stroke:#eed9ac; stroke-width:1.5; stroke-opacity:.85; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+.cube-face-top { fill:url(#strategy-cube-face-top); }
+.cube-face-left { fill:url(#strategy-cube-face-left); }
+.cube-face-right { fill:url(#strategy-cube-face-right); }
+.strategy-value-axis { position:absolute; display:grid; gap:2px; min-width:132px; padding:14px 16px; border-left:2px solid #d5ad68; background:rgba(7,23,42,.7); backdrop-filter:blur(8px); }
 .strategy-value-axis strong { color:#e1bd77; font-family:Georgia,serif; font-size:1.65rem; }
 .strategy-value-axis span { color:#fff; font-weight:700; }
 .strategy-value-axis small { color:#8fa7bc; }
-.axis-r { left:0; top:58px; }
-.axis-g { right:0; bottom:58px; }
-.axis-s { right:0; top:32px; }
-.strategy-value-caption { position:absolute; left:50%; bottom:18px; display:flex; align-items:baseline; gap:14px; transform:translateX(-50%); white-space:nowrap; }
+.axis-s { left:0; top:32px; }
+.axis-r { left:0; bottom:0; }
+.axis-g { right:0; bottom:0; }
+.strategy-value-caption { position:absolute; left:50%; bottom:96px; display:flex; align-items:baseline; gap:14px; transform:translateX(-50%); white-space:nowrap; }
 .strategy-value-caption b { color:#fff; font-size:1rem; letter-spacing:.16em; }
 .strategy-value-caption span { color:#d5ad68; font-family:Georgia,serif; font-size:1.6rem; }
 
@@ -366,17 +362,11 @@
   .strategy-hub-actions { flex-direction:column; align-items:stretch; }
   .strategy-hub-actions .btn { justify-content:center; }
   .strategy-value-model { min-height:470px; transform:scale(.9); transform-origin:center; }
-  .strategy-cube-scene { width:142px; height:142px; }
-  .cube-front { transform:translateZ(71px); }
-  .cube-back { transform:rotateY(180deg) translateZ(71px); }
-  .cube-right { transform:rotateY(90deg) translateZ(71px); }
-  .cube-left { transform:rotateY(-90deg) translateZ(71px); }
-  .cube-top { transform:rotateX(90deg) translateZ(71px); }
-  .cube-bottom { transform:rotateX(-90deg) translateZ(71px); }
-  .strategy-value-axis { min-width:132px; }
-  .axis-r { top:26px; }
-  .axis-s { top:104px; }
-  .axis-g { bottom:54px; }
+  .strategy-value-axis { min-width:118px; }
+  .axis-s { top:26px; }
+  .axis-r { bottom:0; }
+  .axis-g { bottom:0; }
+  .strategy-value-caption { bottom:112px; }
   .strategy-case-showcase { padding:68px 0 82px; }
   .strategy-case-photo { min-height:280px; }
   .strategy-case-arrow { top:242px; width:42px; height:42px; }

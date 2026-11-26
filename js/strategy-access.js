@@ -151,6 +151,12 @@
     var submit = form.querySelector('[type="submit"]');
     var username = form.elements.username.value.trim();
     var password = form.elements.password.value;
+    // 以 file:// 直接打开 HTML 时没有后端 API，登录请求无法送达，
+    // 给出明确指引，避免把环境问题误判成账号密码错误。
+    if (window.location.protocol === 'file:') {
+      if (message) message.textContent = '请通过本地服务地址 http://localhost:8000/ 打开页面后再登录，直接双击 index.html 无法连接验证服务。';
+      return;
+    }
     if (!username || !password) {
       if (message) message.textContent = '请输入账号和密码。';
       return;

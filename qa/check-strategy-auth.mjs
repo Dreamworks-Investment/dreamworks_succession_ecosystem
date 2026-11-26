@@ -22,7 +22,9 @@ const env = {
   WEALTH_AILY_CHANNEL_TOKEN: 'wsk_wealth_test_token_never_in_public_html',
   TRUST_AGENT_USERNAME: 'trust@example.test',
   TRUST_AGENT_PASSWORD: 'trust-password-2026',
-  TRUST_AILY_CHANNEL_TOKEN: 'wsk_trust_test_token_never_in_public_html'
+  TRUST_AILY_CHANNEL_TOKEN: 'wsk_trust_test_token_never_in_public_html',
+  MARKET_AGENT_USERNAME: 'market@example.test',
+  MARKET_AGENT_PASSWORD: 'market-password-2026'
 };
 
 const authService = createStrategyAuthService({ env });
@@ -33,10 +35,12 @@ assert.equal(authService.authenticate('cases', env.STRATEGY_AGENT_USERNAME, env.
 assert.equal(authService.authenticate('value', env.VALUE_AGENT_USERNAME, env.VALUE_AGENT_PASSWORD).ok, true);
 assert.equal(authService.authenticate('wealth', env.WEALTH_AGENT_USERNAME, env.WEALTH_AGENT_PASSWORD).ok, true);
 assert.equal(authService.authenticate('trust', env.TRUST_AGENT_USERNAME, env.TRUST_AGENT_PASSWORD).ok, true);
+assert.equal(authService.authenticate('market', env.MARKET_AGENT_USERNAME, env.MARKET_AGENT_PASSWORD).ok, true);
 
 const server = createDreamworksServer({
   strategyAuthService: authService,
-  agentService: { status: () => ({ configured: false }) }
+  agentService: { status: () => ({ configured: false }) },
+  marketAgentService: { status: () => ({ configured: false }) }
 });
 await new Promise((resolve, reject) => {
   server.once('error', reject);
@@ -52,14 +56,15 @@ const setCookiesFrom = response => {
   return String(response.headers.get('set-cookie') || '').split(/,(?=\s*dw_auth_)/i);
 };
 
-const emptyGrants = () => ({ cases: false, chat: false, agent: false, value: false, wealth: false, trust: false });
+const ALL_SCOPES = ['cases', 'chat', 'agent', 'value', 'wealth', 'trust', 'market'];
+const emptyGrants = () => ({ cases: false, chat: false, agent: false, value: false, wealth: false, trust: false, market: false });
 const expectedGrantsFor = scope => ({ ...emptyGrants(), [scope]: true });
 
 function assertExclusiveSetCookies(response, activeScope) {
   const cookies = setCookiesFrom(response);
-  assert.equal(cookies.length, 6, `${activeScope} login must update all six compartment cookies`);
+  assert.equal(cookies.length, ALL_SCOPES.length, `${activeScope} login must update all compartment cookies`);
   assert(cookies.some(value => value.startsWith(`dw_auth_${activeScope}=`) && !/Max-Age=0(?:;|$)/.test(value)), `${activeScope} login must issue its active cookie`);
-  for (const scope of ['cases', 'chat', 'agent', 'value', 'wealth', 'trust']) {
+  for (const scope of ALL_SCOPES) {
     if (scope === activeScope) continue;
     assert(cookies.some(value => value.startsWith(`dw_auth_${scope}=;`) && value.includes('Max-Age=0')), `${activeScope} login must revoke ${scope}`);
   }
@@ -124,7 +129,7 @@ try {
   const transplantedCasesStatus = await (await request('/api/strategy-auth/status', {
     headers: { Cookie: `dw_auth_agent=${transplantedCasesToken}` }
   })).json();
-  assert.deepEqual(transplantedCasesStatus.grants, { cases: false, chat: false, agent: false, value: false, wealth: false, trust: false }, 'A signed cookie value must not be reusable under another scope name');
+  assert.deepEqual(transplantedCasesStatus.grants, emptyGrants(), 'A signed cookie value must not be reusable under another scope name');
 
   const casesIndexResponse = await request('/#strategy-library', { headers: { Cookie: casesCookie } });
   const casesIndex = await casesIndexResponse.text();
@@ -155,7 +160,7 @@ try {
   const agentCookie = cookieFrom(agentLogin);
   assert(agentCookie.startsWith('dw_auth_agent='), 'Positioning-agent login must issue a separate scope-bound cookie');
   const agentOnlyStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: agentCookie } })).json();
-  assert.deepEqual(agentOnlyStatus.grants, { cases: false, chat: false, agent: true, value: false, wealth: false, trust: false }, 'One scope cookie must never inherit another scope');
+  assert.deepEqual(agentOnlyStatus.grants, expectedGrantsFor('agent'), 'One scope cookie must never inherit another scope');
   const combinedCookie = `${casesCookie}; ${agentCookie}`;
   const combinedIndex = await (await request('/#strategy-agent', { headers: { Cookie: combinedCookie } })).text();
   assert(!combinedIndex.includes('八个合作项目，一套通用翻阅方式'), 'Conflicting old grants must not reveal the case library');
@@ -185,7 +190,7 @@ try {
   const chatCookie = cookieFrom(chatLogin);
   assert(chatCookie.startsWith('dw_auth_chat='), 'Confidential-media login must issue a separate scope-bound cookie');
   const chatOnlyStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: chatCookie } })).json();
-  assert.deepEqual(chatOnlyStatus.grants, { cases: false, chat: true, agent: false, value: false, wealth: false, trust: false }, 'Confidential-media login must not unlock the case library or any agent');
+  assert.deepEqual(chatOnlyStatus.grants, expectedGrantsFor('chat'), 'Confidential-media login must not unlock the case library or any agent');
   const confidentialAsset = await request('/assets/confidential/strategy-wechat-case.jpeg', { headers: { Cookie: chatCookie } });
   assert.equal(confidentialAsset.status, 200);
   assert.match(confidentialAsset.headers.get('cache-control') || '', /private, no-store/);
@@ -230,31 +235,47 @@ try {
     scopeCookies.set(agent.scope, scopeCookie);
   }
 
+  // 市场专员是 WorkBuddy Runtime scope，不走飞书 channelToken，单独验证登录与隔离。
+  const marketLogin = await request('/api/strategy-auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ scope: 'market', username: env.MARKET_AGENT_USERNAME, password: env.MARKET_AGENT_PASSWORD })
+  });
+  assert.equal(marketLogin.status, 200, 'market login must succeed');
+  assertExclusiveSetCookies(marketLogin, 'market');
+  const marketCookie = cookieFrom(marketLogin);
+  assert(marketCookie.startsWith('dw_auth_market='), 'market must receive only its own cookie');
+  const marketStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: marketCookie } })).json();
+  assert.deepEqual(marketStatus.grants, expectedGrantsFor('market'), 'market login must not unlock any other area');
+  scopeCookies.set('market', marketCookie);
+
   const protectedResources = {
     cases: '/assets/strategy/scene-home.png',
     chat: '/assets/confidential/strategy-wechat-case.jpeg',
     agent: '/api/strategy-auth/agent-config',
     value: '/api/strategy-auth/agent-config/value',
     wealth: '/api/strategy-auth/agent-config/wealth',
-    trust: '/api/strategy-auth/agent-config/trust'
+    trust: '/api/strategy-auth/agent-config/trust',
+    market: '/api/market-agent/status'
   };
   const protectedUi = {
     cases: { content: '八个合作项目，一套通用翻阅方式', gate: 'data-strategy-auth-form="cases"' },
     agent: { content: 'id="strategy-agent-websdk-view"', gate: 'data-strategy-auth-form="agent"' },
     value: { content: 'id="value-agent-websdk-view"', gate: 'data-strategy-auth-form="value"' },
     wealth: { content: 'id="wealth-agent-websdk-view"', gate: 'data-strategy-auth-form="wealth"' },
-    trust: { content: 'id="trust-agent-websdk-view"', gate: 'data-strategy-auth-form="trust"' }
+    trust: { content: 'id="trust-agent-websdk-view"', gate: 'data-strategy-auth-form="trust"' },
+    market: { content: 'id="market-agent-websdk-view"', gate: 'data-strategy-auth-form="market"' }
   };
 
-  // Full 6 × 6 access matrix: every cookie may open exactly its own resource,
-  // and must be denied by each of the other five protected resources.
+  // Full 7 × 7 access matrix: every cookie may open exactly its own resource,
+  // and must be denied by each of the other protected resources.
   for (const [sourceScope, sourceCookie] of scopeCookies) {
     const isolatedStatus = await (await request('/api/strategy-auth/status', { headers: { Cookie: sourceCookie } })).json();
     assert.deepEqual(isolatedStatus.grants, expectedGrantsFor(sourceScope), `${sourceScope} status must expose exactly one grant`);
     assert.deepEqual(isolatedStatus.isolation, { mode: 'exclusive', conflict: false, rejectedGrantCount: 0 });
     for (const [targetScope, resource] of Object.entries(protectedResources)) {
       const response = await request(resource, { headers: { Cookie: sourceCookie } });
-      const expectedStatus = sourceScope === targetScope ? 200 : (targetScope === 'cases' || targetScope === 'chat' ? 404 : 401);
+      const expectedStatus = sourceScope === targetScope ? 200 : (['cases', 'chat', 'market'].includes(targetScope) ? 404 : 401);
       assert.equal(response.status, expectedStatus, `${sourceScope} cookie must ${sourceScope === targetScope ? 'open' : 'not open'} ${targetScope}`);
     }
     const isolatedIndex = await (await request('/', { headers: { Cookie: sourceCookie } })).text();
@@ -275,10 +296,10 @@ try {
   assert(!statusText.includes(env.WEALTH_AILY_CHANNEL_TOKEN));
   assert(!statusText.includes(env.TRUST_AILY_CHANNEL_TOKEN));
   const status = JSON.parse(statusText);
-  assert.deepEqual(status.grants, emptyGrants(), 'A six-cookie legacy state must fail closed rather than merge grants');
+  assert.deepEqual(status.grants, emptyGrants(), 'A conflicting multi-cookie state must fail closed rather than merge grants');
   assert.equal(status.isolation.mode, 'exclusive');
   assert.equal(status.isolation.conflict, true);
-  assert.equal(status.isolation.rejectedGrantCount, 6);
+  assert.equal(status.isolation.rejectedGrantCount, 7);
 
   for (const resource of Object.values(protectedResources)) {
     const response = await request(resource, { headers: { Cookie: allCookies } });
