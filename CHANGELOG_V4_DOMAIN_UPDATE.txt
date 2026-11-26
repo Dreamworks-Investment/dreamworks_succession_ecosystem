@@ -1,0 +1,21 @@
+梦工场设计系统 Claude V4 域名切换说明
+====================================
+
+本次仅执行狠值投资入口域名替换：
+
+旧地址：
+[旧域名已移除]
+
+新地址：
+https://sd85slpdkcofupk4bn66g.apigateway-cn-guangzhou.volceapi.com/
+
+已更新文件：
+- index.html
+- js/app.js
+- BACKEND_INTEGRATION_NOTES.md
+- CHANGELOG_V2.txt
+
+验证：
+- 项目内不再包含旧域名。
+- 所有 JavaScript 文件通过 Node.js 语法检查。
+- 其他页面、导航与功能未改动。

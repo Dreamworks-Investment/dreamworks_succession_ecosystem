@@ -1,0 +1,918 @@
+{
+  "title": "梦工场 · 空间漫游",
+  "version": "0.2.0-beta+video-pending",
+  "source": {
+    "folderUrl": "https://drive.google.com/drive/folders/1nrmAJIdpSisCMUGv3j8RKI-v03MqNq8t",
+    "inspectedAt": "2026-09-20",
+    "photoCount": 87,
+    "sectionCount": 14,
+    "geometry": "approximate",
+    "notice": "实景照片 + 近似 3D 空间示意。不是测绘模型、360° 全景或头显 VR。",
+    "limitations": [
+      "没有尺寸图或 360° 全景，模型的距离、墙体角度和比例尚未测量。",
+      "用户已补充 01–07 段连续步行视频；新增视频的连接与转角证据另行标注，不据此声称测绘精度。",
+      "14 个站点按提供的顺时针编号串联；照片可确认部分相邻入口和相互视线，不能确定所有距离。",
+      "本地内部测试版。正式发布前应审核照片中的人物、白板、屏幕与文件等敏感信息。"
+    ]
+  },
+  "sections": [
+    {
+      "id": 1,
+      "title": "Reception and Awards Section",
+      "titleZh": "前台与荣誉陈列",
+      "kind": "reception",
+      "description": "从石材品牌墙与木质前台开始，沿荣誉陈列走入办公区。灰色石材、深色木饰面与暖色灯光，构成参观的第一印象。",
+      "features": [
+        "石材品牌墙",
+        "木质接待台",
+        "荣誉陈列"
+      ],
+      "chapter": "前台 · 参观起点",
+      "photos": [
+        {
+          "src": "/media/01/IMG_2820.webp",
+          "thumb": "/thumbs/01/IMG_2820.webp",
+          "name": "IMG_2820.jpg",
+          "caption": "从入口看前台与品牌墙"
+        },
+        {
+          "src": "/media/01/IMG_2821.webp",
+          "thumb": "/thumbs/01/IMG_2821.webp",
+          "name": "IMG_2821.jpg",
+          "caption": "前台侧面与通往办公区的路径"
+        },
+        {
+          "src": "/media/01/IMG_2822.webp",
+          "thumb": "/thumbs/01/IMG_2822.webp",
+          "name": "IMG_2822.jpg",
+          "caption": "荣誉陈列细节"
+        },
+        {
+          "src": "/media/01/IMG_2823.webp",
+          "thumb": "/thumbs/01/IMG_2823.webp",
+          "name": "IMG_2823.jpg",
+          "caption": "前台背面与陈列区域"
+        },
+        {
+          "src": "/media/01/IMG_2824.webp",
+          "thumb": "/thumbs/01/IMG_2824.webp",
+          "name": "IMG_2824.jpg",
+          "caption": "石材至地毯的门口交界"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 2,
+      "title": "Trading Office",
+      "titleZh": "交易办公室",
+      "kind": "trading",
+      "description": "越过石材与地毯的交界，进入紧凑的交易办公空间。连续桌面和多屏工作位沿墙设置，离开后接回内部走廊。",
+      "features": [
+        "多屏工作位",
+        "连续桌面",
+        "玻璃与木门"
+      ],
+      "chapter": "工作 · 专注与研究",
+      "photos": [
+        {
+          "src": "/media/02/IMG_2825.webp",
+          "thumb": "/thumbs/02/IMG_2825.webp",
+          "name": "IMG_2825.jpg",
+          "caption": "交易办公室入口"
+        },
+        {
+          "src": "/media/02/IMG_2826.webp",
+          "thumb": "/thumbs/02/IMG_2826.webp",
+          "name": "IMG_2826.jpg",
+          "caption": "连续桌面与多屏工作位"
+        },
+        {
+          "src": "/media/02/IMG_2827.webp",
+          "thumb": "/thumbs/02/IMG_2827.webp",
+          "name": "IMG_2827.jpg",
+          "caption": "门外走廊方向"
+        },
+        {
+          "src": "/media/02/IMG_2827.5.webp",
+          "thumb": "/thumbs/02/IMG_2827.5.webp",
+          "name": "IMG_2827.5.jpeg",
+          "caption": "交易室内反向视角"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 3,
+      "title": "Executive Office",
+      "titleZh": "行政办公室",
+      "kind": "executive",
+      "description": "办公桌与会客区组合在同一空间中：棕色皮质沙发、浅色茶几、展示柜与窗边工作位。门口的同一视角可以看到隔壁会议室入口。",
+      "features": [
+        "皮质会客区",
+        "展示书柜",
+        "窗边办公桌"
+      ],
+      "chapter": "办公 · 会客与交流",
+      "photos": [
+        {
+          "src": "/media/03/IMG_2828.webp",
+          "thumb": "/thumbs/03/IMG_2828.webp",
+          "name": "IMG_2828.jpg",
+          "caption": "行政办公室与会议室的相邻入口"
+        },
+        {
+          "src": "/media/03/IMG_2829.webp",
+          "thumb": "/thumbs/03/IMG_2829.webp",
+          "name": "IMG_2829.jpg",
+          "caption": "行政办公室全景"
+        },
+        {
+          "src": "/media/03/IMG_2830.webp",
+          "thumb": "/thumbs/03/IMG_2830.webp",
+          "name": "IMG_2830.jpg",
+          "caption": "木质办公桌与陈列"
+        },
+        {
+          "src": "/media/03/IMG_2831.webp",
+          "thumb": "/thumbs/03/IMG_2831.webp",
+          "name": "IMG_2831.jpg",
+          "caption": "办公区另一角度"
+        },
+        {
+          "src": "/media/03/IMG_2832.webp",
+          "thumb": "/thumbs/03/IMG_2832.webp",
+          "name": "IMG_2832.jpg",
+          "caption": "会客区与窗边"
+        },
+        {
+          "src": "/media/03/IMG_2833.webp",
+          "thumb": "/thumbs/03/IMG_2833.webp",
+          "name": "IMG_2833.jpg",
+          "caption": "室内反向观察"
+        },
+        {
+          "src": "/media/03/IMG_2834.webp",
+          "thumb": "/thumbs/03/IMG_2834.webp",
+          "name": "IMG_2834.jpg",
+          "caption": "返回门口方向"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 4,
+      "title": "Meeting Room",
+      "titleZh": "会议室",
+      "kind": "meeting",
+      "description": "长形会议桌是空间的中心，黑色座椅沿两侧排列。外侧窗景与内侧玻璃隔断形成通透关系，隔断后方可见共享办公区。",
+      "features": [
+        "长形会议桌",
+        "墙面显示屏",
+        "通透玻璃隔断"
+      ],
+      "chapter": "协作 · 讨论与决策",
+      "photos": [
+        {
+          "src": "/media/04/IMG_2835.webp",
+          "thumb": "/thumbs/04/IMG_2835.webp",
+          "name": "IMG_2835.jpg",
+          "caption": "会议室入口方向"
+        },
+        {
+          "src": "/media/04/IMG_2836.webp",
+          "thumb": "/thumbs/04/IMG_2836.webp",
+          "name": "IMG_2836.jpg",
+          "caption": "长桌与会议座席"
+        },
+        {
+          "src": "/media/04/IMG_2837.webp",
+          "thumb": "/thumbs/04/IMG_2837.webp",
+          "name": "IMG_2837.jpg",
+          "caption": "会议桌与显示屏"
+        },
+        {
+          "src": "/media/04/IMG_2838.webp",
+          "thumb": "/thumbs/04/IMG_2838.webp",
+          "name": "IMG_2838.jpg",
+          "caption": "透过玻璃看共享办公区"
+        },
+        {
+          "src": "/media/04/IMG_2839.webp",
+          "thumb": "/thumbs/04/IMG_2839.webp",
+          "name": "IMG_2839.jpg",
+          "caption": "玻璃隔断与工作区视线"
+        },
+        {
+          "src": "/media/04/IMG_2840.webp",
+          "thumb": "/thumbs/04/IMG_2840.webp",
+          "name": "IMG_2840.jpg",
+          "caption": "会议室另一端"
+        },
+        {
+          "src": "/media/04/IMG_2841.webp",
+          "thumb": "/thumbs/04/IMG_2841.webp",
+          "name": "IMG_2841.jpg",
+          "caption": "沿长桌回看"
+        },
+        {
+          "src": "/media/04/IMG_2842.webp",
+          "thumb": "/thumbs/04/IMG_2842.webp",
+          "name": "IMG_2842.jpg",
+          "caption": "会议室出口方向"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 5,
+      "title": "Corridor View",
+      "titleZh": "走廊观察点",
+      "kind": "corridor",
+      "description": "在走廊停留，透过玻璃观察共享工位、收纳与打印区域。这一站是走廊视角，并不是一间新增的独立办公室。",
+      "features": [
+        "共享办公视线",
+        "几何线形灯",
+        "打印与收纳"
+      ],
+      "chapter": "连接 · 看见空间关系",
+      "photos": [
+        {
+          "src": "/media/05/IMG_2843.webp",
+          "thumb": "/thumbs/05/IMG_2843.webp",
+          "name": "IMG_2843.jpg",
+          "caption": "走廊透过玻璃看共享工位"
+        },
+        {
+          "src": "/media/05/IMG_2844.webp",
+          "thumb": "/thumbs/05/IMG_2844.webp",
+          "name": "IMG_2844.jpg",
+          "caption": "共享办公区的另一侧视线"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 6,
+      "title": "Director Office",
+      "titleZh": "董事办公室",
+      "kind": "director",
+      "description": "蓝色沙发与扶手椅围合出会客区，木质办公桌、低柜和大屏组成另一侧的工作空间。多角度照片帮助理解两部分的相互位置。",
+      "features": [
+        "蓝色会客区",
+        "木质办公桌",
+        "大屏与低柜"
+      ],
+      "chapter": "办公 · 沉静的会客空间",
+      "photos": [
+        {
+          "src": "/media/06/IMG_2845.webp",
+          "thumb": "/thumbs/06/IMG_2845.webp",
+          "name": "IMG_2845.jpg",
+          "caption": "董事办公室入口视角"
+        },
+        {
+          "src": "/media/06/IMG_2846.webp",
+          "thumb": "/thumbs/06/IMG_2846.webp",
+          "name": "IMG_2846.jpg",
+          "caption": "蓝色会客区"
+        },
+        {
+          "src": "/media/06/IMG_2847.webp",
+          "thumb": "/thumbs/06/IMG_2847.webp",
+          "name": "IMG_2847.jpg",
+          "caption": "木质办公桌方向"
+        },
+        {
+          "src": "/media/06/IMG_2848.webp",
+          "thumb": "/thumbs/06/IMG_2848.webp",
+          "name": "IMG_2848.jpg",
+          "caption": "室内陈设细节"
+        },
+        {
+          "src": "/media/06/IMG_2849.webp",
+          "thumb": "/thumbs/06/IMG_2849.webp",
+          "name": "IMG_2849.jpg",
+          "caption": "工作区反向观察"
+        },
+        {
+          "src": "/media/06/IMG_2850.webp",
+          "thumb": "/thumbs/06/IMG_2850.webp",
+          "name": "IMG_2850.jpg",
+          "caption": "窗边与办公区"
+        },
+        {
+          "src": "/media/06/IMG_2851.webp",
+          "thumb": "/thumbs/06/IMG_2851.webp",
+          "name": "IMG_2851.jpg",
+          "caption": "会客区另一角度"
+        },
+        {
+          "src": "/media/06/IMG_2852.webp",
+          "thumb": "/thumbs/06/IMG_2852.webp",
+          "name": "IMG_2852.jpg",
+          "caption": "会客区与工作区的相互位置"
+        },
+        {
+          "src": "/media/06/IMG_2853.webp",
+          "thumb": "/thumbs/06/IMG_2853.webp",
+          "name": "IMG_2853.jpg",
+          "caption": "蓝色沙发与浅色茶几"
+        },
+        {
+          "src": "/media/06/IMG_2854.webp",
+          "thumb": "/thumbs/06/IMG_2854.webp",
+          "name": "IMG_2854.jpg",
+          "caption": "返回办公室门口"
+        },
+        {
+          "src": "/media/06/IMG_2944.5.webp",
+          "thumb": "/thumbs/06/IMG_2944.5.webp",
+          "name": "IMG_2944.5.jpg",
+          "caption": "补充入口视角 · 保留原始文件名"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 7,
+      "title": "Wine Room",
+      "titleZh": "品酒与会客室",
+      "kind": "wine",
+      "description": "从地毯进入木地板区域，长木桌与浅色座椅适合交流。书架、陈列柜与皮质沙发形成另一处较私密的会客角，窗外保留真实夜景。",
+      "features": [
+        "木质长桌",
+        "书架与皮质沙发",
+        "窗外夜景"
+      ],
+      "chapter": "会客 · 放慢参观节奏",
+      "photos": [
+        {
+          "src": "/media/07/IMG_2855.webp",
+          "thumb": "/thumbs/07/IMG_2855.webp",
+          "name": "IMG_2855.jpg",
+          "caption": "木地板会客室入口"
+        },
+        {
+          "src": "/media/07/IMG_2856.webp",
+          "thumb": "/thumbs/07/IMG_2856.webp",
+          "name": "IMG_2856.jpg",
+          "caption": "长木桌与浅色座椅"
+        },
+        {
+          "src": "/media/07/IMG_2857.webp",
+          "thumb": "/thumbs/07/IMG_2857.webp",
+          "name": "IMG_2857.jpg",
+          "caption": "书架与皮质沙发角"
+        },
+        {
+          "src": "/media/07/IMG_2858.webp",
+          "thumb": "/thumbs/07/IMG_2858.webp",
+          "name": "IMG_2858.jpg",
+          "caption": "围绕木桌交流的空间"
+        },
+        {
+          "src": "/media/07/IMG_2859.webp",
+          "thumb": "/thumbs/07/IMG_2859.webp",
+          "name": "IMG_2859.jpg",
+          "caption": "灯光陈列柜"
+        },
+        {
+          "src": "/media/07/IMG_2861.webp",
+          "thumb": "/thumbs/07/IMG_2861.webp",
+          "name": "IMG_2861.jpg",
+          "caption": "窗外真实夜景"
+        },
+        {
+          "src": "/media/07/IMG_2862.webp",
+          "thumb": "/thumbs/07/IMG_2862.webp",
+          "name": "IMG_2862.jpg",
+          "caption": "桌面与书架的空间关系"
+        },
+        {
+          "src": "/media/07/IMG_2863.webp",
+          "thumb": "/thumbs/07/IMG_2863.webp",
+          "name": "IMG_2863.jpg",
+          "caption": "反向看桌面与出口"
+        },
+        {
+          "src": "/media/07/IMG_2864.webp",
+          "thumb": "/thumbs/07/IMG_2864.webp",
+          "name": "IMG_2864.jpg",
+          "caption": "大屏、陈列与长桌"
+        },
+        {
+          "src": "/media/07/IMG_2865.webp",
+          "thumb": "/thumbs/07/IMG_2865.webp",
+          "name": "IMG_2865.jpg",
+          "caption": "皮质沙发与圆茶几"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 8,
+      "title": "Pearl Office",
+      "titleZh": "明珠共享办公区",
+      "kind": "pearl",
+      "description": "弧形玻璃围合中央共享办公区，白色工位和黑色工作椅连续排列。透过玻璃可以辨认周边独立办公室，呈现这组空间的核心与环绕关系。",
+      "features": [
+        "弧形玻璃",
+        "中央共享工位",
+        "周边办公室视线"
+      ],
+      "chapter": "核心 · 通透与连接",
+      "photos": [
+        {
+          "src": "/media/08/IMG_2866.webp",
+          "thumb": "/thumbs/08/IMG_2866.webp",
+          "name": "IMG_2866.jpg",
+          "caption": "进入弧形玻璃共享办公区"
+        },
+        {
+          "src": "/media/08/IMG_2868.webp",
+          "thumb": "/thumbs/08/IMG_2868.webp",
+          "name": "IMG_2868.jpg",
+          "caption": "白色工位与玻璃围合"
+        },
+        {
+          "src": "/media/08/IMG_2869.webp",
+          "thumb": "/thumbs/08/IMG_2869.webp",
+          "name": "IMG_2869.jpg",
+          "caption": "连续工位侧面"
+        },
+        {
+          "src": "/media/08/IMG_2870.webp",
+          "thumb": "/thumbs/08/IMG_2870.webp",
+          "name": "IMG_2870.jpg",
+          "caption": "共享办公区后端"
+        },
+        {
+          "src": "/media/08/IMG_2871.webp",
+          "thumb": "/thumbs/08/IMG_2871.webp",
+          "name": "IMG_2871.jpg",
+          "caption": "打印与日常配套角"
+        },
+        {
+          "src": "/media/08/IMG_2872.webp",
+          "thumb": "/thumbs/08/IMG_2872.webp",
+          "name": "IMG_2872.jpg",
+          "caption": "沿工位回看入口"
+        },
+        {
+          "src": "/media/08/IMG_2873.webp",
+          "thumb": "/thumbs/08/IMG_2873.webp",
+          "name": "IMG_2873.jpg",
+          "caption": "多工位与周边玻璃"
+        },
+        {
+          "src": "/media/08/IMG_2874.webp",
+          "thumb": "/thumbs/08/IMG_2874.webp",
+          "name": "IMG_2874.jpg",
+          "caption": "工位另一侧的室外视线"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 9,
+      "title": "Manager Office 1",
+      "titleZh": "经理办公室 1",
+      "kind": "manager",
+      "description": "玻璃门后是一间紧凑的独立办公室，深色桌面、显示器、两把来访座椅和白板组成基本配置。向外回看，可见中央共享办公区。",
+      "features": [
+        "独立办公桌",
+        "两席来访座椅",
+        "面向共享办公区"
+      ],
+      "chapter": "专注 · 独立办公空间",
+      "photos": [
+        {
+          "src": "/media/09/IMG_2875.webp",
+          "thumb": "/thumbs/09/IMG_2875.webp",
+          "name": "IMG_2875.jpg",
+          "caption": "经理办公室 1 入口"
+        },
+        {
+          "src": "/media/09/IMG_2876.webp",
+          "thumb": "/thumbs/09/IMG_2876.webp",
+          "name": "IMG_2876.jpg",
+          "caption": "桌面与两席来访座位"
+        },
+        {
+          "src": "/media/09/IMG_2877.webp",
+          "thumb": "/thumbs/09/IMG_2877.webp",
+          "name": "IMG_2877.jpg",
+          "caption": "白板与门口方向"
+        },
+        {
+          "src": "/media/09/IMG_2878.webp",
+          "thumb": "/thumbs/09/IMG_2878.webp",
+          "name": "IMG_2878.jpg",
+          "caption": "透过玻璃看中央办公区"
+        },
+        {
+          "src": "/media/09/IMG_2879.webp",
+          "thumb": "/thumbs/09/IMG_2879.webp",
+          "name": "IMG_2879.jpg",
+          "caption": "从桌后回看走廊"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 10,
+      "title": "Manager Office 2",
+      "titleZh": "经理办公室 2",
+      "kind": "manager",
+      "description": "深色木纹办公桌上设置白色背板显示器，两把黑色来访座椅面向工作位。蓝色手写白板与墙面动物肖像构成这间办公室的辨识点，玻璃门外可见中央共享办公区。",
+      "features": [
+        "白色背板显示器",
+        "两席来访座椅",
+        "蓝色手写白板"
+      ],
+      "chapter": "专注 · 独立办公空间",
+      "photos": [
+        {
+          "src": "/media/10/IMG_2880.webp",
+          "thumb": "/thumbs/10/IMG_2880.webp",
+          "name": "IMG_2880.jpg",
+          "caption": "经理办公室 2 入口"
+        },
+        {
+          "src": "/media/10/IMG_2881.webp",
+          "thumb": "/thumbs/10/IMG_2881.webp",
+          "name": "IMG_2881.jpg",
+          "caption": "白色显示器与来访座位"
+        },
+        {
+          "src": "/media/10/IMG_2882.webp",
+          "thumb": "/thumbs/10/IMG_2882.webp",
+          "name": "IMG_2882.jpg",
+          "caption": "白板与墙面装饰"
+        },
+        {
+          "src": "/media/10/IMG_2883.webp",
+          "thumb": "/thumbs/10/IMG_2883.webp",
+          "name": "IMG_2883.jpg",
+          "caption": "桌后看中央办公区"
+        },
+        {
+          "src": "/media/10/IMG_2884.webp",
+          "thumb": "/thumbs/10/IMG_2884.webp",
+          "name": "IMG_2884.jpg",
+          "caption": "办公室 2 反向视角"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "2026-09-20 已按更新后的 Drive 文件夹核对，本房间对应 IMG_2880–2884。"
+    },
+    {
+      "id": 11,
+      "title": "Manager Office 3",
+      "titleZh": "经理办公室 3",
+      "kind": "manager",
+      "description": "与经理办公室 1、2 相似的独立办公配置：木纹办公桌、两把黑色来访座椅与白板。两幅小型装饰画区分这间办公室；通过玻璃门向外回看，茶室就在相邻的短走廊另一侧。",
+      "features": [
+        "木纹办公桌与两席来访座椅",
+        "白板与两幅装饰画",
+        "面向茶室的门口视线"
+      ],
+      "chapter": "专注 · 独立办公空间",
+      "photos": [
+        {
+          "src": "/media/11/IMG_2885.webp",
+          "thumb": "/thumbs/11/IMG_2885.webp",
+          "name": "IMG_2885.jpg",
+          "caption": "经理办公室 3 入口 · 左侧可见办公室 2"
+        },
+        {
+          "src": "/media/11/IMG_2886.webp",
+          "thumb": "/thumbs/11/IMG_2886.webp",
+          "name": "IMG_2886.jpg",
+          "caption": "经理办公室 3 的桌面与来访座席"
+        },
+        {
+          "src": "/media/11/IMG_2887.webp",
+          "thumb": "/thumbs/11/IMG_2887.webp",
+          "name": "IMG_2887.jpg",
+          "caption": "经理办公室 3 的白板与两幅装饰画"
+        },
+        {
+          "src": "/media/11/IMG_2888.webp",
+          "thumb": "/thumbs/11/IMG_2888.webp",
+          "name": "IMG_2888.jpg",
+          "caption": "从经理办公室 3 回看对侧茶室"
+        },
+        {
+          "src": "/media/11/IMG_2889.webp",
+          "thumb": "/thumbs/11/IMG_2889.webp",
+          "name": "IMG_2889.jpg",
+          "caption": "经理办公室 3 的门口与短走廊视线"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "2026-09-20 已按更新后的 Drive 文件夹核对 IMG_2885–2889，现归档于经理办公室 3；源文件 ID 与既有照片一致。"
+    },
+    {
+      "id": 12,
+      "title": "Tea Room",
+      "titleZh": "茶室",
+      "kind": "tea",
+      "description": "木质茶桌与浅色坐凳围成小型交流空间，玻璃门外紧邻公益陈列走廊。回看门口，能与上一组办公室的照片建立相互视线。",
+      "features": [
+        "木质茶桌",
+        "浅色坐凳",
+        "公益陈列旁"
+      ],
+      "chapter": "交流 · 一杯茶的距离",
+      "photos": [
+        {
+          "src": "/media/12/IMG_2890.webp",
+          "thumb": "/thumbs/12/IMG_2890.webp",
+          "name": "IMG_2890.jpg",
+          "caption": "茶室入口与陈列走廊"
+        },
+        {
+          "src": "/media/12/IMG_2891.webp",
+          "thumb": "/thumbs/12/IMG_2891.webp",
+          "name": "IMG_2891.jpg",
+          "caption": "茶桌与浅色坐凳"
+        },
+        {
+          "src": "/media/12/IMG_2892.webp",
+          "thumb": "/thumbs/12/IMG_2892.webp",
+          "name": "IMG_2892.jpg",
+          "caption": "茶桌细节"
+        },
+        {
+          "src": "/media/12/IMG_2893.webp",
+          "thumb": "/thumbs/12/IMG_2893.webp",
+          "name": "IMG_2893.jpg",
+          "caption": "茶室侧面观察"
+        },
+        {
+          "src": "/media/12/IMG_2894.webp",
+          "thumb": "/thumbs/12/IMG_2894.webp",
+          "name": "IMG_2894.jpg",
+          "caption": "茶室与对面办公室的视线"
+        },
+        {
+          "src": "/media/12/IMG_2895.webp",
+          "thumb": "/thumbs/12/IMG_2895.webp",
+          "name": "IMG_2895.jpg",
+          "caption": "从茶桌回看入口"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 13,
+      "title": "Back Office",
+      "titleZh": "后台办公室",
+      "kind": "backoffice",
+      "description": "连续深色桌面布置双工作位，显示器、资料和收纳占据紧凑的后台空间。参观在此短暂停留，再回到公益与接待区域。",
+      "features": [
+        "双工作位",
+        "资料收纳",
+        "紧凑后台空间"
+      ],
+      "chapter": "支持 · 日常运营",
+      "photos": [
+        {
+          "src": "/media/13/IMG_2896.webp",
+          "thumb": "/thumbs/13/IMG_2896.webp",
+          "name": "IMG_2896.jpg",
+          "caption": "后台办公室入口"
+        },
+        {
+          "src": "/media/13/IMG_2897.webp",
+          "thumb": "/thumbs/13/IMG_2897.webp",
+          "name": "IMG_2897.jpg",
+          "caption": "后台双工作位"
+        },
+        {
+          "src": "/media/13/IMG_2898.webp",
+          "thumb": "/thumbs/13/IMG_2898.webp",
+          "name": "IMG_2898.jpg",
+          "caption": "后台办公区反向视角"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    },
+    {
+      "id": 14,
+      "title": "Charity and Reception Section",
+      "titleZh": "公益陈列与接待回环",
+      "kind": "charity",
+      "description": "沿暖光公益陈列墙前行，观看展示、证书与项目照片，再返回熟悉的石材品牌墙和木质前台。这里与第 1 站的实景一致，完成一圈参观。",
+      "features": [
+        "公益展示墙",
+        "暖光陈列",
+        "返回原点"
+      ],
+      "chapter": "回环 · 从空间到价值",
+      "photos": [
+        {
+          "src": "/media/14/IMG_2899.webp",
+          "thumb": "/thumbs/14/IMG_2899.webp",
+          "name": "IMG_2899.jpg",
+          "caption": "沿茶室外侧进入公益陈列走廊"
+        },
+        {
+          "src": "/media/14/IMG_2900.webp",
+          "thumb": "/thumbs/14/IMG_2900.webp",
+          "name": "IMG_2900.jpg",
+          "caption": "公益项目照片陈列"
+        },
+        {
+          "src": "/media/14/IMG_2901.webp",
+          "thumb": "/thumbs/14/IMG_2901.webp",
+          "name": "IMG_2901.jpg",
+          "caption": "项目展示与证书"
+        },
+        {
+          "src": "/media/14/IMG_2902.webp",
+          "thumb": "/thumbs/14/IMG_2902.webp",
+          "name": "IMG_2902.jpg",
+          "caption": "公益证书陈列"
+        },
+        {
+          "src": "/media/14/IMG_2903.webp",
+          "thumb": "/thumbs/14/IMG_2903.webp",
+          "name": "IMG_2903.jpg",
+          "caption": "陈列墙与前台连接处"
+        },
+        {
+          "src": "/media/14/IMG_2904.webp",
+          "thumb": "/thumbs/14/IMG_2904.webp",
+          "name": "IMG_2904.jpg",
+          "caption": "回到前台侧面"
+        },
+        {
+          "src": "/media/14/IMG_2905.webp",
+          "thumb": "/thumbs/14/IMG_2905.webp",
+          "name": "IMG_2905.jpg",
+          "caption": "前台与来路的连接"
+        },
+        {
+          "src": "/media/14/IMG_2906.webp",
+          "thumb": "/thumbs/14/IMG_2906.webp",
+          "name": "IMG_2906.jpg",
+          "caption": "返回品牌墙 · 一圈参观完成"
+        }
+      ],
+      "geometryConfidence": "approximate",
+      "sourceNote": "实景取自对应编号的原始文件夹；各角度不是 360° 全景。"
+    }
+  ],
+  "connections": [
+    {
+      "from": 1,
+      "to": 2,
+      "bidirectional": true,
+      "confidence": "visual-match",
+      "evidence": "IMG_2824 与 IMG_2825 的木门、花瓶和地面交界匹配。",
+      "references": [
+        "01/IMG_2824.jpg",
+        "02/IMG_2825.jpg"
+      ]
+    },
+    {
+      "from": 2,
+      "to": 3,
+      "bidirectional": true,
+      "confidence": "sequence-only",
+      "evidence": "按用户提供的顺时针文件夹编号连接；没有足够连续照片确认转角与距离。",
+      "references": []
+    },
+    {
+      "from": 3,
+      "to": 4,
+      "bidirectional": true,
+      "confidence": "visual-match",
+      "evidence": "IMG_2828 同时展示行政办公室与会议室的相邻入口。",
+      "references": [
+        "03/IMG_2828.jpg",
+        "04/IMG_2835.jpg"
+      ]
+    },
+    {
+      "from": 4,
+      "to": 5,
+      "bidirectional": true,
+      "confidence": "visual-match",
+      "evidence": "会议室玻璃后的共享工位，与走廊观察点的布局一致。",
+      "references": [
+        "04/IMG_2838.jpg",
+        "05/IMG_2843.jpg"
+      ]
+    },
+    {
+      "from": 5,
+      "to": 6,
+      "bidirectional": true,
+      "confidence": "sequence-only",
+      "evidence": "按用户提供的顺时针文件夹编号连接；没有足够连续照片确认转角与距离。",
+      "references": []
+    },
+    {
+      "from": 6,
+      "to": 7,
+      "bidirectional": true,
+      "confidence": "sequence-only",
+      "evidence": "按用户提供的顺时针文件夹编号连接；没有足够连续照片确认转角与距离。",
+      "references": []
+    },
+    {
+      "from": 7,
+      "to": 8,
+      "bidirectional": true,
+      "confidence": "visual-match",
+      "evidence": "品酒会客室的门口视线中，直接可见共享办公区的白色工位和弧形玻璃。",
+      "references": [
+        "07/IMG_2863.jpg",
+        "08/IMG_2866.jpg"
+      ]
+    },
+    {
+      "from": 8,
+      "to": 9,
+      "bidirectional": true,
+      "confidence": "visual-match",
+      "evidence": "经理办公室回望可见明珠共享办公区的白色工位及弧形玻璃。",
+      "references": [
+        "08/IMG_2873.jpg",
+        "09/IMG_2878.jpg"
+      ]
+    },
+    {
+      "from": 9,
+      "to": 10,
+      "bidirectional": true,
+      "confidence": "sequence-only",
+      "evidence": "按用户提供的顺时针文件夹编号连接；没有足够连续照片确认转角与距离。",
+      "references": []
+    },
+    {
+      "from": 10,
+      "to": 11,
+      "bidirectional": true,
+      "confidence": "visual-match",
+      "evidence": "经理办公室 3 入口左侧玻璃后可见办公室 2 的蓝色手写白板，两间办公室沿同一段走廊相邻。",
+      "references": [
+        "10/IMG_2884.jpg",
+        "11/IMG_2885.jpg"
+      ]
+    },
+    {
+      "from": 11,
+      "to": 12,
+      "bidirectional": true,
+      "confidence": "visual-match",
+      "evidence": "办公室 3 回望可见茶桌；从茶室回看可辨认办公室 3 的双来访椅和两幅装饰画，形成相互视线。",
+      "references": [
+        "11/IMG_2888.jpg",
+        "12/IMG_2894.jpg"
+      ]
+    },
+    {
+      "from": 12,
+      "to": 13,
+      "bidirectional": true,
+      "confidence": "sequence-only",
+      "evidence": "按用户提供的顺时针文件夹编号连接；没有足够连续照片确认转角与距离。",
+      "references": []
+    },
+    {
+      "from": 13,
+      "to": 14,
+      "bidirectional": true,
+      "confidence": "sequence-only",
+      "evidence": "按用户提供的顺时针文件夹编号连接；没有足够连续照片确认转角与距离。",
+      "references": []
+    },
+    {
+      "from": 14,
+      "to": 1,
+      "bidirectional": true,
+      "confidence": "visual-match",
+      "evidence": "最后一段回到同一石材品牌墙、木质前台和两侧瓷瓶。",
+      "references": [
+        "14/IMG_2906.jpg",
+        "01/IMG_2820.jpg"
+      ]
+    }
+  ]
+}
